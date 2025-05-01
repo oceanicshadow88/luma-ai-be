@@ -11,6 +11,8 @@ A RESTful API(Frontend - backend) backend built with Express.js and TypeScript f
 - Error handling middleware
 - Layered architecture (MVC+)
 - Input validation
+- ESLint for code quality
+- Prettier for consistent code formatting
 
 ## Project Structure
 
@@ -68,6 +70,46 @@ To start the development server with hot-reloading:
 
 ```bash
 npm run dev
+```
+
+### Code Quality and Formatting
+
+This project uses ESLint and Prettier to ensure code quality and consistent formatting.
+
+#### Available Commands
+
+- Check for linting issues:
+  ```bash
+  npm run lint:check
+  ```
+
+- Fix linting issues automatically:
+  ```bash
+  npm run lint
+  ```
+
+- Check code formatting:
+  ```bash
+  npm run format:check
+  ```
+
+- Format code automatically:
+  ```bash
+  npm run format
+  ```
+
+#### VS Code Integration
+
+For the best development experience in VS Code, install the ESLint and Prettier extensions and add this to your workspace settings:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": ["typescript"]
+}
 ```
 
 ### Production

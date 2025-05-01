@@ -21,12 +21,17 @@ export const userController = {
   getUserById: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.params.id;
+
+      if (!userId) {
+        return next(new AppError('User ID is required', 400));
+      }
+
       const user = await userService.getUserById(userId);
-      
+
       if (!user) {
         return next(new AppError('User not found', 404));
       }
-      
+
       res.status(200).json({
         success: true,
         data: user,
@@ -41,7 +46,7 @@ export const userController = {
     try {
       const userData = req.body;
       const user = await userService.createUser(userData);
-      
+
       res.status(201).json({
         success: true,
         data: user,
@@ -55,13 +60,18 @@ export const userController = {
   updateUser: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.params.id;
+
+      if (!userId) {
+        return next(new AppError('User ID is required', 400));
+      }
+
       const userData = req.body;
       const user = await userService.updateUser(userId, userData);
-      
+
       if (!user) {
         return next(new AppError('User not found', 404));
       }
-      
+
       res.status(200).json({
         success: true,
         data: user,
@@ -75,12 +85,17 @@ export const userController = {
   deleteUser: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.params.id;
+
+      if (!userId) {
+        return next(new AppError('User ID is required', 400));
+      }
+
       const user = await userService.deleteUser(userId);
-      
+
       if (!user) {
         return next(new AppError('User not found', 404));
       }
-      
+
       res.status(200).json({
         success: true,
         data: {},
