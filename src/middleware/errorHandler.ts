@@ -5,7 +5,7 @@ export const errorHandler = (
   err: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction,
 ) => {
   const statusCode = 'statusCode' in err ? err.statusCode : 500;
   const message = err.message || 'Internal Server Error';
@@ -13,6 +13,6 @@ export const errorHandler = (
   res.status(statusCode).json({
     success: false,
     error: message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 };

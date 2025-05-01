@@ -11,7 +11,7 @@ export const connectDB = async () => {
     const options = {
       serverSelectionTimeoutMS: 5000, // 5 seconds timeout
     };
-    
+
     await mongoose.connect(MONGODB_URI, options);
     console.log('MongoDB connected successfully');
   } catch (error) {

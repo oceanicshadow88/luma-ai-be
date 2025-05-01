@@ -1,6 +1,7 @@
 /**
  * Utility functions for the application
  */
+import { Request, Response, NextFunction } from 'express';
 
 /**
  * Format response object
@@ -8,11 +9,7 @@
  * @param data - The data to be returned
  * @param message - Optional message
  */
-export const formatResponse = (
-  success: boolean,
-  data: any,
-  message?: string
-) => {
+export const formatResponse = <T>(success: boolean, data: T, message?: string) => {
   return {
     success,
     data,
@@ -25,10 +22,8 @@ export const formatResponse = (
  * Async handler to avoid try/catch blocks
  * @param fn - The async function to handle
  */
-export const asyncHandler = (fn: Function) => (
-  req: any,
-  res: any,
-  next: any
-) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
+export const asyncHandler =
+  (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
