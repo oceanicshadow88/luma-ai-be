@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler';
-import apiRoutes from './routes';
+import apiRoutes from './handlers';
 
 // Load environment variables
 dotenv.config();

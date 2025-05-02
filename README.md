@@ -55,7 +55,7 @@ cd luma-ai-be
 npm install
 ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. copy your a `.env.example` file in the root directory with the following variables:
 
 ```
 PORT=5000
@@ -66,7 +66,7 @@ JWT_SECRET=your_jwt_secret
 
 ### Development
 
-To start test for format, eslint and start dev:
+To start test for format, eslint and test:
 
 ```bash
 npm run check
@@ -196,19 +196,6 @@ The following commands are available for testing:
 - Clean up test data after test runs
 - Mock external dependencies in unit tests
 
-## API Endpoints
-
-### Users
-
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get a single user by ID
-- `POST /api/users` - Create a new user
-- `PUT /api/users/:id` - Update an existing user
-- `DELETE /api/users/:id` - Delete a user
-
-### Health Check
-
-- `GET /api/health` - Check API health status
 
 ## License
 
