@@ -16,7 +16,7 @@
     "test:unit": "jest --testPathPattern=unit",
     "test:integration": "jest --testPathPattern=integration",
     "test:coverage": "jest --coverage",
-    "check": "npm run format:check && npm run lint:check && npm test && echo 'All checks passed! Starting development server...' && npm run dev"
+    "check": "npm run format:check && npm run lint:check && npm test && echo 'All checks passed!"
   },
   "keywords": [
     "express",

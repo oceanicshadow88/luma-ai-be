@@ -11,7 +11,7 @@ jest.setTimeout(30000);
 beforeAll(async () => {
   // Use a test configuration that doesn't touch your real database
   const MONGODB_TEST_URI = process.env.MONGODB_TEST_URI || 'mongodb://localhost:27017/luma-ai-test';
-  
+
   try {
     await mongoose.connect(MONGODB_TEST_URI);
     console.log('Connected to the test database');
