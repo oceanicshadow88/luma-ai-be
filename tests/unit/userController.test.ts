@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { userController } from '../../src/app/controllers/userController';
-import { userService } from '../../src/app/services/userService';
-import { AppError } from '../../src/app/error/AppError';
+import { userService } from '../../src/services/userService';
+import { AppError } from '../../src/error/AppError';
 
 // Mock dependencies
 jest.mock('../../src/services/userService');
