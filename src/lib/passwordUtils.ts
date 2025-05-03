@@ -9,13 +9,13 @@ export const passwordUtils = {
    */
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
-    return bcryptjs.hash(password, saltRounds); // 使用 bcryptjs 的 hash 方法
+    return bcryptjs.hash(password, saltRounds);
   },
 
   /**
    * Verify a password against a hash
    */
   async verifyPassword(inputPassword: string, hashedPassword: string): Promise<boolean> {
-    return bcryptjs.compare(inputPassword, hashedPassword); // 使用 bcryptjs 的 compare 方法
+    return bcryptjs.compare(inputPassword, hashedPassword);
   },
 };

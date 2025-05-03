@@ -43,7 +43,6 @@ src/
 ### Installation
 
 1. Clone the repository:
-
 ```bash
 git clone https://github.com/oceanicshadow88/luma-ai-be.git
 cd luma-ai-be
