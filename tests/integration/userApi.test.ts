@@ -1,7 +1,7 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import User from '@src/models/User';
-import app from '@src/app';
+import app from 'loaders/app';
 
 describe('User API Endpoints', () => {
   let userId: string;

@@ -37,13 +37,12 @@ src/
 ### Prerequisites
 
 - Node.js (v20 or higher)
-- npm or yarn
+- yarn
 - MongoDB
 
 ### Installation
 
 1. Clone the repository:
-
 ```bash
 git clone https://github.com/oceanicshadow88/luma-ai-be.git
 cd luma-ai-be
@@ -52,7 +51,9 @@ cd luma-ai-be
 2. Install dependencies:
 
 ```bash
-npm install
+rm -rf node_modules package-lock.json
+npm install --global yarn
+yarn install
 ```
 
 3. copy your a `.env.example` file in the root directory with the following variables:
@@ -69,13 +70,13 @@ JWT_SECRET=your_jwt_secret
 To start test for format, eslint and test:
 
 ```bash
-npm run check
+yarn check
 ```
 
 To start the development server with hot-reloading:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 ### Code Quality and Formatting
@@ -87,25 +88,25 @@ This project uses ESLint and Prettier to ensure code quality and consistent form
 - Check for linting issues:
 
   ```bash
-  npm run lint:check
+  yarn lint:check
   ```
 
 - Fix linting issues automatically:
 
   ```bash
-  npm run lint
+  yarn lint
   ```
 
 - Check code formatting:
 
   ```bash
-  npm run format:check
+  yarn format:check
   ```
 
 - Format code automatically:
 
   ```bash
-  npm run format
+  yarn format
   ```
 
 #### VS Code Integration
@@ -127,8 +128,8 @@ For the best development experience in VS Code, install the ESLint and Prettier 
 To build and start for production:
 
 ```bash
-npm run build
-npm start
+yarn build
+yarn start
 ```
 
 ## Testing
@@ -157,27 +158,27 @@ The following commands are available for testing:
 
 - Run all tests:
   ```bash
-  npm test
+  yarn test
   ```
 
 - Run tests in watch mode (useful during development):
   ```bash
-  npm run test:watch
+  yarn test:watch
   ```
 
 - Run only unit tests:
   ```bash
-  npm run test:unit
+  yarn test:unit
   ```
 
 - Run only integration tests:
   ```bash
-  npm run test:integration
+  yarn test:integration
   ```
 
 - Generate test coverage report:
   ```bash
-  npm run test:coverage
+  yarn test:coverage
   ```
 
 ### Testing Approaches
