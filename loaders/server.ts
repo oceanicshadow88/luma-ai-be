@@ -1,28 +1,25 @@
-import dotenv from 'dotenv';
+import config from '../src/config';
 import { connectDB } from '../src/database/connection';
 import app from './app';
+import logger from '../src/utils/logger';
 
-// Load environment variables
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-console.log(process.env.PORT);
-
-const port = process.env.PORT || 8000;
+const port = config.port || 8000;
 
 // Start server
 const startServer = async () => {
-    try {
-        // Connect to MongoDB
-        console.log('Attempting to connect to MongoDB...');
-        await connectDB();
-        console.log('Database connection established');
+  try {
+    // Connect to MongoDB
+    logger.info('Attempting to connect to MongoDB...');
+    await connectDB();
+    logger.info('Database connection established');
 
-        app.listen(port, () => {
-            console.log(`Server running on port localhost:${port}`);
-        });
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
-    }
+    app.listen(port, () => {
+      logger.info(`Server running on port localhost:${port}`);
+    });
+  } catch (error) {
+    logger.error('Failed to start server:', { payload: error });
+    process.exit(1);
+  }
 };
 
 startServer();

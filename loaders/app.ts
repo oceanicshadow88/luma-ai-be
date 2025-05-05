@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimiter from '../src/middleware/rateLimit';
 import { errorHandler } from '../src/middleware/errorHandler';
-import v1Router from '../src/handlers/v1'
+import v1Router from '../src/handlers/v1';
 
 // Create Express app
 const app: Express = express();
