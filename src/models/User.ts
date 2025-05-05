@@ -4,9 +4,9 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: string;
+  avatarUrl: string;
+  locale: string;
   createdAt: Date;
-  updatedAt: Date;
 }
 
 const UserSchema: Schema = new Schema(
@@ -31,11 +31,6 @@ const UserSchema: Schema = new Schema(
       required: [true, 'Please provide a password'],
       minlength: [6, 'Password must be at least 6 characters'],
       select: false,
-    },
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user',
     },
   },
   { timestamps: true },

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import logger from '../utils/logger';
 
 dotenv.config();
 
@@ -13,10 +14,10 @@ export const connectDB = async () => {
     };
 
     await mongoose.connect(MONGODB_URI, options);
-    console.log('MongoDB connected successfully');
+    logger.info('MongoDB connected successfully');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
-    console.log('Starting server without database connection...');
+    logger.error('MongoDB connection error:', error);
+    logger.info('Starting server without database connection...');
     // Continue without exiting, allowing API to run even if DB is unavailable
     // process.exit(1); - commented out to prevent termination
   }

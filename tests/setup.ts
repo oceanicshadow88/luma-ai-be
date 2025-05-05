@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import logger from '../src/utils/logger';
 
 // Load environment variables
 dotenv.config({ path: '.env.test' });
@@ -14,9 +15,9 @@ beforeAll(async () => {
 
   try {
     await mongoose.connect(MONGODB_TEST_URI);
-    console.log('Connected to the test database');
+    logger.info('Connected to the test database');
   } catch (error) {
-    console.error('Error connecting to the test database:', error);
+    logger.error('Error connecting to the test database:', error);
   }
 });
 
@@ -26,6 +27,6 @@ afterAll(async () => {
   if (mongoose.connection.readyState) {
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
-    console.log('Test database connection closed');
+    logger.info('Test database connection closed');
   }
 });
