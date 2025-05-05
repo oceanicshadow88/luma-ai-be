@@ -1,14 +1,16 @@
 import { Router, Request, Response } from 'express';
-import userRoutes from './userRoutes';
+import userRoutes from './userRoute';
+import authRouter from './authRoute';
 
-const router = Router();
+const v1Router = Router();
 
 // Mount routes
-router.use('/users', userRoutes);
+v1Router.use('/auth', authRouter);
+v1Router.use('/users', userRoutes);
 
 // Health check route
-router.get('/health', (req: Request, res: Response) => {
+v1Router.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
-export default router;
+export default v1Router;

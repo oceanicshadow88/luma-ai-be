@@ -14,7 +14,7 @@ const startServer = async () => {
     logger.info('Database connection established');
 
     app.listen(port, () => {
-      logger.info(`Server running on port localhost:${port}`);
+      logger.info(`Server running on port:${port}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', { payload: error });
