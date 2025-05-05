@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../error/AppError';
+import { AppError } from '../error/appError';
 
 /**
  * Validates user input for creating or updating a user
