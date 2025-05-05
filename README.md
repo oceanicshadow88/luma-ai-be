@@ -17,6 +17,7 @@ A RESTful API(Frontend - backend) backend built with Express.js and TypeScript f
 ## Project Structure
 
 ```
+loaders/                # Loading and configuring
 src/
 ├── config/             # Configuration files
 ├── controllers/        # Route controllers
@@ -30,6 +31,7 @@ src/
 ├── utils/              # Utility functions
 ├── validations/        # Input validation
 └── server.ts           # Application entry point
+tests/                  # Test scripts
 ```
 
 ## Getting Started

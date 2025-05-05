@@ -3,7 +3,8 @@ import { connectDB } from '../src/database/connection';
 import app from './app';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+console.log(process.env.PORT);
 
 const port = process.env.PORT || 8000;
 
@@ -16,7 +17,7 @@ const startServer = async () => {
         console.log('Database connection established');
 
         app.listen(port, () => {
-            console.log(`Server running on port ${port}`);
+            console.log(`Server running on port localhost:${port}`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);
