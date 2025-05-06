@@ -1,4 +1,4 @@
-import Company from '../models/Company';
+import Company from '../models/company';
 import { Types } from 'mongoose';
 
 interface CompanyInput {
