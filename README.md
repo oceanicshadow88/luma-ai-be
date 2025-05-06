@@ -61,10 +61,15 @@ yarn install
 3. copy your a `.env.example` file in the root directory with the following variables:
 
 ```
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/luma-ai
-NODE_ENV=development
-JWT_SECRET=your_jwt_secret
+PORT = 5000
+LOG_LEVEL = info
+NODE_ENV = development
+
+RATE_LIMIT_WINDOW_MS = 60000
+RATE_LIMIT = 100
+
+MONGODB_URI = mongodb://localhost:27017/luma-ai
+JWT_SECRET = your_jwt_secret
 ```
 
 ### Development

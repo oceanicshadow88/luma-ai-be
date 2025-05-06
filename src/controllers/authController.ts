@@ -1,7 +1,6 @@
 // authentication, authorization
 import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/user';
-//import { error } from 'console';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -11,14 +10,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       email,
       avatarUrl,
       locale,
-    }: {
-      username: string;
-      password: string;
-      email: string;
-      avatarUrl?: string;
-      locale: string;
-    } = req.body;
-
+    }: { username: string; password: string; email: string; avatarUrl?: string; locale: string } =
+      req.body;
     const user = new UserModel({
       username,
       password,
@@ -26,7 +19,10 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       avatarUrl,
       locale,
     });
+
+    await user.hashPassword();
     await user.save();
+
     res.status(201).json(user);
   } catch (error) {
     return next(error);
@@ -36,13 +32,17 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password }: { email: string; password: string } = req.body;
+
     const existingUser = await UserModel.findOne({ email }).exec();
     if (!existingUser) {
-      res.status(401).json({ error: 'Email not exist' });
+      res.status(401).json({ error: 'No account found with this email address' });
       return;
     }
 
-    if (existingUser.password !== password) {
+    // Check password
+    const validatePassword: boolean = await existingUser.validatePassword(password);
+    if (validatePassword) {
+      // fail fast
       res.status(401).json({ error: 'Invalid credentials' });
       return;
     }

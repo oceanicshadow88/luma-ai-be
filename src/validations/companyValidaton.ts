@@ -1,0 +1,51 @@
+import { body, param } from 'express-validator';
+import { validateRequest } from '../middleware/validateRequest';
+
+export const companyValidators = {
+  createCompany: [
+    body('name')
+      .trim()
+      .notEmpty()
+      .withMessage('Company name is required')
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Company name must be between 2 and 100 characters'),
+    body('plan')
+      .trim()
+      .notEmpty()
+      .withMessage('Plan is required')
+      .isIn(['free', 'pro', 'enterprise'])
+      .withMessage('Invalid plan type'),
+    body('settings.timezone').optional().isString().withMessage('Timezone must be a string'),
+    body('settings.locale').optional().isString().withMessage('Locale must be a string'),
+    body('settings.logoUrl').optional().isURL().withMessage('Logo URL must be a valid URL'),
+    body('settings.primaryColor')
+      .optional()
+      .matches(/^#[0-9A-Fa-f]{6}$/)
+      .withMessage('Primary color must be a valid hex color'),
+    validateRequest,
+  ],
+
+  updateCompany: [
+    param('id').isMongoId().withMessage('Invalid company ID'),
+    body('name')
+      .optional()
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Company name must be between 2 and 100 characters'),
+    body('plan')
+      .optional()
+      .trim()
+      .isIn(['free', 'pro', 'enterprise'])
+      .withMessage('Invalid plan type'),
+    body('settings.timezone').optional().isString().withMessage('Timezone must be a string'),
+    body('settings.locale').optional().isString().withMessage('Locale must be a string'),
+    body('settings.logoUrl').optional().isURL().withMessage('Logo URL must be a valid URL'),
+    body('settings.primaryColor')
+      .optional()
+      .matches(/^#[0-9A-Fa-f]{6}$/)
+      .withMessage('Primary color must be a valid hex color'),
+    validateRequest,
+  ],
+
+  getCompany: [param('id').isMongoId().withMessage('Invalid company ID'), validateRequest],
+};
