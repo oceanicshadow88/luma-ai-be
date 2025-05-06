@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Express.js and TypeScript backend for LUMA AI",
   "main": "dist/server.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/loaders/server.js",

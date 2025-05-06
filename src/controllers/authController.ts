@@ -19,6 +19,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
             avatarUrl,
             locale,
         });
+
+        await user.hashPassword();
         await user.save();
 
         res.status(201).json(user);
@@ -33,12 +35,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
         const existingUser = await UserModel.findOne({ email }).exec();
         if (!existingUser) {
-            res.status(401).json({ error: 'Email not exist' });
+            res.status(401).json({ error: 'No account found with this email address' });
             return;
         }
 
         // Check password
-        if (existingUser.password !== password) {
+        const validatePassword: boolean = await existingUser.validatePassword(password);
+        if (!validatePassword) {
             // fail fast
             res.status(401).json({ error: 'Invalid credentials' });
             return;
