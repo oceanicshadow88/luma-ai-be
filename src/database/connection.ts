@@ -1,24 +1,31 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import config from '../config'
 import logger from '../utils/logger';
 
-dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/luma-ai';
+export const connectDB = () => {
+  // Set a connection timeout
+  const options = {
+    serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+  };
 
-export const connectDB = async () => {
-  try {
-    // Set a connection timeout
-    const options = {
-      serverSelectionTimeoutMS: 5000, // 5 seconds timeout
-    };
-
-    await mongoose.connect(MONGODB_URI, options);
+  const db = mongoose.connection;
+  db.on('connecting', () => {
+    logger.info('Attempting to connect to DB');
+  });
+  db.on('connected', () => {
     logger.info('MongoDB connected successfully');
-  } catch (error) {
-    logger.error('MongoDB connection error:', error);
-    logger.info('Starting server without database connection...');
-    // Continue without exiting, allowing API to run even if DB is unavailable
-    // process.exit(1); - commented out to prevent termination
-  }
+  });
+  db.on('error', (error) => {
+    logger.error('MongoDB connection error:', { payload: error });
+    process.exit(0);
+  });
+  db.on('disconnected', () => {
+    logger.info('MongoDB connection disconnected');
+  });
+  db.on('reconnected', () => {
+    logger.info('MongoDB connection reconnected');
+  });
+
+  return mongoose.connect(config.mongoURI, options);
 };

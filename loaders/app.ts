@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
+import morgan from '../src/middleware/morgan';
 import rateLimiter from '../src/middleware/rateLimit';
 import { errorHandler } from '../src/middleware/errorHandler';
 import v1Router from '../src/handlers/v1';
@@ -10,9 +10,9 @@ import v1Router from '../src/handlers/v1';
 const app: Express = express();
 
 // Middleware
-app.use(cors());
 app.use(helmet());
-app.use(morgan('dev'));
+app.use(cors());
+app.use(morgan);
 app.use(rateLimiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
