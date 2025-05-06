@@ -72,6 +72,7 @@ declare module 'express-serve-static-core' {
 }
 
 export const companyController = {
+  // Create company
   createCompany: async (req: Request, res: Response) => {
     try {
       const { name, plan, settings } = req.body;
@@ -85,7 +86,6 @@ export const companyController = {
         ownerId: req.user._id,
         settings,
       });
-
       res.status(201).json(company);
     } catch (error) {
       if (error instanceof Error) {
@@ -93,6 +93,79 @@ export const companyController = {
       } else {
         res.status(500).json({ message: 'Internal server error' });
       }
+    }
+  },
+
+  // Get all companies for current user
+  getCompanies: async (req: Request, res: Response) => {
+    try {
+      if (!req.user?._id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const companies = await companyService.getCompaniesByOwnerId(req.user._id);
+      res.json(companies);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  // Get company by ID
+  getCompanyById: async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        return res.status(400).json({ message: 'Company ID is required' });
+      }
+      const company = await companyService.getCompanyById(id);
+      if (!company) {
+        return res.status(404).json({ message: 'Company not found' });
+      }
+      res.json(company);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  // Update company
+  updateCompany: async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        return res.status(400).json({ message: 'Company ID is required' });
+      }
+      const { name, plan, settings } = req.body;
+      const company = await companyService.updateCompany(id, {
+        name,
+        plan,
+        settings,
+      });
+      if (!company) {
+        return res.status(404).json({ message: 'Company not found' });
+      }
+      res.json(company);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
+
+  // Delete company
+  deleteCompany: async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        return res.status(400).json({ message: 'Company ID is required' });
+      }
+      const result = await companyService.deleteCompany(id);
+      if (!result) {
+        return res.status(404).json({ message: 'Company not found' });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
     }
   },
 };

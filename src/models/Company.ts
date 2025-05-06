@@ -12,6 +12,7 @@ export interface ICompany extends Document {
     logoUrl: string;
     primaryColor: string;
   };
+  active: boolean;
 }
 
 const companySchema: Schema = new Schema({
@@ -26,6 +27,7 @@ const companySchema: Schema = new Schema({
     logoUrl: { type: String, default: '' },
     primaryColor: { type: String, default: '#000000' },
   },
+  active: { type: Boolean, default: true },
 });
 
 export default mongoose.model<ICompany>('Company', companySchema);

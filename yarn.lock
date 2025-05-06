@@ -818,6 +818,13 @@
     "@types/range-parser" "*"
     "@types/send" "*"
 
+"@types/express-validator@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/express-validator/-/express-validator-3.0.2.tgz#cda46181a58a8b09e1b225d922f0a1153a5c7f7f"
+  integrity sha512-dV+1u6absDDEIVe5jd5ID1XYvPPvOSvggMWh09VYM3TeBjAjBDtwJWyJg/5PnK7s8FRgbOtHgD6oX3N2MKWwDw==
+  dependencies:
+    express-validator "*"
+
 "@types/express@^5.0.1":
   version "5.0.1"
   resolved "https://registry.npmjs.org/@types/express/-/express-5.0.1.tgz"
@@ -1926,9 +1933,9 @@ express-requests-logger@^4.0.3:
     flat "^5.0.2"
     lodash "^4.17.21"
 
-express-validator@^7.2.1:
+express-validator@*, express-validator@^7.2.1:
   version "7.2.1"
-  resolved "https://registry.npmjs.org/express-validator/-/express-validator-7.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/express-validator/-/express-validator-7.2.1.tgz#8403deaf810f9bededa0a4fd7116803e46f122c2"
   integrity sha512-CjNE6aakfpuwGaHQZ3m8ltCG2Qvivd7RHtVMS/6nVxOM7xVGqr4bhflsm4+N5FP5zI7Zxp+Hae+9RE+o8e3ZOQ==
   dependencies:
     lodash "^4.17.21"
