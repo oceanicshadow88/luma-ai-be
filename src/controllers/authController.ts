@@ -1,6 +1,6 @@
 // authentication, authorization
 import { Request, Response, NextFunction } from 'express';
-import UserModel from '../models/uuser';
+import UserModel from '../models/user'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {

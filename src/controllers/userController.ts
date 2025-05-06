@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../error/aappError';
+import { AppError } from '../error/errorApp';
 import { userService } from '../services/userService';
 
 export const userController = {
