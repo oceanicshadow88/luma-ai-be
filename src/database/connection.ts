@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
-import config from '../config'
+import config from '../config';
 import logger from '../utils/logger';
-
 
 export const connectDB = () => {
   // Set a connection timeout
@@ -16,7 +15,7 @@ export const connectDB = () => {
   db.on('connected', () => {
     logger.info('MongoDB connected successfully');
   });
-  db.on('error', (error) => {
+  db.on('error', error => {
     logger.error('MongoDB connection error:', { payload: error });
     process.exit(0);
   });
