@@ -1,4 +1,4 @@
-import User, { IUser } from '../models/user';
+import User, { IUser } from '../models/User';
 
 export const userService = {
   // Get all users
