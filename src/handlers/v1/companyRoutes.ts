@@ -1,23 +1,42 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { companyController } from '../../controllers/companyController';
 import { auth } from '../../middleware/auth';
-import { companyValidators } from '../../validations/companyValidaton';
+import { validateCompany } from '../../validations/companyValidaton';
 
 const router = Router();
 
 // Create company
-router.post('/', auth, companyValidators.createCompany, companyController.createCompany);
+router.post('/', 
+  auth as RequestHandler,
+  validateCompany.createCompany as unknown as RequestHandler[],
+  companyController.createCompany as RequestHandler
+);
 
 // Get all companies for current user
-router.get('/', auth, companyController.getCompanies);
+router.get('/', 
+  auth as RequestHandler,
+  companyController.getCompanies as RequestHandler
+);
 
 // Get company by ID
-router.get('/:id', auth, companyValidators.getCompany, companyController.getCompanyById);
+router.get('/:id', 
+  auth as RequestHandler,
+  validateCompany.getCompany as unknown as RequestHandler[],
+  companyController.getCompanyById as RequestHandler
+);
 
 // Update company
-router.patch('/:id', auth, companyValidators.updateCompany, companyController.updateCompany);
+router.patch('/:id', 
+  auth as RequestHandler,
+  validateCompany.updateCompany as unknown as RequestHandler[],
+  companyController.updateCompany as RequestHandler
+);
 
 // Delete company
-router.delete('/:id', auth, companyValidators.getCompany, companyController.deleteCompany);
+router.delete('/:id', 
+  auth as RequestHandler,
+  validateCompany.getCompany as unknown as RequestHandler[],
+  companyController.deleteCompany as RequestHandler
+);
 
 export default router;

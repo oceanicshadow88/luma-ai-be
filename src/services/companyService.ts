@@ -49,11 +49,11 @@ export const companyService = {
   },
 
   getCompanyById: async (id: string) => {
-    return await Company.findById(id);
+    return await Company.findOne({ _id: id, active: true });
   },
 
   getCompaniesByOwnerId: async (ownerId: string) => {
-    return await Company.find({ ownerId });
+    return await Company.find({ ownerId, active: true });
   },
 
   updateCompany: async (id: string, data: CompanyUpdate) => {
