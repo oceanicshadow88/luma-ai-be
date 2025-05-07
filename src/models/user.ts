@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { validate } from '../../node_modules/@types/json-schema/index.d';
 
 export interface IUser extends Document {
   username: string;

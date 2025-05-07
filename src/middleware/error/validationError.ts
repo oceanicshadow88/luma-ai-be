@@ -5,14 +5,13 @@ export const validationError = (
   error: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   // Check error type
-  if(error.name === 'ValidationError'){
+  if (error.name === 'ValidationError') {
     // record
-    logger.info('Validation error', {
+    logger.warn('Mongoose Validation error', {
       payload: {
-        type: 'Validation',
         path: req.path,
         method: req.method,
         error,
@@ -23,9 +22,8 @@ export const validationError = (
       success: false,
       error: error.message,
     });
-  };
-  
+  }
+
   // next function pass error to handler
   next(error);
- 
 };

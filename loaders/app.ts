@@ -21,6 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/v1', v1Router);
 
 // Error Handling
-errorMiddleware.forEach((handler) => app.use(handler));
+errorMiddleware.forEach(handler => app.use(handler));
 
 export default app;
