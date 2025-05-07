@@ -1,12 +1,11 @@
 import { Router, Request, Response } from 'express';
-import userRoutes from './userRoute';
 import authRouter from './authRoute';
 
 const v1Router = Router();
 
 // Mount routes
 v1Router.use('/auth', authRouter);
-v1Router.use('/users', userRoutes);
+// v1Router.use('/users', userRoutes);
 
 // Health check route
 v1Router.get('/health', (req: Request, res: Response) => {

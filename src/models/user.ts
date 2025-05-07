@@ -18,10 +18,21 @@ const userSchema: Schema<IUser> = new Schema(
     username: {
       type: String,
       required: true,
+      minlength: 2,
+      maxlength: 20,
+      validate: {
+        validator: username => {
+          // validation logic
+          return /^[a-zA-Z0-9._-]+$/.test(username);
+        },
+        message: props => `${props.value} is not a valid username`,
+      },
     },
     password: {
       type: String,
       required: true,
+      minlength: 6,
+      maxlength: 200,
     },
     email: {
       type: String,
@@ -53,8 +64,8 @@ userSchema.methods.hashPassword = async function (this: IUser): Promise<void> {
 userSchema.methods.validatePassword = async function (
   this: IUser,
   password: string,
-): Promise<void> {
-  bcrypt.compare(password, this.password);
+): Promise<boolean> {
+  return bcrypt.compare(password, this.password);
 };
 
 // Prevent duplicate model registration in development (hot reload)
