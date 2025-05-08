@@ -58,6 +58,9 @@ const registerSchema = baseAuthSchema.keys({
   active: Joi.boolean().default(true).messages({
     'boolean.base': 'Active must be a boolean value',
   }),
+  refreshToken: Joi.string().required().messages({
+    'string.empty': 'RefreshToken is required',
+  }),
 });
 
 const authValidationSchema = {

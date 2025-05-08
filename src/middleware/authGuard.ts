@@ -1,30 +1,61 @@
 import { Request, Response, NextFunction } from 'express';
-import { validateToken } from '../utils/jwt';
+import { jwtUtils } from '../lib/jwtUtils';
 
-const authGuard = (req: Request, res: Response, next: NextFunction) => {
-  const authorization = req.header('Authorization');
-  if (!authorization) {
-    res.status(401).json({ success: false, error: 'Missing Authorization Token' });
-    return;
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    [key: string]: any;
+  };
+}
+
+/**
+ * Middleware to verify JWT token and authorize access to protected routes
+ * Returns a middleware function compatible with Express
+ */
+export const authGuard = (req: Request, res: Response, next: NextFunction): void => {
+  try {
+
+    // Get auth header
+    const authHeader = req.header('Authorization');
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ error: 'Access denied. No token provided.' });
+      return;
+    }
+
+    // Extract token from header
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+      res.status(401).json({ error: 'Access denied. No token provided.' });
+      return;
+    }
+
+    try {
+      // Verify token
+      const decoded = jwtUtils.verifyAccessToken(token);
+
+      // Attach user info to request
+      (req as AuthRequest).user = decoded;
+
+      next();
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'TokenExpiredError') {
+          res.status(401).json({ error: 'Token expired' });
+          return;
+        }
+
+        if (error.name === 'JsonWebTokenError') {
+          res.status(401).json({ error: 'Invalid token' });
+          return;
+        }
+      }
+
+      res.status(401).json({ error: 'Invalid token' });
+      return;
+    }
+  } catch (error) {
+    next(error);
   }
-
-  // Bearer: xxxxx
-  const [type, token] = authorization.split(' ');
-  // not bearer or no token pass
-  if (type !== 'Bearer' || !token) {
-    res.status(401).json({ success: false, error: 'Invalid Token' });
-    return;
-  }
-
-  // token invalid
-  const payload = validateToken(token);
-  if (!payload) {
-    res.status(401).json({ success: false, error: 'Invalid Token' });
-    return;
-  }
-
-  // all successful
-  next();
 };
-
-export default authGuard;

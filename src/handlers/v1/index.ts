@@ -1,8 +1,8 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
-import userRoutes from './userRoute';
+// import userRoutes from './userRoute';
 import authRouter from './authRoute';
-import { authMiddleware, AuthRequest } from '../../middleware/auth';
+import { authGuard, AuthRequest } from '../../middleware/authGuard';
 
 const v1Router = Router();
 
@@ -19,15 +19,15 @@ v1Router.get('/health', (req: Request, res: Response) => {
 const protectedTestHandler = (req: Request, res: Response): void => {
   // Cast the request to AuthRequest to access the user property
   const authReq = req as AuthRequest;
-  
-  res.status(200).json({ 
-    status: 'success', 
+
+  res.status(200).json({
+    status: 'success',
     message: 'You have accessed a protected route',
     user: authReq.user
   });
 };
 
 // Protected test route to verify JWT authentication
-v1Router.get('/protected-test', authMiddleware, protectedTestHandler);
+v1Router.get('/protected-test', authGuard, protectedTestHandler);
 
 export default v1Router;
