@@ -7,6 +7,7 @@ export interface IUser extends Document {
   email: string;
   avatarUrl: string;
   locale: string;
+  refreshToken?: string;
   createdAt: Date;
   active: boolean;
   hashPassword(): Promise<void>;
@@ -65,10 +66,8 @@ const userSchema: Schema<IUser> = new Schema(
       enum: ['en', 'zh'],
       default: 'en',
     },
-    active: {
-      type: Boolean,
-      required: true,
-      default: true,
+    refreshToken: {
+      type: String,
     },
   },
   { timestamps: true },
