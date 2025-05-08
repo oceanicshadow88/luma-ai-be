@@ -38,17 +38,21 @@
     "express-requests-logger": "^4.0.3",
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.1",
     "morgan": "^1.10.0",
     "supertest": "^7.1.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/express-rate-limit": "^6.0.2",
     "@types/jest": "^29.5.14",
+    "@types/joi": "^17.2.3",
+
     "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.15.3",

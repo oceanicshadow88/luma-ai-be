@@ -3,12 +3,9 @@ import dotenv from 'dotenv';
 const env: string = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}` });
 
-interface JwtConfig {
-  secret: string;
-  expiresIn: string;
-  refreshSecret: string;
-  refreshExpiresIn: string;
-}
+
+export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
+export type SafePayload = Record<string, unknown>;
 
 interface Config {
   env: string;

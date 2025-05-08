@@ -19,22 +19,51 @@ const userSchema: Schema<IUser> = new Schema(
     username: {
       type: String,
       required: true,
+      minlength: 2,
+      maxlength: 20,
+      trim: true,
+      validate: {
+        validator: (username: string) => {
+          // validation logic
+          return /^[a-zA-Z0-9._-]+$/.test(username);
+        },
+        message: props => `${props.value} is not a valid username`,
+      },
     },
     password: {
       type: String,
       required: true,
+      minlength: 6,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      index: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: (email: string) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        message: props => `${props.value} is not a valid email address`,
+      },
     },
     avatarUrl: {
       type: String,
+      required: false,
+      default: '',
+      validate: {
+        validator: function (avatarUrl: string) {
+          return (
+            avatarUrl === '' || /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i.test(avatarUrl)
+          );
+        },
+        message: props => `${props.value} is not a valid image URL`,
+      },
     },
     locale: {
       type: String,
-      required: true,
+      required: false,
+      enum: ['en', 'zh'],
       default: 'en',
     },
     refreshToken: {
@@ -52,8 +81,8 @@ userSchema.methods.hashPassword = async function (this: IUser): Promise<void> {
 userSchema.methods.validatePassword = async function (
   this: IUser,
   password: string,
-): Promise<void> {
-  bcrypt.compare(password, this.password);
+): Promise<boolean> {
+  return bcrypt.compare(password, this.password);
 };
 
 // Prevent duplicate model registration in development (hot reload)

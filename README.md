@@ -22,6 +22,7 @@ src/
 ├── config/             # Configuration files
 ├── controllers/        # Route controllers
 ├── database/           # Database connection and setup
+├── exceptions/         # Error Exception class
 ├── error/              # Error handling classes
 ├── lib/                # Reusable libraries and utilities
 ├── middleware/         # Express middleware
