@@ -1,29 +1,50 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger';
+import ValidationException from '../../exceptions/validationException';
 
-export const validationError = (
+const validationError = (
   error: Error,
   req: Request,
   res: Response,
   next: NextFunction,
 ): void => {
-  // Check error type
-  if (error.name === 'ValidationError') {
-    // record
-    logger.warn('Mongoose Validation error', {
+  // Handle ValidationException errors
+  if (error instanceof ValidationException) {
+    logger.warn('Joi Validation error', {
       payload: {
         path: req.path,
         method: req.method,
         error,
       },
     });
-    // response
+    // Return error response for Joi validation exception
+    res.status(error.statusCode).json({
+      success: false,
+      error: error.message,
+    });
+    return;
+  }
+
+  // Handle Mongoose validation errors
+  if (error.name === 'ValidationError') {
+    logger.error('Mongoose Validation error', {
+      payload: {
+        path: req.path,
+        method: req.method,
+        error,
+      },
+    });
+    // Return error response for Mongoose validation error
     res.status(400).json({
       success: false,
       error: error.message,
     });
+    return;
   }
 
-  // next function pass error to handler
+  // If the error is not a ValidationException or Mongoose ValidationError,
+  // just pass the error to the next error handler
   next(error);
 };
+
+export default validationError;

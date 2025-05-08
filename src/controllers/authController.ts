@@ -4,9 +4,12 @@ import UserModel from '../models/user';
 import { generateToken } from '../utils/jwt';
 import ConflictsException from '../exceptions/conflictsException';
 import UnauthorizedException from '../exceptions/unauthorizedException';
+import Joi from 'joi';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Validate Data - Joi validate schema: deal in route with authvalidation middleware
+    // Get params from request body
     const {
       username,
       password,
@@ -18,16 +21,15 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       password: string;
       email: string;
       avatarUrl?: string;
-      locale: string;
-    } = req.body;
-
-    // conflicts
+      locale?: string;
+    } = req.body
+    // Check conflicts
     if (await UserModel.findOne({ email: email })) {
       next(new ConflictsException(`Email address: <${email}> already exists`));
       return;
     }
 
-    // create user
+    // Create new user
     const user = new UserModel({
       username,
       password,

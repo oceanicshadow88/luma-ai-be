@@ -21,8 +21,9 @@ const userSchema: Schema<IUser> = new Schema(
       required: true,
       minlength: 2,
       maxlength: 20,
+      trim: true,
       validate: {
-        validator: username => {
+        validator: (username: string) => {
           // validation logic
           return /^[a-zA-Z0-9._-]+$/.test(username);
         },
@@ -33,19 +34,40 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       required: true,
       minlength: 6,
-      maxlength: 200,
+      maxlength: 20,
+      validate: {
+        validator: (password: string) =>
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{6,}$/.test(password),
+        message: () => 'Password must be at least 6 characters and include uppercase, lowercase, number, and special character',
+      },
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      index: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: (email: string) =>
+          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        message: props => `${props.value} is not a valid email address`,
+      },
     },
     avatarUrl: {
       type: String,
+      required: false,
+      default: '',
+      validate: {
+        validator: (avatarUrl: string) =>
+          /^(https?:\/\/[^\s/$.?#].[^\s]*\.(?:png|jpg|jpeg|gif|svg))$/i.test(avatarUrl),
+        message: props => `${props.value} is not a valid image URL`,
+      },
     },
     locale: {
       type: String,
-      required: true,
+      required: false,
+      enum: ['en', 'zh'],
       default: 'en',
     },
     active: {
