@@ -2,12 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger';
 import ValidationException from '../../exceptions/validationException';
 
-const validationError = (
-  error: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
+const validationError = (error: Error, req: Request, res: Response, next: NextFunction): void => {
   // Handle ValidationException errors
   if (error instanceof ValidationException) {
     logger.warn('Joi Validation error', {

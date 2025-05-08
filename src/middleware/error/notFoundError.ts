@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger';
-import ConflictsException from '../../exceptions/conflictsException';
+import NotFoundException from '../../exceptions/notFoundException';
 
-const conflictsError = (error: Error, req: Request, res: Response, next: NextFunction): void => {
+const notFoundError = (error: Error, req: Request, res: Response, next: NextFunction): void => {
   // Handle ValidationException errors
-  if (error instanceof ConflictsException) {
-    logger.warn('Resource conflict', {
+  if (error instanceof NotFoundException) {
+    logger.warn('Resource not found', {
       payload: {
         method: req.method,
         path: req.path,
@@ -21,8 +21,7 @@ const conflictsError = (error: Error, req: Request, res: Response, next: NextFun
     return;
   }
 
-  // just pass the error to the next error handler
   next(error);
 };
 
-export default conflictsError;
+export default notFoundError;

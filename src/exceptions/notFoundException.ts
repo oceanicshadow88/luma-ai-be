@@ -1,10 +1,10 @@
 import { SafePayload } from '../config';
 import AppException from './appException';
 
-class UnauthorizedException extends AppException {
+class NotFoundException extends AppException {
   constructor(message: string, payload?: SafePayload) {
-    super(401, message, payload);
+    super(404, message, payload);
   }
 }
 
-export default UnauthorizedException;
+export default NotFoundException;

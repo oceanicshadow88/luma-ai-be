@@ -2,9 +2,8 @@
 import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/user';
 import { generateToken } from '../utils/jwt';
-import ConflictsException from '../exceptions/conflictsException';
 import UnauthorizedException from '../exceptions/unauthorizedException';
-import Joi from 'joi';
+import ConflictsException from '../exceptions/conflictsException';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,10 +21,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       email: string;
       avatarUrl?: string;
       locale?: string;
-    } = req.body
+    } = req.body;
+
     // Check conflicts
-    if (await UserModel.findOne({ email: email })) {
-      next(new ConflictsException(`Email address: <${email}> already exists`));
+    const existUser = await UserModel.findOne({ email: email });
+    if (existUser) {
+      next(new ConflictsException(`${email} already exists`));
       return;
     }
 
@@ -57,14 +58,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const user = await UserModel.findOne({ email: email });
     // no user
     if (!user) {
-      next(new UnauthorizedException("User not found"));
+      next(new UnauthorizedException('User not found'));
       return;
     }
 
     // password wrong
     const validPassword = await user.validatePassword(password);
     if (!validPassword) {
-      next(new UnauthorizedException('Invalid credentials'))
+      next(new UnauthorizedException('Invalid credentials'));
       return;
     }
 

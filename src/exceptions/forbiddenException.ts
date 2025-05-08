@@ -1,10 +1,10 @@
 import { SafePayload } from '../config';
 import AppException from './appException';
 
-class UnauthorizedException extends AppException {
+class ForbiddenException extends AppException {
   constructor(message: string, payload?: SafePayload) {
-    super(401, message, payload);
+    super(403, message, payload);
   }
 }
 
-export default UnauthorizedException;
+export default ForbiddenException;

@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { validate } from '../../node_modules/@types/json-schema/index.d';
 
 export interface IUser extends Document {
   username: string;
@@ -34,12 +33,6 @@ const userSchema: Schema<IUser> = new Schema(
       type: String,
       required: true,
       minlength: 6,
-      maxlength: 20,
-      validate: {
-        validator: (password: string) =>
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{6,}$/.test(password),
-        message: () => 'Password must be at least 6 characters and include uppercase, lowercase, number, and special character',
-      },
     },
     email: {
       type: String,
@@ -49,8 +42,7 @@ const userSchema: Schema<IUser> = new Schema(
       lowercase: true,
       trim: true,
       validate: {
-        validator: (email: string) =>
-          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        validator: (email: string) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
         message: props => `${props.value} is not a valid email address`,
       },
     },
@@ -59,8 +51,11 @@ const userSchema: Schema<IUser> = new Schema(
       required: false,
       default: '',
       validate: {
-        validator: (avatarUrl: string) =>
-          /^(https?:\/\/[^\s/$.?#].[^\s]*\.(?:png|jpg|jpeg|gif|svg))$/i.test(avatarUrl),
+        validator: function (avatarUrl: string) {
+          return (
+            avatarUrl === '' || /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i.test(avatarUrl)
+          );
+        },
         message: props => `${props.value} is not a valid image URL`,
       },
     },

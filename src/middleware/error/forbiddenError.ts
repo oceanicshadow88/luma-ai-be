@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger';
-import ConflictsException from '../../exceptions/conflictsException';
+import ForbiddenException from '../../exceptions/forbiddenException';
 
-const conflictsError = (error: Error, req: Request, res: Response, next: NextFunction): void => {
+const forbiddenError = (error: Error, req: Request, res: Response, next: NextFunction): void => {
   // Handle ValidationException errors
-  if (error instanceof ConflictsException) {
-    logger.warn('Resource conflict', {
+  if (error instanceof ForbiddenException) {
+    logger.warn('Unauthorized operation', {
       payload: {
         method: req.method,
         path: req.path,
@@ -21,8 +21,7 @@ const conflictsError = (error: Error, req: Request, res: Response, next: NextFun
     return;
   }
 
-  // just pass the error to the next error handler
   next(error);
 };
 
-export default conflictsError;
+export default forbiddenError;
