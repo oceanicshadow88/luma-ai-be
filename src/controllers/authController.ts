@@ -50,9 +50,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     // Save refresh token to the database
     user.refreshToken = refreshToken;
     await user.save();
-    // token
-    const token = generateToken({ id: user.id, username: user.username });
 
+    // request
     res.status(201).json({ success: true, data: { accessToken } });
 
   } catch (error) {
@@ -77,14 +76,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
     // Generate tokens
-    const accessToken = jwtUtils.generateAccessToken({ userId: existingUser._id });
-    const refreshToken = jwtUtils.generateRefreshToken({ userId: existingUser._id });
+    const accessToken = jwtUtils.generateAccessToken({ userId: user._id });
+    const refreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
 
     // Save refresh token to the database
     user.refreshToken = refreshToken;
-    await existingUser.save();
+    await user.save();
 
-    res.json({ success: true, data: {  accessToken } });
+    res.json({ success: true, data: { accessToken } });
   } catch (error) {
     return next(error);
   }
@@ -92,11 +91,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-      return res.status(401).json({ error: 'Refresh token is required' });
-    }
+    const { refreshToken } = req.body; //refreshToken must in req.body already verity in userValidation.ts
 
     // Verify refresh token
     const payload = jwtUtils.verifyRefreshToken(refreshToken);
@@ -105,7 +100,8 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     const user = await UserModel.findOne({ _id: payload.userId, refreshToken }).exec();
 
     if (!user) {
-      return res.status(403).json({ error: 'Invalid refresh token' });
+      next(new UnauthorizedException('Invalid refresh token'));
+      return;
     }
 
     // Generate new tokens
@@ -135,12 +131,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.body;
-
-    if (!refreshToken) {
-      next(new ValidationException('Refresh token is required'));
-      return ;
-    }
+    const { refreshToken } = req.body;//refreshToken must in req.body already verity in userValidation.ts 
 
     // Find user with the provided refresh token
     const user = await UserModel.findOne({ refreshToken }).exec();
