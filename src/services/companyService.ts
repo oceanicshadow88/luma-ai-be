@@ -11,7 +11,7 @@ interface CompanyInput {
     logoUrl?: string;
     primaryColor?: string;
   };
-  active?: boolean;
+  userEmail: string;
 }
 
 interface CompanyUpdate {
@@ -28,24 +28,28 @@ interface CompanyUpdate {
 
 export const companyService = {
   createCompany: async (data: CompanyInput) => {
-    const { name, plan, ownerId, settings } = data;
+    const { name, plan, ownerId, settings, userEmail } = data;
 
-    // Check if company name exists
-    const existing = await Company.findOne({ name });
+    // Extract domain from email
+    const domain = userEmail.split('@')[1];
+    
+    // Check if company exists with this domain
+    const existing = await Company.findOne({ 
+      name: new RegExp(`^${name}$`, 'i') 
+    });
+    
     if (existing) {
       throw new Error('Company name already exists');
     }
 
-    // Create new company
-    const company = await Company.create({
+    // Create company
+    return await Company.create({
       name,
       slug: name.toLowerCase().replace(/\s+/g, '-'),
       plan,
       ownerId: new Types.ObjectId(ownerId),
       settings,
     });
-
-    return company;
   },
 
   getCompanyById: async (id: string) => {

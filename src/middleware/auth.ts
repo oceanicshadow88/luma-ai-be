@@ -1,32 +1,12 @@
-<<<<<<< HEAD
-import { Request, Response, NextFunction } from 'express';
-
-declare module 'express' {
-  interface Request {
-    user?: {
-      _id: string;
-      name?: string;
-      email?: string;
-      role?: string;
-    };
-  }
-}
-
-export const auth = (req: Request, res: Response, next: NextFunction) => {
-  // Example: attach a mock user to the request
-  // In production, verify JWT and extract user info
-  req.user = { _id: 'mockUserId' };
-  next();
-};
-||||||| 300d820
-=======
 import { Request, Response, NextFunction } from 'express';
 import { jwtUtils } from '../lib/jwtUtils';
 
 export interface AuthRequest extends Request {
   user?: {
-    userId: string;
-    [key: string]: any;
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
   };
 }
 
@@ -57,7 +37,12 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
       const decoded = jwtUtils.verifyAccessToken(token);
       
       // Attach user info to request
-      (req as AuthRequest).user = decoded;
+      (req as AuthRequest).user = {
+        _id: decoded.userId,
+        name: decoded.name,
+        email: decoded.email,
+        role: decoded.role
+      };
       
       next();
     } catch (error) {
@@ -80,4 +65,3 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     next(error);
   }
 };
->>>>>>> 9c972785a34dbeb0454aedba7e796ea832200901
