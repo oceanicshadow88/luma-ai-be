@@ -9,7 +9,7 @@ export const membershipController = {
         companyId,
         userId,
         role,
-        status
+        status,
       });
       res.status(201).json(membership);
     } catch (error) {
@@ -29,7 +29,7 @@ export const membershipController = {
       }
       const memberships = await membershipService.getMembershipsByCompany(companyId);
       res.json(memberships);
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
@@ -42,7 +42,7 @@ export const membershipController = {
       }
       const memberships = await membershipService.getMembershipsByUser(userId);
       res.json(memberships);
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
@@ -59,7 +59,7 @@ export const membershipController = {
         return res.status(404).json({ message: 'Membership not found' });
       }
       res.json(membership);
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
@@ -75,8 +75,8 @@ export const membershipController = {
         return res.status(404).json({ message: 'Membership not found' });
       }
       res.status(204).send();
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
-  }
-}; 
+  },
+};

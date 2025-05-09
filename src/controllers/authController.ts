@@ -4,6 +4,7 @@ import UserModel from '../models/user';
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import ConflictsException from '../exceptions/conflictsException';
 import { jwtUtils } from '../lib/jwtUtils';
+import { Types } from 'mongoose';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -43,8 +44,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await user.hashPassword();
 
     // Generate tokens
-    const accessToken = jwtUtils.generateAccessToken({ userId: user._id });
-    const refreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
+    const _accessToken = jwtUtils.generateAccessToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
+    const refreshToken = jwtUtils.generateRefreshToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
 
     // Save refresh token to the database
     user.refreshToken = refreshToken;
@@ -52,7 +57,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     // request
     res.status(201).json({ success: true, data: { refreshToken } });
-
   } catch (error) {
     next(error);
   }
@@ -75,8 +79,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
     // Generate tokens
-    const accessToken = jwtUtils.generateAccessToken({ userId: user._id });
-    const refreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
+    const _accessToken = jwtUtils.generateAccessToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
+    const refreshToken = jwtUtils.generateRefreshToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
 
     // Save refresh token to the database
     user.refreshToken = refreshToken;
@@ -104,18 +112,24 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Generate new tokens
-    const newAccessToken = jwtUtils.generateAccessToken({ userId: user._id });
-    const newRefreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
+    const newAccessToken = jwtUtils.generateAccessToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
+    const newRefreshToken = jwtUtils.generateRefreshToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
 
     // Update refresh token in the database
     user.refreshToken = newRefreshToken;
     await user.save();
 
-    res.json({ success: true, data: { 
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken, 
-    } });
-
+    res.json({
+      success: true,
+      data: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+    });
   } catch (error) {
     if (error instanceof Error && error.name === 'JsonWebTokenError') {
       return res.status(403).json({ error: 'Invalid refresh token' });
@@ -131,7 +145,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.body;//refreshToken must in req.body already verity in userAuthValidation.ts
+    const { refreshToken } = req.body; //refreshToken must in req.body already verity in userAuthValidation.ts
 
     // Find user with the provided refresh token
     const user = await UserModel.findOne({ refreshToken }).exec();
@@ -143,7 +157,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     res.status(204).send();
-
   } catch (error) {
     next(error);
   }

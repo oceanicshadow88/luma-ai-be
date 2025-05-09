@@ -4,14 +4,16 @@ import { membershipController } from '../../controllers/membershipController';
 
 const router = Router();
 
-router.post('/', 
+router.post(
+  '/',
   validateMembership.createMembership as unknown as RequestHandler[],
-  membershipController.createMembership as RequestHandler
+  membershipController.createMembership as RequestHandler,
 );
 
-router.get('/company/:companyId',
+router.get(
+  '/company/:companyId',
   validateMembership.getMembershipsByCompany as unknown as RequestHandler[],
-  membershipController.getMembershipsByCompany as RequestHandler
+  membershipController.getMembershipsByCompany as RequestHandler,
 );
 
-export default router; 
+export default router;

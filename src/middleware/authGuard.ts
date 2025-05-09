@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { jwtUtils } from '../lib/jwtUtils';
 
-export interface AuthRequest extends Request {
-  user?: {
-    _id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-}
+// export interface AuthRequest extends Request {
+//   user?: {
+//     _id: string;
+//     name?: string;
+//     email?: string;
+//     role?: string;
+//   };
+// }
 
 /**
  * Middleware to verify JWT token and authorize access to protected routes
@@ -16,7 +16,6 @@ export interface AuthRequest extends Request {
  */
 export const authGuard = (req: Request, res: Response, next: NextFunction): void => {
   try {
-
     // Get auth header
     const authHeader = req.header('Authorization');
 
@@ -37,14 +36,15 @@ export const authGuard = (req: Request, res: Response, next: NextFunction): void
       // Verify token
       const decoded = jwtUtils.verifyAccessToken(token);
 
-      // Attach user info to request
-      (req as AuthRequest).user = {
-        _id: decoded.userId,
-        name: decoded.name,
-        email: decoded.email,
-        role: decoded.role
-      };
-      
+      if (decoded.name && decoded.email && decoded.role) {
+        req.user = {
+          _id: decoded.userId,
+          name: decoded.name,
+          email: decoded.email,
+          role: decoded.role,
+        };
+      }
+
       next();
     } catch (error) {
       if (error instanceof Error) {

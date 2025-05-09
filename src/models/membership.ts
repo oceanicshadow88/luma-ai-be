@@ -13,28 +13,28 @@ const membershipSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Company',
     required: true,
-    index: true
+    index: true,
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    index: true
+    index: true,
   },
   role: {
     type: String,
     enum: ['admin', 'instructor', 'student'],
-    required: true
+    required: true,
   },
   status: {
     type: String,
     enum: ['invited', 'active', 'disabled'],
-    default: 'active'
+    default: 'active',
   },
   joinedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-export default mongoose.model<IMembership>('Membership', membershipSchema); 
+export default mongoose.model<IMembership>('Membership', membershipSchema);

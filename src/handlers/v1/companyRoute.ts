@@ -1,72 +1,77 @@
 import { Router, RequestHandler } from 'express';
 import { companyController } from '../../controllers/companyController';
-import { authMiddleware } from '../../middleware/auth';
+import { authGuard } from '../../middleware/authGuard';
 import { validateCompany } from '../../validations/companyValidaton';
 
 const router = Router();
 
 // Create company
-router.post('/', 
-  authMiddleware as RequestHandler,
+router.post(
+  '/',
+  authGuard as RequestHandler,
   validateCompany.createCompany as unknown as RequestHandler[],
-  companyController.createCompany as RequestHandler
+  companyController.createCompany as RequestHandler,
 );
 
 // Get all companies for current user
-router.get('/', 
-  authMiddleware as RequestHandler,
-  companyController.getCompanies as RequestHandler
-);
+router.get('/', authGuard as RequestHandler, companyController.getCompanies as RequestHandler);
 
 // Get company by ID
-router.get('/:id', 
-  authMiddleware as RequestHandler,
+router.get(
+  '/:id',
+  authGuard as RequestHandler,
   validateCompany.getCompany as unknown as RequestHandler[],
-  companyController.getCompanyById as RequestHandler
+  companyController.getCompanyById as RequestHandler,
 );
 
 // Update company
-router.patch('/:id', 
-  authMiddleware as RequestHandler,
+router.patch(
+  '/:id',
+  authGuard as RequestHandler,
   validateCompany.updateCompany as unknown as RequestHandler[],
-  companyController.updateCompany as RequestHandler
+  companyController.updateCompany as RequestHandler,
 );
 
 // Delete company
-router.delete('/:id',
-  authMiddleware as RequestHandler,
-  validateCompany.getCompany as unknown as RequestHandler[],
-  companyController.deleteCompany as RequestHandler
+router.delete(
+  '/:id',
+  authGuard as RequestHandler,
+  companyController.deleteCompany as RequestHandler,
 );
 
 // Check email and send verification code
-router.post('/verify-email',
+router.post(
+  '/verify-email',
   validateCompany.checkEmail as unknown as RequestHandler[],
-  companyController.checkEmailAndSendCode as RequestHandler
+  companyController.checkEmailAndSendCode as RequestHandler,
 );
 
 // Verify code
-router.post('/verify-code',
+router.post(
+  '/verify-code',
   validateCompany.verifyCode as unknown as RequestHandler[],
-  companyController.verifyCode as RequestHandler
+  companyController.verifyCode as RequestHandler,
 );
 
 // Resend verification code
-router.post('/resend-code',
-  validateCompany.resendCode as unknown as RequestHandler[],
-  companyController.resendCode as RequestHandler
+router.post(
+  '/resend-code',
+  validateCompany.checkEmail as unknown as RequestHandler[],
+  companyController.resendCode as RequestHandler,
 );
 
 // Check domain and create organization if needed
-router.post('/check-domain',
-  validateCompany.checkDomain as unknown as RequestHandler[],
-  companyController.checkDomainAndCreate as RequestHandler
+router.post(
+  '/check-domain',
+  validateCompany.completeRegistration as unknown as RequestHandler[],
+  companyController.checkDomainAndCreate as RequestHandler,
 );
 
 // Complete registration
-router.post('/complete-registration',
+router.post(
+  '/complete-registration',
   validateCompany.completeRegistration as unknown as RequestHandler[],
-  companyController.completeRegistration as RequestHandler
+  companyController.completeRegistration as RequestHandler,
 );
 
 export default router;
