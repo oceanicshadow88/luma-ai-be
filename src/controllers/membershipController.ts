@@ -9,7 +9,7 @@ export const membershipController = {
         companyId,
         userId,
         role,
-        status
+        status,
       });
       res.status(201).json(membership);
     } catch (error) {
@@ -78,5 +78,5 @@ export const membershipController = {
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
     }
-  }
-}; 
+  },
+};

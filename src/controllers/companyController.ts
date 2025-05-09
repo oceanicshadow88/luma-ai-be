@@ -26,7 +26,7 @@ export const companyController = {
         plan,
         ownerId: req.user._id,
         settings,
-        userEmail: req.user.email
+        userEmail: req.user.email,
       });
       res.status(201).json(company);
     } catch (error) {
@@ -179,5 +179,5 @@ export const companyController = {
         res.status(500).json({ message: 'Internal server error' });
       }
     }
-  }
+  },
 };

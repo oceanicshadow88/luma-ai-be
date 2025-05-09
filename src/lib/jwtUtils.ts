@@ -15,12 +15,12 @@ export const jwtUtils = {
    */
   generateAccessToken(payload: object): string {
     const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-    
+
     // Use type assertion to treat our string as any first to avoid TypeScript errors
     const options = {
-      expiresIn: (config.jwt?.expiresIn || DEFAULT_JWT_EXPIRES_IN) as any
+      expiresIn: (config.jwt?.expiresIn || DEFAULT_JWT_EXPIRES_IN) as any,
     };
-    
+
     return jwt.sign(payload, secret, options);
   },
 
@@ -29,12 +29,12 @@ export const jwtUtils = {
    */
   generateRefreshToken(payload: object): string {
     const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
-    
+
     // Use type assertion to treat our string as any first to avoid TypeScript errors
     const options = {
-      expiresIn: (config.jwt?.refreshExpiresIn || DEFAULT_JWT_REFRESH_EXPIRES_IN) as any
+      expiresIn: (config.jwt?.refreshExpiresIn || DEFAULT_JWT_REFRESH_EXPIRES_IN) as any,
     };
-    
+
     return jwt.sign(payload, secret, options);
   },
 

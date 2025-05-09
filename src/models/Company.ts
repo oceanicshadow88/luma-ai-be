@@ -16,51 +16,51 @@ export interface ICompany extends Document {
 }
 
 const companySchema = new Schema({
-  name: { 
-    type: String, 
-    required: true 
+  name: {
+    type: String,
+    required: true,
   },
-  slug: { 
-    type: String, 
-    required: true, 
-    unique: true 
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
   },
-  plan: { 
-    type: String, 
-    required: true, 
-    default: 'free' 
+  plan: {
+    type: String,
+    required: true,
+    default: 'free',
   },
-  ownerId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
   settings: {
-    timezone: { 
-      type: String, 
-      default: 'UTC' 
+    timezone: {
+      type: String,
+      default: 'UTC',
     },
-    locale: { 
-      type: String, 
-      default: 'en-US' 
+    locale: {
+      type: String,
+      default: 'en-US',
     },
-    logoUrl: { 
-      type: String, 
-      default: '' 
+    logoUrl: {
+      type: String,
+      default: '',
     },
-    primaryColor: { 
-      type: String, 
-      default: '#000000' 
-    }
+    primaryColor: {
+      type: String,
+      default: '#000000',
+    },
   },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
-  active: { 
-    type: Boolean, 
-    default: true 
-  }
+  active: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 export default mongoose.model<ICompany>('Company', companySchema);

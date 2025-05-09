@@ -5,11 +5,14 @@ import { generateVerificationCode, sendVerificationEmail } from '../utils/verifi
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 
 // 使用 Map 在内存中临时存储验证码
-const verificationStore = new Map<string, {
-  code: string;
-  expiresAt: Date;
-  verified: boolean;
-}>();
+const verificationStore = new Map<
+  string,
+  {
+    code: string;
+    expiresAt: Date;
+    verified: boolean;
+  }
+>();
 
 interface CompanyInput {
   name: string;
@@ -43,12 +46,12 @@ export const companyService = {
 
     // Extract domain from email
     const domain = userEmail.split('@')[1];
-    
+
     // Check if company exists with this domain
-    const existing = await Company.findOne({ 
-      name: new RegExp(`^${name}$`, 'i') 
+    const existing = await Company.findOne({
+      name: new RegExp(`^${name}$`, 'i'),
     });
-    
+
     if (existing) {
       throw new Error('Company name already exists');
     }
@@ -82,7 +85,7 @@ export const companyService = {
     return await Company.findByIdAndUpdate(
       id,
       { ...data, ...(name && { slug: name.toLowerCase().replace(/\s+/g, '-') }) },
-      { new: true }
+      { new: true },
     );
   },
 
@@ -102,7 +105,7 @@ export const companyService = {
     verificationStore.set(email, {
       code,
       expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
-      verified: false
+      verified: false,
     });
 
     await sendVerificationEmail(email, code);
@@ -138,14 +141,17 @@ export const companyService = {
 
     return {
       hasOrganization: !!existingCompany,
-      organizationId: existingCompany?._id
+      organizationId: existingCompany?._id,
     };
   },
 
-  checkDomainAndCreate: async (email: string, organizationData: {
-    name: string;
-    logo?: string;
-  }) => {
+  checkDomainAndCreate: async (
+    email: string,
+    organizationData: {
+      name: string;
+      logo?: string;
+    },
+  ) => {
     const domain = email.split('@')[1];
     const existingCompany = await Company.findOne({ domain });
 
@@ -157,7 +163,7 @@ export const companyService = {
       ...organizationData,
       domain,
       plan: 'free',
-      active: true
+      active: true,
     });
   },
 
@@ -171,18 +177,18 @@ export const companyService = {
     // Create user
     const user = await User.create({
       ...userData,
-      active: true
+      active: true,
     });
 
     // Generate tokens
-    const accessToken = generateAccessToken(user);  
+    const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
     return {
       user,
       accessToken,
       refreshToken,
-      redirectPath: userData.role === 'admin' ? '/dashboard/admin' : '/dashboard/instructor'
+      redirectPath: userData.role === 'admin' ? '/dashboard/admin' : '/dashboard/instructor',
     };
-  }
+  },
 };

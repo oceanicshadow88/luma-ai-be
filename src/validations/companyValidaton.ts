@@ -22,10 +22,7 @@ const createCompanyValidation: ValidationChain[] = [
     .optional()
     .matches(/^#[0-9A-Fa-f]{6}$/)
     .withMessage('Primary color must be a valid hex color'),
-  body('active')
-    .optional()
-    .isBoolean()
-    .withMessage('Active must be a boolean'),
+  body('active').optional().isBoolean().withMessage('Active must be a boolean'),
 ];
 
 const updateCompanyValidation: ValidationChain[] = [
@@ -47,10 +44,7 @@ const updateCompanyValidation: ValidationChain[] = [
     .optional()
     .matches(/^#[0-9A-Fa-f]{6}$/)
     .withMessage('Primary color must be a valid hex color'),
-  body('active')
-    .optional()
-    .isBoolean()
-    .withMessage('Active must be a boolean'),
+  body('active').optional().isBoolean().withMessage('Active must be a boolean'),
 ];
 
 const getCompanyValidation: ValidationChain[] = [
@@ -68,28 +62,19 @@ export const validateCompany = {
       .withMessage('Invalid email format')
       .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
       .withMessage('Invalid email domain'),
-    validateRequest
+    validateRequest,
   ],
   verifyCode: [
     body('email').isEmail().withMessage('Invalid email format'),
-    body('code')
-      .isLength({ min: 4, max: 4 })
-      .isNumeric()
-      .withMessage('Invalid verification code'),
-    validateRequest
+    body('code').isLength({ min: 4, max: 4 }).isNumeric().withMessage('Invalid verification code'),
+    validateRequest,
   ],
   completeRegistration: [
     body('email').isEmail().withMessage('Invalid email format'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
     body('name').notEmpty().withMessage('Name is required'),
-    body('role')
-      .isIn(['admin', 'instructor'])
-      .withMessage('Invalid role'),
-    body('companyId')
-      .isMongoId()
-      .withMessage('Invalid company ID'),
-    validateRequest
-  ]
+    body('role').isIn(['admin', 'instructor']).withMessage('Invalid role'),
+    body('companyId').isMongoId().withMessage('Invalid company ID'),
+    validateRequest,
+  ],
 };

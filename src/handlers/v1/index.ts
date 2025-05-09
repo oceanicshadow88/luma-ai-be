@@ -1,4 +1,3 @@
-
 import { Router, Request, Response, NextFunction } from 'express';
 // import userRoutes from './userRoute';
 import authRouter from './authRoute';
@@ -23,7 +22,7 @@ const protectedTestHandler = (req: Request, res: Response): void => {
   res.status(200).json({
     status: 'success',
     message: 'You have accessed a protected route',
-    user: authReq.user
+    user: authReq.user,
   });
 };
 

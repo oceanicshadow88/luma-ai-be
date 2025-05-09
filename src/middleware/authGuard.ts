@@ -16,7 +16,6 @@ export interface AuthRequest extends Request {
  */
 export const authGuard = (req: Request, res: Response, next: NextFunction): void => {
   try {
-
     // Get auth header
     const authHeader = req.header('Authorization');
 
@@ -42,9 +41,9 @@ export const authGuard = (req: Request, res: Response, next: NextFunction): void
         _id: decoded.userId,
         name: decoded.name,
         email: decoded.email,
-        role: decoded.role
+        role: decoded.role,
       };
-      
+
       next();
     } catch (error) {
       if (error instanceof Error) {

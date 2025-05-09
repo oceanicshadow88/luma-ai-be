@@ -52,7 +52,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     // request
     res.status(201).json({ success: true, data: { refreshToken } });
-
   } catch (error) {
     next(error);
   }
@@ -111,11 +110,13 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     user.refreshToken = newRefreshToken;
     await user.save();
 
-    res.json({ success: true, data: { 
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken, 
-    } });
-
+    res.json({
+      success: true,
+      data: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+    });
   } catch (error) {
     if (error instanceof Error && error.name === 'JsonWebTokenError') {
       return res.status(403).json({ error: 'Invalid refresh token' });
@@ -131,7 +132,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.body;//refreshToken must in req.body already verity in userAuthValidation.ts
+    const { refreshToken } = req.body; //refreshToken must in req.body already verity in userAuthValidation.ts
 
     // Find user with the provided refresh token
     const user = await UserModel.findOne({ refreshToken }).exec();
@@ -143,7 +144,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     res.status(204).send();
-
   } catch (error) {
     next(error);
   }
