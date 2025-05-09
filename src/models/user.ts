@@ -33,7 +33,7 @@ const userSchema: Schema<IUser> = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
     },
     email: {
       type: String,

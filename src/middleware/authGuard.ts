@@ -3,8 +3,10 @@ import { jwtUtils } from '../lib/jwtUtils';
 
 export interface AuthRequest extends Request {
   user?: {
-    userId: string;
-    [key: string]: any;
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
   };
 }
 
@@ -14,7 +16,6 @@ export interface AuthRequest extends Request {
  */
 export const authGuard = (req: Request, res: Response, next: NextFunction): void => {
   try {
-
     // Get auth header
     const authHeader = req.header('Authorization');
 
@@ -36,7 +37,12 @@ export const authGuard = (req: Request, res: Response, next: NextFunction): void
       const decoded = jwtUtils.verifyAccessToken(token);
 
       // Attach user info to request
-      (req as AuthRequest).user = decoded;
+      (req as AuthRequest).user = {
+        _id: decoded.userId,
+        name: decoded.name,
+        email: decoded.email,
+        role: decoded.role,
+      };
 
       next();
     } catch (error) {
