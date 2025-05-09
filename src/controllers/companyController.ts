@@ -111,4 +111,73 @@ export const companyController = {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
+
+  checkEmailAndSendCode: async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      await companyService.checkEmailAndSendCode(email);
+      res.json({ success: true });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
+
+  verifyCode: async (req: Request, res: Response) => {
+    try {
+      const { email, code } = req.body;
+      const result = await companyService.verifyCode(email, code);
+      res.json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
+
+  resendCode: async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      await companyService.checkEmailAndSendCode(email);
+      res.json({ success: true });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
+
+  checkDomainAndCreate: async (req: Request, res: Response) => {
+    try {
+      const { email, organizationData } = req.body;
+      const company = await companyService.checkDomainAndCreate(email, organizationData);
+      res.json(company);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
+
+  completeRegistration: async (req: Request, res: Response) => {
+    try {
+      const result = await companyService.completeRegistration(req.body);
+      res.json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  }
 };
