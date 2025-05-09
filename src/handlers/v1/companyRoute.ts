@@ -1,6 +1,6 @@
 import { Router, RequestHandler } from 'express';
 import { companyController } from '../../controllers/companyController';
-import { authMiddleware } from '../../middleware/auth';
+import { authGuard } from '../../middleware/authGuard';
 import { validateCompany } from '../../validations/companyValidaton';
 
 const router = Router();
@@ -8,18 +8,18 @@ const router = Router();
 // Create company
 router.post(
   '/',
-  authMiddleware as RequestHandler,
+  authGuard as RequestHandler,
   validateCompany.createCompany as unknown as RequestHandler[],
   companyController.createCompany as RequestHandler,
 );
 
 // Get all companies for current user
-router.get('/', authMiddleware as RequestHandler, companyController.getCompanies as RequestHandler);
+router.get('/', authGuard as RequestHandler, companyController.getCompanies as RequestHandler);
 
 // Get company by ID
 router.get(
   '/:id',
-  authMiddleware as RequestHandler,
+  authGuard as RequestHandler,
   validateCompany.getCompany as unknown as RequestHandler[],
   companyController.getCompanyById as RequestHandler,
 );
@@ -27,7 +27,7 @@ router.get(
 // Update company
 router.patch(
   '/:id',
-  authMiddleware as RequestHandler,
+  authGuard as RequestHandler,
   validateCompany.updateCompany as unknown as RequestHandler[],
   companyController.updateCompany as RequestHandler,
 );
@@ -35,8 +35,7 @@ router.patch(
 // Delete company
 router.delete(
   '/:id',
-  authMiddleware as RequestHandler,
-  validateCompany.getCompany as unknown as RequestHandler[],
+  authGuard as RequestHandler,
   companyController.deleteCompany as RequestHandler,
 );
 
@@ -57,14 +56,14 @@ router.post(
 // Resend verification code
 router.post(
   '/resend-code',
-  validateCompany.resendCode as unknown as RequestHandler[],
+  validateCompany.checkEmail as unknown as RequestHandler[],
   companyController.resendCode as RequestHandler,
 );
 
 // Check domain and create organization if needed
 router.post(
   '/check-domain',
-  validateCompany.checkDomain as unknown as RequestHandler[],
+  validateCompany.completeRegistration as unknown as RequestHandler[],
   companyController.checkDomainAndCreate as RequestHandler,
 );
 

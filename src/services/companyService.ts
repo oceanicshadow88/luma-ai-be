@@ -4,7 +4,6 @@ import User from '../models/user';
 import { generateVerificationCode, sendVerificationEmail } from '../utils/verification';
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 
-// 使用 Map 在内存中临时存储验证码
 const verificationStore = new Map<
   string,
   {
@@ -45,7 +44,7 @@ export const companyService = {
     const { name, plan, ownerId, settings, userEmail } = data;
 
     // Extract domain from email
-    const domain = userEmail.split('@')[1];
+    const _domain = userEmail.split('@')[1];
 
     // Check if company exists with this domain
     const existing = await Company.findOne({

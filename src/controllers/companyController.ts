@@ -16,7 +16,7 @@ export const companyController = {
   // Create company
   createCompany: async (req: Request, res: Response) => {
     try {
-      const { name, plan, settings, active } = req.body;
+      const { name, plan, settings, _active } = req.body;
       if (!req.user?._id) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
@@ -46,7 +46,7 @@ export const companyController = {
       }
       const companies = await companyService.getCompaniesByOwnerId(req.user._id);
       res.json(companies);
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
@@ -63,7 +63,7 @@ export const companyController = {
         return res.status(404).json({ message: 'Company not found' });
       }
       res.json(company);
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
@@ -86,12 +86,8 @@ export const companyController = {
         return res.status(404).json({ message: 'Company not found' });
       }
       res.json(company);
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: 'Internal server error' });
-      }
+    } catch {
+      res.status(500).json({ message: 'Internal server error' });
     }
   },
 
@@ -107,7 +103,7 @@ export const companyController = {
         return res.status(404).json({ message: 'Company not found' });
       }
       res.status(204).send();
-    } catch (error) {
+    } catch {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
@@ -159,12 +155,8 @@ export const companyController = {
       const { email, organizationData } = req.body;
       const company = await companyService.checkDomainAndCreate(email, organizationData);
       res.json(company);
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: 'Internal server error' });
-      }
+    } catch {
+      res.status(500).json({ message: 'Internal server error' });
     }
   },
 

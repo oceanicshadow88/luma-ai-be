@@ -3,31 +3,33 @@ import * as authController from '../../controllers/authController';
 import { validateBody } from '../../middleware/validationMiddleware';
 import authValidationSchema from '../../validations/userAuthValidation';
 
-const authRouter = Router();
+const router = Router();
 
-// Handler wrapper to properly handle Express middleware types
+// Helper function to handle async routes
 const asyncHandler =
-  (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+  (fn: (req: Request, res: Response, next: NextFunction) => Promise<Response | void>) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
+    }
   };
 
-// Apply the wrapper to each route handler
-authRouter.post(
+router.post(
   '/register',
   validateBody(authValidationSchema.register),
   asyncHandler(authController.register),
 );
-authRouter.post(
-  '/login',
-  validateBody(authValidationSchema.login),
-  asyncHandler(authController.login),
-);
-authRouter.post(
+
+router.post('/login', validateBody(authValidationSchema.login), asyncHandler(authController.login));
+
+router.post(
   '/refresh-token',
   validateBody(authValidationSchema.freshToken),
   asyncHandler(authController.refreshToken),
 );
-authRouter.post('/logout', asyncHandler(authController.logout));
 
-export default authRouter;
+router.post('/logout', asyncHandler(authController.logout));
+
+export default router;

@@ -1,4 +1,4 @@
-import { body, param, ValidationChain } from 'express-validator';
+import { body, param } from 'express-validator';
 import { validateRequest } from '../middleware/validateRequest';
 
 export const validateMembership = {

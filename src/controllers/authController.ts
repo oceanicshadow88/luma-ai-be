@@ -4,6 +4,7 @@ import UserModel from '../models/user';
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import ConflictsException from '../exceptions/conflictsException';
 import { jwtUtils } from '../lib/jwtUtils';
+import { Types } from 'mongoose';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -43,8 +44,12 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await user.hashPassword();
 
     // Generate tokens
-    const accessToken = jwtUtils.generateAccessToken({ userId: user._id });
-    const refreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
+    const _accessToken = jwtUtils.generateAccessToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
+    const refreshToken = jwtUtils.generateRefreshToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
 
     // Save refresh token to the database
     user.refreshToken = refreshToken;
@@ -74,8 +79,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
     // Generate tokens
-    const accessToken = jwtUtils.generateAccessToken({ userId: user._id });
-    const refreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
+    const _accessToken = jwtUtils.generateAccessToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
+    const refreshToken = jwtUtils.generateRefreshToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
 
     // Save refresh token to the database
     user.refreshToken = refreshToken;
@@ -103,8 +112,12 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Generate new tokens
-    const newAccessToken = jwtUtils.generateAccessToken({ userId: user._id });
-    const newRefreshToken = jwtUtils.generateRefreshToken({ userId: user._id });
+    const newAccessToken = jwtUtils.generateAccessToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
+    const newRefreshToken = jwtUtils.generateRefreshToken({
+      userId: (user._id as Types.ObjectId).toString(),
+    });
 
     // Update refresh token in the database
     user.refreshToken = newRefreshToken;
