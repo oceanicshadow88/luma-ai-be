@@ -21,6 +21,16 @@ interface Config {
   rateLimitWindowMS: number;
   rateLimit: number;
   logLevel: string;
+  email: {
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: {
+      user: string;
+      pass: string;
+    };
+    from: string;
+  };
 }
 
 export const config: Config = {
@@ -36,6 +46,16 @@ export const config: Config = {
   rateLimitWindowMS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
   rateLimit: parseInt(process.env.RATE_LIMIT || '100', 10),
   logLevel: process.env.LOG_LEVEL || 'info',
+  email: {
+    host: process.env.EMAIL_HOST || 'smtp.example.com',
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: process.env.EMAIL_SECURE === 'true',
+    auth: {
+      user: process.env.EMAIL_USER || '',
+      pass: process.env.EMAIL_PASS || ''
+    },
+    from: process.env.EMAIL_FROM || 'noreply@example.com'
+  },
 };
 
 export default config;

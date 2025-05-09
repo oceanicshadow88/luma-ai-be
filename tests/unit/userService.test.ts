@@ -1,5 +1,5 @@
 import { userService } from '../../src/services/userService';
-import User from '../../src/models/User';
+import user from '../../src/models/user';
 
 // Mock the User model
 jest.mock('../../src/models/User');
@@ -18,7 +18,7 @@ describe('User Service', () => {
         { _id: '2', name: 'Test User 2', email: 'test2@example.com' },
       ];
 
-      (User.find as jest.Mock).mockReturnValue({
+      (user.find as jest.Mock).mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUsers),
       });
 
@@ -26,14 +26,14 @@ describe('User Service', () => {
       const result = await userService.getAllUsers();
 
       // Assert
-      expect(User.find).toHaveBeenCalled();
+      expect(user.find).toHaveBeenCalled();
       expect(result).toEqual(mockUsers);
       expect(result).toHaveLength(2);
     });
 
     it('should handle errors and return empty array', async () => {
       // Arrange
-      (User.find as jest.Mock).mockReturnValue({
+      (user.find as jest.Mock).mockReturnValue({
         select: jest.fn().mockRejectedValue(new Error('Database error')),
       });
 
@@ -41,7 +41,7 @@ describe('User Service', () => {
       const result = await userService.getAllUsers();
 
       // Assert
-      expect(User.find).toHaveBeenCalled();
+      expect(user.find).toHaveBeenCalled();
       expect(result).toEqual([]);
     });
   });
@@ -52,7 +52,7 @@ describe('User Service', () => {
       const userId = '12345';
       const mockUser = { _id: userId, name: 'Test User', email: 'test@example.com' };
 
-      (User.findById as jest.Mock).mockReturnValue({
+      (user.findById as jest.Mock).mockReturnValue({
         select: jest.fn().mockResolvedValue(mockUser),
       });
 
@@ -60,7 +60,7 @@ describe('User Service', () => {
       const result = await userService.getUserById(userId);
 
       // Assert
-      expect(User.findById).toHaveBeenCalledWith(userId);
+      expect(user.findById).toHaveBeenCalledWith(userId);
       expect(result).toEqual(mockUser);
     });
 
@@ -68,7 +68,7 @@ describe('User Service', () => {
       // Arrange
       const userId = 'nonexistent';
 
-      (User.findById as jest.Mock).mockReturnValue({
+      (user.findById as jest.Mock).mockReturnValue({
         select: jest.fn().mockResolvedValue(null),
       });
 
@@ -76,7 +76,7 @@ describe('User Service', () => {
       const result = await userService.getUserById(userId);
 
       // Assert
-      expect(User.findById).toHaveBeenCalledWith(userId);
+      expect(user.findById).toHaveBeenCalledWith(userId);
       expect(result).toBeNull();
     });
   });
@@ -87,13 +87,13 @@ describe('User Service', () => {
       const userData = { name: 'New User', email: 'new@example.com', password: 'password123' };
       const mockUser = { _id: '123', ...userData };
 
-      (User.create as jest.Mock).mockResolvedValue(mockUser);
+      (user.create as jest.Mock).mockResolvedValue(mockUser);
 
       // Act
       const result = await userService.createUser(userData);
 
       // Assert
-      expect(User.create).toHaveBeenCalledWith(userData);
+      expect(user.create).toHaveBeenCalledWith(userData);
       expect(result).toEqual(mockUser);
     });
   });
