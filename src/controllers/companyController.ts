@@ -26,7 +26,7 @@ export const companyController = {
         plan,
         ownerId: req.user._id,
         settings,
-        active,
+        userEmail: req.user.email
       });
       res.status(201).json(company);
     } catch (error) {

@@ -1,15 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { hashVerificationCode } from '../utils/verification';
 
 export interface IVerification extends Document {
   email: string;
-  code: string;
+  code: string; // This will store hashed code
   expiresAt: Date;
   verified: boolean;
   attempts: number;
   createdAt: Date;
 }
 
-const verificationSchema: Schema = new Schema({
+const verificationSchema = new Schema({
   email: { 
     type: String, 
     required: true,
@@ -22,7 +23,7 @@ const verificationSchema: Schema = new Schema({
   expiresAt: { 
     type: Date, 
     required: true,
-    default: () => new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
+    default: () => new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
   },
   verified: { 
     type: Boolean, 
@@ -36,6 +37,14 @@ const verificationSchema: Schema = new Schema({
     type: Date, 
     default: Date.now 
   }
+});
+
+// Hash code before saving
+verificationSchema.pre('save', async function(next) {
+  if (this.isModified('code')) {
+    this.code = await hashVerificationCode(this.code);
+  }
+  next();
 });
 
 // Add index for cleanup

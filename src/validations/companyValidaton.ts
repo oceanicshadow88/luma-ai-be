@@ -62,4 +62,34 @@ export const validateCompany = {
   createCompany: [...createCompanyValidation, validateRequest],
   updateCompany: [...updateCompanyValidation, validateRequest],
   getCompany: [...getCompanyValidation, validateRequest],
+  checkEmail: [
+    body('email')
+      .isEmail()
+      .withMessage('Invalid email format')
+      .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+      .withMessage('Invalid email domain'),
+    validateRequest
+  ],
+  verifyCode: [
+    body('email').isEmail().withMessage('Invalid email format'),
+    body('code')
+      .isLength({ min: 4, max: 4 })
+      .isNumeric()
+      .withMessage('Invalid verification code'),
+    validateRequest
+  ],
+  completeRegistration: [
+    body('email').isEmail().withMessage('Invalid email format'),
+    body('password')
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
+    body('name').notEmpty().withMessage('Name is required'),
+    body('role')
+      .isIn(['admin', 'instructor'])
+      .withMessage('Invalid role'),
+    body('companyId')
+      .isMongoId()
+      .withMessage('Invalid company ID'),
+    validateRequest
+  ]
 };

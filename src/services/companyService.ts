@@ -1,5 +1,9 @@
 import Company from '../models/company';
 import { Types } from 'mongoose';
+import User from '../models/user';
+import Verification from '../models/verification';
+import { generateVerificationCode, sendVerificationEmail } from 'src/utils/verification';
+import { generateAccessToken, generateRefreshToken } from 'src/utils/auth';
 
 interface CompanyInput {
   name: string;
@@ -12,6 +16,7 @@ interface CompanyInput {
     primaryColor?: string;
   };
   userEmail: string;
+  active?: boolean;
 }
 
 interface CompanyUpdate {
@@ -78,4 +83,92 @@ export const companyService = {
   deleteCompany: async (id: string) => {
     return await Company.findByIdAndDelete(id);
   },
+
+  checkEmailAndSendCode: async (email: string) => {
+    // Check if email exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new Error('Email already registered');
+    }
+
+    // Generate and send verification code
+    const code = generateVerificationCode();
+    await Verification.create({
+      email,
+      code,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+    });
+
+    await sendVerificationEmail(email, code);
+    return true;
+  },
+
+  verifyCode: async (email: string, code: string) => {
+    const verification = await Verification.findOne({
+      email,
+      code,
+      expiresAt: { $gt: new Date() },
+      verified: false
+    });
+
+    if (!verification) {
+      throw new Error('Invalid or expired verification code');
+    }
+
+    verification.verified = true;
+    await verification.save();
+
+    // Check if domain has organization
+    const domain = email.split('@')[1];
+    const existingCompany = await Company.findOne({ domain });
+
+    return {
+      hasOrganization: !!existingCompany,
+      organizationId: existingCompany?._id
+    };
+  },
+
+  checkDomainAndCreate: async (email: string, organizationData: {
+    name: string;
+    logo?: string;
+  }) => {
+    const domain = email.split('@')[1];
+    const existingCompany = await Company.findOne({ domain });
+
+    if (existingCompany) {
+      return existingCompany;
+    }
+
+    return await Company.create({
+      ...organizationData,
+      domain,
+      plan: 'free',
+      active: true
+    });
+  },
+
+  completeRegistration: async (userData: {
+    email: string;
+    password: string;
+    name: string;
+    role: 'admin' | 'instructor';
+    companyId: string;
+  }) => {
+    // Create user
+    const user = await User.create({
+      ...userData,
+      active: true
+    });
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user);  
+    const refreshToken = generateRefreshToken(user);
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+      redirectPath: userData.role === 'admin' ? '/dashboard/admin' : '/dashboard/instructor'
+    };
+  }
 };
