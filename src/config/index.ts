@@ -10,6 +10,9 @@ interface JwtConfig {
   refreshExpiresIn: string;
 }
 
+export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
+export type SafePayload = Record<string, unknown>;
+
 interface Config {
   env: string;
   port: number;

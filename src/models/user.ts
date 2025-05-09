@@ -50,7 +50,10 @@ userSchema.methods.hashPassword = async function(): Promise<void> {
   this.password = await bcrypt.hash(this.password, salt);
 };
 
-userSchema.methods.validatePassword = async function(password: string): Promise<boolean> {
+userSchema.methods.validatePassword = async function (
+  this: IUser,
+  password: string,
+): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
 

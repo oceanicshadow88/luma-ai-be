@@ -3,8 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from '../src/middleware/morgan';
 import rateLimiter from '../src/middleware/rateLimit';
-import { errorHandler } from '../src/middleware/errorHandler';
 import v1Router from '../src/handlers/v1';
+import errorMiddleware from '../src/middleware/error';
 
 // Create Express app
 const app: Express = express();
@@ -21,6 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/v1', v1Router);
 
 // Error Handling
-app.use(errorHandler);
+errorMiddleware.forEach(handler => app.use(handler));
 
 export default app;
