@@ -13,13 +13,13 @@ const baseAuthSchema = Joi.object({
 
   password: Joi.string()
     .required()
-    .min(6)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{6,}$/)
+    .min(8)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
     .messages({
-      'string.pattern.base':
-        'Password must include uppercase, lowercase, number, and special character',
-      'string.min': 'Password must be at least 6 characters',
       'string.empty': 'Password is required',
+      'string.min': 'Password must be at least 8 characters long',
+      'string.pattern.base':
+        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
     }),
 });
 

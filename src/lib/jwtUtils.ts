@@ -24,9 +24,27 @@ export const jwtUtils = {
    */
   generateAccessToken(payload: TokenPayload): string {
     const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+<<<<<<< HEAD
     const options: SignOptions = {
       expiresIn: (config.jwt?.expiresIn as StringValue) || DEFAULT_JWT_EXPIRES_IN,
+||||||| 99c1a32
+    
+    // Use type assertion to treat our string as any first to avoid TypeScript errors
+    const options = {
+      expiresIn: (config.jwt?.expiresIn || DEFAULT_JWT_EXPIRES_IN) as any
+=======
+
+    // Use type assertion to treat our string as any first to avoid TypeScript errors
+    const options = {
+      expiresIn: (config.jwt?.expiresIn || DEFAULT_JWT_EXPIRES_IN) as any,
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
     };
+<<<<<<< HEAD
+||||||| 99c1a32
+    
+=======
+
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
     return jwt.sign(payload, secret, options);
   },
 
@@ -35,9 +53,27 @@ export const jwtUtils = {
    */
   generateRefreshToken(payload: TokenPayload): string {
     const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
+<<<<<<< HEAD
     const options: SignOptions = {
       expiresIn: (config.jwt?.refreshExpiresIn as StringValue) || DEFAULT_JWT_REFRESH_EXPIRES_IN,
+||||||| 99c1a32
+    
+    // Use type assertion to treat our string as any first to avoid TypeScript errors
+    const options = {
+      expiresIn: (config.jwt?.refreshExpiresIn || DEFAULT_JWT_REFRESH_EXPIRES_IN) as any
+=======
+
+    // Use type assertion to treat our string as any first to avoid TypeScript errors
+    const options = {
+      expiresIn: (config.jwt?.refreshExpiresIn || DEFAULT_JWT_REFRESH_EXPIRES_IN) as any,
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
     };
+<<<<<<< HEAD
+||||||| 99c1a32
+    
+=======
+
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
     return jwt.sign(payload, secret, options);
   },
 

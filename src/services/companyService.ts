@@ -45,8 +45,16 @@ export const companyService = {
     const { name, plan, ownerId, settings, userEmail } = data;
 
     // Extract domain from email
+<<<<<<< HEAD
     const _domain = userEmail.split('@')[1];
 
+||||||| 99c1a32
+    const domain = userEmail.split('@')[1];
+    
+=======
+    const domain = userEmail.split('@')[1];
+
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
     // Check if company exists with this domain
     const existing = await Company.findOne({
       name: new RegExp(`^${name}$`, 'i'),

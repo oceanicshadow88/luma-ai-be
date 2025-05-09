@@ -36,6 +36,7 @@ export const authGuard = (req: Request, res: Response, next: NextFunction): void
       // Verify token
       const decoded = jwtUtils.verifyAccessToken(token);
 
+<<<<<<< HEAD
       if (decoded.name && decoded.email && decoded.role) {
         req.user = {
           _id: decoded.userId,
@@ -45,6 +46,25 @@ export const authGuard = (req: Request, res: Response, next: NextFunction): void
         };
       }
 
+||||||| 99c1a32
+      // Attach user info to request
+      (req as AuthRequest).user = {
+        _id: decoded.userId,
+        name: decoded.name,
+        email: decoded.email,
+        role: decoded.role
+      };
+      
+=======
+      // Attach user info to request
+      (req as AuthRequest).user = {
+        _id: decoded.userId,
+        name: decoded.name,
+        email: decoded.email,
+        role: decoded.role,
+      };
+
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
       next();
     } catch (error) {
       if (error instanceof Error) {

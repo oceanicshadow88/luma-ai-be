@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 import { Router, Request, Response } from 'express';
+||||||| 99c1a32
+
+import { Router, Request, Response, NextFunction } from 'express';
+=======
+import { Router, Request, Response, NextFunction } from 'express';
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
 // import userRoutes from './userRoute';
 import authRouter from './authRoute';
 import { authGuard } from '../../middleware/authGuard';
@@ -19,7 +26,13 @@ const protectedTestHandler = (req: Request, res: Response): void => {
   res.status(200).json({
     status: 'success',
     message: 'You have accessed a protected route',
+<<<<<<< HEAD
     user: req.user,
+||||||| 99c1a32
+    user: authReq.user
+=======
+    user: authReq.user,
+>>>>>>> 3a132484c3dd607c9420aa0d48f120136f33d6d3
   });
 };
 
