@@ -1,9 +1,15 @@
 import Company from '../models/company';
 import { Types } from 'mongoose';
 import User from '../models/user';
-import Verification from '../models/verification';
-import { generateVerificationCode, sendVerificationEmail } from 'src/utils/verification';
-import { generateAccessToken, generateRefreshToken } from 'src/utils/auth';
+import { generateVerificationCode, sendVerificationEmail } from '../utils/verification';
+import { generateAccessToken, generateRefreshToken } from '../utils/auth';
+
+// 使用 Map 在内存中临时存储验证码
+const verificationStore = new Map<string, {
+  code: string;
+  expiresAt: Date;
+  verified: boolean;
+}>();
 
 interface CompanyInput {
   name: string;
@@ -91,12 +97,12 @@ export const companyService = {
       throw new Error('Email already registered');
     }
 
-    // Generate and send verification code
+    // Generate and store verification code
     const code = generateVerificationCode();
-    await Verification.create({
-      email,
+    verificationStore.set(email, {
       code,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+      verified: false
     });
 
     await sendVerificationEmail(email, code);
@@ -104,19 +110,27 @@ export const companyService = {
   },
 
   verifyCode: async (email: string, code: string) => {
-    const verification = await Verification.findOne({
-      email,
-      code,
-      expiresAt: { $gt: new Date() },
-      verified: false
-    });
+    const verification = verificationStore.get(email);
 
     if (!verification) {
-      throw new Error('Invalid or expired verification code');
+      throw new Error('No verification code found');
+    }
+
+    if (verification.expiresAt < new Date()) {
+      verificationStore.delete(email);
+      throw new Error('Verification code expired');
+    }
+
+    if (verification.code !== code) {
+      throw new Error('Invalid verification code');
+    }
+
+    if (verification.verified) {
+      throw new Error('Code already verified');
     }
 
     verification.verified = true;
-    await verification.save();
+    verificationStore.set(email, verification);
 
     // Check if domain has organization
     const domain = email.split('@')[1];

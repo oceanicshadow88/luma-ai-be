@@ -1,53 +1,82 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
-  email: string;
-  name: string;
-  password: string;
   username: string;
-  avatarUrl?: string;
+  password: string;
+  email: string;
+  avatarUrl: string;
   locale: string;
   refreshToken?: string;
   createdAt: Date;
+  active: boolean;
   hashPassword(): Promise<void>;
-  validatePassword(password: string): Promise<boolean>;
+  validatePassword(inputPassword: string): Promise<boolean>;
 }
 
-const userSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
+const userSchema: Schema<IUser> = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      minlength: 2,
+      maxlength: 20,
+      trim: true,
+      validate: {
+        validator: (username: string) => {
+          // validation logic
+          return /^[a-zA-Z0-9._-]+$/.test(username);
+        },
+        message: props => `${props.value} is not a valid username`,
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: (email: string) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        message: props => `${props.value} is not a valid email address`,
+      },
+    },
+    avatarUrl: {
+      type: String,
+      required: false,
+      default: '',
+      validate: {
+        validator: function (avatarUrl: string) {
+          return (
+            avatarUrl === '' || /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i.test(avatarUrl)
+          );
+        },
+        message: props => `${props.value} is not a valid image URL`,
+      },
+    },
+    locale: {
+      type: String,
+      required: false,
+      enum: ['en', 'zh'],
+      default: 'en',
+    },
+    refreshToken: {
+      type: String,
+      required: false,
+    },
   },
-  name: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  username: {
-    type: String,
-    required: true
-  },
-  refreshToken: String,
-  avatarUrl: String,
-  locale: {
-    type: String,
-    default: 'en'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  { timestamps: true },
+);
 
-userSchema.methods.hashPassword = async function(): Promise<void> {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+// use this: no arrow function
+userSchema.methods.hashPassword = async function (this: IUser): Promise<void> {
+  this.password = await bcrypt.hash(this.password, 12);
 };
 
 userSchema.methods.validatePassword = async function (
@@ -57,4 +86,7 @@ userSchema.methods.validatePassword = async function (
   return bcrypt.compare(password, this.password);
 };
 
-export default mongoose.model<IUser>('User', userSchema);
+// Prevent duplicate model registration in development (hot reload)
+const UserModel: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
+
+export default UserModel;
