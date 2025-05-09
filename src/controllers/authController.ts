@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/user';
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import ConflictsException from '../exceptions/conflictsException';
-import ValidationException from '../exceptions/validationException';
 import { jwtUtils } from '../lib/jwtUtils';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -52,7 +51,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await user.save();
 
     // request
-    res.status(201).json({ success: true, data: { accessToken } });
+    res.status(201).json({ success: true, data: { refreshToken } });
 
   } catch (error) {
     next(error);
@@ -83,7 +82,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.json({ success: true, data: { accessToken } });
+    res.json({ success: true, data: { refreshToken } });
   } catch (error) {
     return next(error);
   }
@@ -91,7 +90,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.body; //refreshToken must in req.body already verity in userValidation.ts
+    const { refreshToken } = req.body; //refreshToken must in req.body already verity in userAuthValidation.ts
 
     // Verify refresh token
     const payload = jwtUtils.verifyRefreshToken(refreshToken);
@@ -112,10 +111,11 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     user.refreshToken = newRefreshToken;
     await user.save();
 
-    res.json({
+    res.json({ success: true, data: { 
       accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    });
+      refreshToken: newRefreshToken, 
+    } });
+
   } catch (error) {
     if (error instanceof Error && error.name === 'JsonWebTokenError') {
       return res.status(403).json({ error: 'Invalid refresh token' });
@@ -131,7 +131,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken } = req.body;//refreshToken must in req.body already verity in userValidation.ts 
+    const { refreshToken } = req.body;//refreshToken must in req.body already verity in userAuthValidation.ts
 
     // Find user with the provided refresh token
     const user = await UserModel.findOne({ refreshToken }).exec();
