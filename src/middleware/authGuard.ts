@@ -1,15 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { jwtUtils } from '../lib/jwtUtils';
 
-// export interface AuthRequest extends Request {
-//   user?: {
-//     _id: string;
-//     name?: string;
-//     email?: string;
-//     role?: string;
-//   };
-// }
-
 /**
  * Middleware to verify JWT token and authorize access to protected routes
  * Returns a middleware function compatible with Express

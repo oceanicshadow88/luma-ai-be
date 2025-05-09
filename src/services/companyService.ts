@@ -4,7 +4,6 @@ import User from '../models/user';
 import { generateVerificationCode, sendVerificationEmail } from '../utils/verification';
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 
-// 使用 Map 在内存中临时存储验证码
 const verificationStore = new Map<
   string,
   {
