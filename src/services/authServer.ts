@@ -33,7 +33,15 @@ export const authService = {
     }
 
     // create new user
-    const user = new UserModel({ firstname, lastname, username, password, email, avatarUrl, locale });
+    const user = new UserModel({
+      firstname,
+      lastname,
+      username,
+      password,
+      email,
+      avatarUrl,
+      locale,
+    });
     await user.hashPassword();
 
     // generate Token

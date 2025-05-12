@@ -1,80 +1,50 @@
-import NotFoundException from '../exceptions/notFoundException';
+import UnauthorizedException from '../exceptions/unauthorizedException';
 import UserModel, { IUser } from '../models/user';
-import logger from '../utils/logger';
 
 export const userService = {
   // Get all users
-  getAllUsers: async (
-    page: number,
-    limit: number,
-    q?: string
-  ): Promise<IUser[]> => {
+  getAllUsers: async (page: number, limit: number, q?: string) => {
     const query = q ? { $text: { $search: q } } : {};
     const skip = (page - 1) * limit;
-    try {
-      const users = await UserModel.find(query)
-        .skip(skip)
-        .limit(limit)
-        .select('-password')
-        .exec();
 
-      if (!users.length) {
-        throw new NotFoundException('No users found!');
-      }
-      return users;
+    const users = await UserModel.find(query).skip(skip).limit(limit).select('-password').exec();
 
-    } catch (error) {
-      logger.error('Error in getAllUsers:', error);
-      return [];
+    if (!users.length) {
+      throw new UnauthorizedException('User not found');
     }
+    return users;
   },
 
   // Get user by ID
-  getUserById: async (userId: string): Promise<IUser | null> => {
-    try {
-      const user = await UserModel.findById(userId).select('-password').exec();
-      if (!user) {
-        throw new NotFoundException(`Users not found ${userId}`);
-      }
-
-      return user;
-
-    } catch (error) {
-      logger.error(`Error fetching user with ID ${userId}:`, error);
-      return null;
+  getUserById: async (userId: string) => {
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
+    return user;
   },
 
-  // // Create new user
-  // createUser: async (userData: Partial<IUser>): Promise<IUser> => {
-  //   try {
-  //     return await User.create(userData);
-  //   } catch (error) {
-  //     console.error('Error creating user:', error);
-  //     throw error; // Re-throw to allow controller to handle appropriately
-  //   }
-  // },
+  // Update user
+  updateUserById: async (userId: string, updates: Partial<IUser>) => {
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
 
-  // // Update user
-  // updateUser: async (userId: string, userData: Partial<IUser>): Promise<IUser | null> => {
-  //   try {
-  //     return await User.findByIdAndUpdate(userId, userData, {
-  //       new: true,
-  //       runValidators: true,
-  //     }).select('-password');
-  //   } catch (error) {
-  //     console.error(`Error updating user with ID ${userId}:`, error);
-  //     return null;
-  //   }
-  // },
+    user.set(updates);
+    await user.save();
 
-  // // Delete user
-  // deleteUser: async (userId: string): Promise<IUser | null> => {
-  //   try {
-  //     return await User.findByIdAndDelete(userId);
-  //   } catch (error) {
-  //     console.error(`Error deleting user with ID ${userId}:`, error);
-  //     return null;
-  //   }
-  // },
+    return user;
+  },
+
+  // Delete user
+  deleteUserById: async (userId: string) => {
+    // find user
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return await user.deleteOne();
+  },
 };
