@@ -1,14 +1,14 @@
-// import { Router } from 'express';
-// import { userController } from '../../controllers/userController';
-// import { validateUser } from '../../validations/userValidation';
+import { Router } from 'express';
+import { userController } from '../../controllers/userController';
+import { validateBody, validateQuery } from '../../middleware/validationMiddleware';
+import { userValidateSchema } from '../../validations/userValidaion';
 
-// const router = Router();
+const router = Router();
 
-// // User routes
-// router.get('/', userController.getAllUsers);
-// router.get('/:id', userController.getUserById);
-// router.post('/', validateUser, userController.createUser);
-// router.put('/:id', validateUser, userController.updateUser);
-// router.delete('/:id', userController.deleteUser);
+// User routes
+router.get('/', validateQuery(userValidateSchema.search), userController.getAllUsers);
+router.get('/:id', userController.getUserById);
+router.put('/:id', validateBody(userValidateSchema.update), userController.updateUserById);
+router.delete('/:id', userController.deleteUserById);
 
-// export default router;
+export default router;

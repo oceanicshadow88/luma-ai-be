@@ -3,9 +3,10 @@ import logger from '../../utils/logger';
 import NotFoundException from '../../exceptions/notFoundException';
 
 const notFoundError = (error: Error, req: Request, res: Response, next: NextFunction): void => {
-  // Handle ValidationException errors
+  // Check error type
   if (error instanceof NotFoundException) {
-    logger.warn('Resource not found', {
+    // record
+    logger.info('Unauthorized access', {
       payload: {
         method: req.method,
         path: req.path,
@@ -13,12 +14,11 @@ const notFoundError = (error: Error, req: Request, res: Response, next: NextFunc
         ...error.payload,
       },
     });
-    // Return error response for Joi validation exception
+    // response
     res.status(error.statusCode).json({
       success: false,
       error: error.message,
     });
-    return;
   }
 
   next(error);

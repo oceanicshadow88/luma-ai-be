@@ -1,56 +1,50 @@
-import User, { IUser } from '../models/user';
+import UnauthorizedException from '../exceptions/unauthorizedException';
+import UserModel, { IUser } from '../models/user';
 
 export const userService = {
   // Get all users
-  getAllUsers: async (): Promise<IUser[]> => {
-    try {
-      return await User.find().select('-password');
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      return [];
+  getAllUsers: async (page: number, limit: number, q?: string) => {
+    const query = q ? { $text: { $search: q } } : {};
+    const skip = (page - 1) * limit;
+
+    const users = await UserModel.find(query).skip(skip).limit(limit).select('-password').exec();
+
+    if (!users.length) {
+      throw new UnauthorizedException('User not found');
     }
+    return users;
   },
 
   // Get user by ID
-  getUserById: async (userId: string): Promise<IUser | null> => {
-    try {
-      return await User.findById(userId).select('-password');
-    } catch (error) {
-      console.error(`Error fetching user with ID ${userId}:`, error);
-      return null;
+  getUserById: async (userId: string) => {
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
-  },
-
-  // Create new user
-  createUser: async (userData: Partial<IUser>): Promise<IUser> => {
-    try {
-      return await User.create(userData);
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw error; // Re-throw to allow controller to handle appropriately
-    }
+    return user;
   },
 
   // Update user
-  updateUser: async (userId: string, userData: Partial<IUser>): Promise<IUser | null> => {
-    try {
-      return await User.findByIdAndUpdate(userId, userData, {
-        new: true,
-        runValidators: true,
-      }).select('-password');
-    } catch (error) {
-      console.error(`Error updating user with ID ${userId}:`, error);
-      return null;
+  updateUserById: async (userId: string, updates: Partial<IUser>) => {
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
+
+    user.set(updates);
+    await user.save();
+
+    return user;
   },
 
   // Delete user
-  deleteUser: async (userId: string): Promise<IUser | null> => {
-    try {
-      return await User.findByIdAndDelete(userId);
-    } catch (error) {
-      console.error(`Error deleting user with ID ${userId}:`, error);
-      return null;
+  deleteUserById: async (userId: string) => {
+    // find user
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
     }
+
+    return await user.deleteOne();
   },
 };
