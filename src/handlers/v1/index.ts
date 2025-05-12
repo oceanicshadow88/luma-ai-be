@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import userRoutes from './userRoute';
 import authRouter from './authRoute';
 import { authGuard } from '../../middleware/authGuard';
+import { IUser } from '../../models/user';
 
 const v1Router = Router();
 
@@ -15,6 +16,20 @@ v1Router.get('/health', (req: Request, res: Response) => {
 });
 
 // Protected test route handler
+interface IAuthUser {
+  _id: string;
+  email: string;
+  role: string;
+  name: string;
+}
+
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: IAuthUser;
+  }
+}
+
+
 const protectedTestHandler = (req: Request, res: Response): void => {
   res.status(200).json({
     status: 'success',
