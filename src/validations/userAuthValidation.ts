@@ -24,6 +24,17 @@ const baseAuthSchema = Joi.object({
 });
 
 const registerSchema = baseAuthSchema.keys({
+  firstname: Joi.string()
+    .required()
+    .messages({
+      'string.empty': 'Firstname is required',
+    }),
+
+  lastname: Joi.string()
+    .required()
+    .messages({
+      'string.empty': 'Lastname is required',
+    }),
   username: Joi.string()
     .required()
     .pattern(/^[a-zA-Z0-9._-]+$/)

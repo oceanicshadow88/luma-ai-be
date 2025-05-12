@@ -2,23 +2,35 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
+  firstname: string;
+  lastname: string;
   username: string;
   password: string;
   email: string;
   avatarUrl: string;
   locale: string;
-  refreshToken?: string;
   createdAt: Date;
   active: boolean;
   hashPassword(): Promise<void>;
   validatePassword(inputPassword: string): Promise<boolean>;
+  refreshToken?: string;
 }
 
 const userSchema: Schema<IUser> = new Schema(
   {
+    firstname: {
+      type: String,
+      required: true,
+    },
+    lastname: {
+      type: String,
+      required: true,
+    },
     username: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
       minlength: 2,
       maxlength: 20,
       trim: true,
