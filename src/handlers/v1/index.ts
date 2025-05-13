@@ -29,7 +29,6 @@ declare module 'express-serve-static-core' {
   }
 }
 
-
 const protectedTestHandler = (req: Request, res: Response): void => {
   res.status(200).json({
     status: 'success',

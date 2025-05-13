@@ -32,4 +32,8 @@ router.post(
 
 router.post('/logout', asyncHandler(authController.logout));
 
+router.post('/request-reset-code', asyncHandler(authController.requestResetCode));
+router.post('/verify-reset-code', asyncHandler(authController.verifyResetCode));
+router.post('/reset-password', asyncHandler(authController.resetPassword));
+
 export default router;
