@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import userRoutes from './userRoute';
 import authRouter from './authRoute';
 import { authGuard } from '../../middleware/authGuard';
-import { IUser } from '../../models/user';
 
 const v1Router = Router();
 

@@ -2,8 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/authServer';
 import UserModel from '../models/user';
-import { jwtUtils } from '../lib/jwtUtils';
-import { AppError } from '../error/errorApp';
+import ValidationException from '../exceptions/validationException';
 import { isValidEmail, isValidPassword } from '../utils';
 import config from '../config';
 
@@ -98,11 +97,11 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
 
     // Email validation
     if (!email) {
-      return next(new AppError('Please enter your email address', 400));
+      return next(new ValidationException('Please enter your email address'));
     }
 
     if (!isValidEmail(email)) {
-      return next(new AppError('Sorry, please type a valid email', 400));
+      return next(new ValidationException('Sorry, please type a valid email'));
     }
 
     // Find user by email
@@ -177,36 +176,35 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
 
     // Validation
     if (!email) {
-      return next(new AppError('Please enter your email address', 400));
+      return next(new ValidationException('Please enter your email address'));
     }
 
     if (!code) {
-      return next(new AppError('Please enter the verification code', 400));
+      return next(new ValidationException('Please enter the verification code'));
     }
 
     if (!newPassword) {
-      return next(new AppError('Please enter your new password', 400));
+      return next(new ValidationException('Please enter your new password'));
     }
 
     if (!confirmPassword) {
-      return next(new AppError('Please confirm your password', 400));
+      return next(new ValidationException('Please confirm your password'));
     }
 
     if (!isValidEmail(email)) {
-      return next(new AppError('Sorry, please type a valid email', 400));
+      return next(new ValidationException('Sorry, please type a valid email'));
     }
 
     // Check if passwords match
     if (newPassword !== confirmPassword) {
-      return next(new AppError('Passwords do not match', 400));
+      return next(new ValidationException('Passwords do not match'));
     }
 
     // Check password strength
     if (!isValidPassword(newPassword)) {
       return next(
-        new AppError(
+        new ValidationException(
           'Password must be 8-20 characters and contain at least one uppercase letter, lowercase letter, number and special character',
-          400,
         ),
       );
     }

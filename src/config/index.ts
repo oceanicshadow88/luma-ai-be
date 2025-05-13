@@ -69,6 +69,7 @@ export const config: Config = {
       pass: process.env.EMAIL_PASS || '',
     },
     from: process.env.EMAIL_FROM || 'noreply@example.com',
+  },
   resetCodeExpiry: parseInt(process.env.RESET_CODE_EXPIRY || '300', 10), // 5 minutes in seconds
   resetCodeRateLimit: parseInt(process.env.RESET_CODE_RATE_LIMIT || '1', 10), // 1 request allowed
   resetCodeRateLimitExpiry: parseInt(process.env.RESET_CODE_RATE_LIMIT_EXPIRY || '60', 10), // 60 seconds
