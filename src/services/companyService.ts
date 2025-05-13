@@ -6,7 +6,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 import { redisClient } from '../utils/redis';
 import { membershipService } from './membershipService';
 import crypto from 'crypto';
-import { emailService } from '../services/emailService';
+import { emailService } from '../utils/emailService';
 
 const verificationStore = new Map<
   string,
