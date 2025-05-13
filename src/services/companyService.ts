@@ -1,4 +1,4 @@
-import Company from '../models/ccompany';
+import Company from '../models/company';
 import { Types } from 'mongoose';
 import User from '../models/user';
 import { generateVerificationCode, sendVerificationEmail } from '../utils/verification';
