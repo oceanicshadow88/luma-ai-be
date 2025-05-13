@@ -1,5 +1,7 @@
 import Membership from '../models/membership';
 import { Types } from 'mongoose';
+import User from '../models/user';
+import redisClient from '../utils/redisClient';
 
 interface MembershipInput {
   companyId: string;
@@ -49,5 +51,56 @@ export const membershipService = {
 
   deleteMembership: async (id: string) => {
     return await Membership.findByIdAndUpdate(id, { status: 'disabled' }, { new: true });
+  },
+
+  createInitialMembership: async (
+    userId: string,
+    companyId: string,
+    role: 'admin' | 'instructor',
+  ) => {
+    return await Membership.create({
+      userId: new Types.ObjectId(userId),
+      companyId: new Types.ObjectId(companyId),
+      role,
+      status: 'active',
+    });
+  },
+
+  checkExistingMembership: async (email: string, companyId: string) => {
+    const user = await User.findOne({ email });
+    if (!user) return false;
+
+    const membership = await Membership.findOne({
+      userId: user._id,
+      companyId,
+      status: 'active',
+    });
+
+    return !!membership;
+  },
+
+  acceptInvite: async (token: string) => {
+    const inviteData = await redisClient.get(`invite:${token}`);
+    if (!inviteData) {
+      throw new Error('Invalid or expired invite token');
+    }
+
+    const { companyId, email, role } = JSON.parse(inviteData);
+
+    // Create or update membership
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const membership = await membershipService.createMembership({
+      userId: user._id.toString(),
+      companyId,
+      role,
+      status: 'active',
+    });
+
+    await redisClient.del(`invite:${token}`);
+    return membership;
   },
 };

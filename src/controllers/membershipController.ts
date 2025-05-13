@@ -79,4 +79,30 @@ export const membershipController = {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
+
+  getCurrentUserMemberships: async (req: Request, res: Response) => {
+    try {
+      const memberships = await membershipService.getMembershipsByUser(req.user?._id || '');
+      res.json(memberships);
+    } catch {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  acceptInvite: async (req: Request, res: Response) => {
+    try {
+      const { token } = req.params;
+      if (!token) {
+        return res.status(400).json({ message: 'Token is required' });
+      }
+      const result = await membershipService.acceptInvite(token);
+      res.json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
 };

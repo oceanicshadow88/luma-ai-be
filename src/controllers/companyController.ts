@@ -172,4 +172,22 @@ export const companyController = {
       }
     }
   },
+
+  createInvite: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { email, role } = req.body;
+      if (!id) {
+        return res.status(400).json({ message: 'Company ID is required' });
+      }
+      const invite = await companyService.createInvite(id, email, role);
+      res.status(201).json(invite);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  },
 };

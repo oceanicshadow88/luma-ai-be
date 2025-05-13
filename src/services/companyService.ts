@@ -1,8 +1,12 @@
-import Company from '../models/ccompany';
+import Company from '../models/company';
 import { Types } from 'mongoose';
 import User from '../models/user';
 import { generateVerificationCode, sendVerificationEmail } from '../utils/verification';
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
+import { redisClient } from '../utils/redis';
+import { membershipService } from './membershipService';
+import crypto from 'crypto';
+import { emailService } from '../utils/emailService';
 
 const verificationStore = new Map<
   string,
@@ -24,7 +28,6 @@ interface CompanyInput {
     primaryColor?: string;
   };
   userEmail: string;
-  active?: boolean;
 }
 
 interface CompanyUpdate {
@@ -42,11 +45,8 @@ interface CompanyUpdate {
 export const companyService = {
   createCompany: async (data: CompanyInput) => {
     const { name, plan, ownerId, settings, userEmail } = data;
-
-    // Extract domain from email
     const _domain = userEmail.split('@')[1];
 
-    // Check if company exists with this domain
     const existing = await Company.findOne({
       name: new RegExp(`^${name}$`, 'i'),
     });
@@ -55,7 +55,6 @@ export const companyService = {
       throw new Error('Company name already exists');
     }
 
-    // Create company
     return await Company.create({
       name,
       slug: name.toLowerCase().replace(/\s+/g, '-'),
@@ -93,20 +92,21 @@ export const companyService = {
   },
 
   checkEmailAndSendCode: async (email: string) => {
-    // Check if email exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      throw new Error('Email already registered');
+    const rateLimitKey = `verification:${email}`;
+    const lastSent = await redisClient.get(rateLimitKey);
+    if (lastSent) {
+      throw new Error('Please wait before requesting another code');
     }
 
-    // Generate and store verification code
+    const VERIFICATION_EXPIRES = 15 * 60;
     const code = generateVerificationCode();
     verificationStore.set(email, {
       code,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+      expiresAt: new Date(Date.now() + VERIFICATION_EXPIRES * 1000),
       verified: false,
     });
 
+    await redisClient.setex(rateLimitKey, 60, 'true');
     await sendVerificationEmail(email, code);
     return true;
   },
@@ -134,9 +134,11 @@ export const companyService = {
     verification.verified = true;
     verificationStore.set(email, verification);
 
-    // Check if domain has organization
+    // Check if organization exists for this email domain
     const domain = email.split('@')[1];
-    const existingCompany = await Company.findOne({ domain });
+    const existingCompany = await Company.findOne({
+      name: new RegExp(`^${domain}$`, 'i'),
+    });
 
     return {
       hasOrganization: !!existingCompany,
@@ -148,38 +150,60 @@ export const companyService = {
     email: string,
     organizationData: {
       name: string;
-      logo?: string;
+      logoUrl?: string;
     },
   ) => {
     const domain = email.split('@')[1];
-    const existingCompany = await Company.findOne({ domain });
+    const existingCompany = await Company.findOne({
+      name: new RegExp(`^${domain}$`, 'i'),
+    });
 
     if (existingCompany) {
-      return existingCompany;
+      return {
+        exists: true,
+        company: existingCompany,
+      };
     }
 
-    return await Company.create({
-      ...organizationData,
-      domain,
+    const company = await Company.create({
+      name: organizationData.name || domain,
+      slug: organizationData.name.toLowerCase().replace(/\s+/g, '-'),
+      settings: {
+        logoUrl: organizationData.logoUrl || '',
+      },
       plan: 'free',
       active: true,
     });
+
+    return {
+      exists: false,
+      company,
+    };
   },
 
-  completeRegistration: async (userData: {
+  completeRegistration: async (data: {
     email: string;
     password: string;
     name: string;
     role: 'admin' | 'instructor';
     companyId: string;
   }) => {
-    // Create user
+    const { email, password, name, role, companyId } = data;
+
     const user = await User.create({
-      ...userData,
+      email,
+      password,
+      name,
       active: true,
     });
 
-    // Generate tokens
+    await membershipService.createMembership({
+      userId: (user._id as Types.ObjectId).toString(),
+      companyId,
+      role,
+      status: 'active',
+    });
+
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
@@ -187,7 +211,29 @@ export const companyService = {
       user,
       accessToken,
       refreshToken,
-      redirectPath: userData.role === 'admin' ? '/dashboard/admin' : '/dashboard/instructor',
+      redirectPath: role === 'admin' ? '/dashboard/admin' : '/dashboard/instructor',
     };
+  },
+
+  createInvite: async (companyId: string, email: string, role: 'admin' | 'instructor') => {
+    const company = await Company.findById(companyId);
+    if (!company) {
+      throw new Error('Company not found');
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    await redisClient.setex(
+      `invite:${token}`,
+      24 * 60 * 60,
+      JSON.stringify({ companyId, email, role }),
+    );
+
+    await emailService.sendMail({
+      to: email,
+      subject: 'Company Invitation',
+      text: `You've been invited to join. Click here to accept: ${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}`,
+    });
+
+    return { token };
   },
 };

@@ -5,7 +5,20 @@ import { validateCompany } from '../../validations/companyValidaton';
 
 const router = Router();
 
-// Create company
+// Auth related routes
+router.post(
+  '/auth/signup',
+  validateCompany.checkEmail as unknown as RequestHandler[],
+  companyController.checkEmailAndSendCode as RequestHandler,
+);
+
+router.post(
+  '/auth/login',
+  validateCompany.verifyCode as unknown as RequestHandler[],
+  companyController.verifyCode as RequestHandler,
+);
+
+// Protected company routes
 router.post(
   '/',
   authGuard as RequestHandler,
@@ -13,16 +26,23 @@ router.post(
   companyController.createCompany as RequestHandler,
 );
 
-// Get all companies for current user
-router.get('/', authGuard as RequestHandler, companyController.getCompanies as RequestHandler);
-
-// Get company by ID
 router.get(
   '/:id',
   authGuard as RequestHandler,
   validateCompany.getCompany as unknown as RequestHandler[],
   companyController.getCompanyById as RequestHandler,
 );
+
+// Invite management
+router.post(
+  '/:id/invites',
+  authGuard as RequestHandler,
+  validateCompany.createInvite as unknown as RequestHandler[],
+  companyController.createInvite as RequestHandler,
+);
+
+// Get all companies for current user
+router.get('/', authGuard as RequestHandler, companyController.getCompanies as RequestHandler);
 
 // Update company
 router.patch(
@@ -37,20 +57,6 @@ router.delete(
   '/:id',
   authGuard as RequestHandler,
   companyController.deleteCompany as RequestHandler,
-);
-
-// Check email and send verification code
-router.post(
-  '/verify-email',
-  validateCompany.checkEmail as unknown as RequestHandler[],
-  companyController.checkEmailAndSendCode as RequestHandler,
-);
-
-// Verify code
-router.post(
-  '/verify-code',
-  validateCompany.verifyCode as unknown as RequestHandler[],
-  companyController.verifyCode as RequestHandler,
 );
 
 // Resend verification code
