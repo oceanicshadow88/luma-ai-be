@@ -1,6 +1,10 @@
 // authentication, authorization
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/authServer';
+import UserModel from '../models/user';
+import ValidationException from '../exceptions/validationException';
+import { isValidEmail, isValidPassword } from '../utils';
+import config from '../config';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -81,4 +85,217 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
   } catch (error) {
     next(error);
   }
+};
+
+/**
+ * Request password reset code
+ * Accepts an email, validates it, and generates a verification code if the email exists
+ */
+export const requestResetCode = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+
+    // Email validation
+    if (!email) {
+      return next(new ValidationException('Please enter your email address'));
+    }
+
+    if (!isValidEmail(email)) {
+      return next(new ValidationException('Sorry, please type a valid email'));
+    }
+
+    // Find user by email
+    const user = await UserModel.findOne({ email }).exec();
+
+    // Check if user exists
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email is not registered',
+      });
+    }
+
+    // Check for rate limiting (using MongoDB instead of Redis)
+    const now = new Date();
+    if (
+      user.resetCodeExpiry &&
+      user.resetCodeExpiry > now &&
+      now.getTime() - user.resetCodeExpiry.getTime() + config.resetCodeExpiry * 1000 <
+        config.resetCodeRateLimitExpiry * 1000
+    ) {
+      // Calculate seconds remaining for cooldown
+      const secondsRemaining = Math.ceil(
+        (config.resetCodeRateLimitExpiry * 1000 -
+          (now.getTime() - user.resetCodeExpiry.getTime() + config.resetCodeExpiry * 1000)) /
+          1000,
+      );
+
+      return res.status(429).json({
+        success: false,
+        message: 'Too many requests. Please try again later.',
+        cooldownSeconds: secondsRemaining,
+      });
+    }
+
+    // Generate 6-digit verification code (for real implementation we'd use generateVerificationCode())
+    const verificationCode = '888888'; // Hardcoded code for now
+
+    // Calculate expiry time (current time + 15 minutes)
+    const expiryTime = new Date();
+    expiryTime.setMinutes(expiryTime.getMinutes() + 15);
+
+    // Store code in user document
+    user.resetCode = verificationCode;
+    user.resetCodeExpiry = expiryTime;
+    user.resetCodeAttempts = 0;
+    await user.save();
+
+    // Skip sending email for now - this will be implemented later
+    // await sendVerificationCodeEmail(email, verificationCode);
+
+    // Return success response with the code (in production, this would be removed)
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code has been generated.',
+      // Only for development/testing - would be removed in production
+      code: verificationCode,
+      expiresAt: expiryTime,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * Combined verify code and reset password
+ * Validates the verification code and resets the password in one step
+ */
+export const verifyResetCode = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, code, newPassword, confirmPassword } = req.body;
+
+    // Validation
+    if (!email) {
+      return next(new ValidationException('Please enter your email address'));
+    }
+
+    if (!code) {
+      return next(new ValidationException('Please enter the verification code'));
+    }
+
+    if (!newPassword) {
+      return next(new ValidationException('Please enter your new password'));
+    }
+
+    if (!confirmPassword) {
+      return next(new ValidationException('Please confirm your password'));
+    }
+
+    if (!isValidEmail(email)) {
+      return next(new ValidationException('Sorry, please type a valid email'));
+    }
+
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+      return next(new ValidationException('Passwords do not match'));
+    }
+
+    // Check password strength
+    if (!isValidPassword(newPassword)) {
+      return next(
+        new ValidationException(
+          'Password must be 8-20 characters and contain at least one uppercase letter, lowercase letter, number and special character',
+        ),
+      );
+    }
+
+    // Find user by email
+    const user = await UserModel.findOne({ email }).exec();
+
+    // Check if user exists
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email is not registered',
+      });
+    }
+
+    // Check if user has a valid reset code
+    if (!user.resetCode || !user.resetCodeExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired code. Please request a new one.',
+      });
+    }
+
+    // Check if code is expired
+    if (user.resetCodeExpiry < new Date()) {
+      // Clear expired code
+      user.resetCode = undefined;
+      user.resetCodeExpiry = undefined;
+      await user.save();
+
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired code. Please request a new one.',
+      });
+    }
+
+    // Increment attempt counter to prevent brute force
+    user.resetCodeAttempts = (user.resetCodeAttempts || 0) + 1;
+
+    // Check for too many attempts (5 max)
+    if (user.resetCodeAttempts >= 5) {
+      // Clear code after too many attempts
+      user.resetCode = undefined;
+      user.resetCodeExpiry = undefined;
+      user.resetCodeAttempts = 0;
+      await user.save();
+
+      return res.status(400).json({
+        success: false,
+        message: 'Too many incorrect attempts. Please request a new verification code.',
+      });
+    }
+
+    // Verify the code (currently hardcoded to 888888)
+    if (user.resetCode !== code) {
+      await user.save(); // Save the incremented attempt counter
+
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired code. Please request a new one.',
+      });
+    }
+
+    // Code is valid - update the password
+    user.password = newPassword;
+    await user.hashPassword();
+
+    // Clear the reset code and expiry
+    user.resetCode = undefined;
+    user.resetCodeExpiry = undefined;
+    user.resetCodeAttempts = 0;
+
+    // Invalidate all existing sessions
+    user.refreshToken = undefined;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * Reset password - This is now combined with verifyResetCode
+ * This function is kept as a placeholder so existing routes still work
+ * It redirects to the combined verifyResetCode function
+ */
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  return verifyResetCode(req, res, next);
 };

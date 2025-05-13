@@ -11,6 +11,10 @@ export interface IUser extends Document {
   locale: string;
   createdAt: Date;
   active: boolean;
+  // Password reset fields
+  resetCode?: string;
+  resetCodeExpiry?: Date;
+  resetCodeAttempts?: number;
   hashPassword(): Promise<void>;
   validatePassword(inputPassword: string): Promise<boolean>;
   refreshToken?: string;
@@ -81,6 +85,17 @@ const userSchema: Schema<IUser> = new Schema(
     refreshToken: {
       type: String,
       required: false,
+    },
+    // Password reset fields
+    resetCode: {
+      type: String,
+    },
+    resetCodeExpiry: {
+      type: Date,
+    },
+    resetCodeAttempts: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true },
