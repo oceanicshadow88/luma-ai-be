@@ -6,7 +6,6 @@ import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 import { redisClient } from '../utils/redis';
 import { membershipService } from './membershipService';
 import crypto from 'crypto';
-import config from '../config';
 import { emailService } from '../services/emailService';
 
 const verificationStore = new Map<
@@ -232,7 +231,7 @@ export const companyService = {
     await emailService.sendMail({
       to: email,
       subject: 'Company Invitation',
-      text: `You've been invited to join. Click here to accept: ${config.appUrl}/invites/${token}`,
+      text: `You've been invited to join. Click here to accept: ${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}`,
     });
 
     return { token };
