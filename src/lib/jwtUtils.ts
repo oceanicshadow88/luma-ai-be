@@ -15,6 +15,10 @@ interface TokenPayload extends JwtPayload {
   role?: string;
 }
 
+interface ResetTokenPayload extends JwtPayload {
+  purpose: 'password-reset';
+}
+
 /**
  * JWT utility functions
  */
@@ -35,30 +39,30 @@ export const jwtUtils = {
    * @param payload - Data to include in the token
    * @param expiresIn - Optional custom expiration time (defaults to 15 minutes)
    */
-  generatePasswordResetToken(payload: object, expiresIn = '15m'): string {
+  generatePasswordResetToken(
+    payload: object,
+    expiresIn: StringValue = '15m' as StringValue,
+  ): string {
     const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-    // Convert string or unknown types to any to satisfy TypeScript
-    const options = {
+    const options: SignOptions = {
       expiresIn,
-    } as any;
-
+    };
     return jwt.sign({ ...payload, purpose: 'password-reset' }, secret, options);
   },
 
   /**
    * Verify a password reset token
    */
-  verifyPasswordResetToken(token: string): any {
+  verifyPasswordResetToken(token: string): ResetTokenPayload {
     try {
       const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-      const decoded = jwt.verify(token, secret);
+      const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
-      // Ensure the token was created for password reset
-      if (typeof decoded === 'object' && decoded !== null && decoded.purpose === 'password-reset') {
-        return decoded;
+      if (decoded.purpose !== 'password-reset') {
+        throw new Error('Invalid token purpose');
       }
 
-      throw new Error('Invalid token purpose');
+      return decoded;
     } catch (error) {
       throw error;
     }

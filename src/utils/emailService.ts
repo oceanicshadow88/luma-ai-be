@@ -1,6 +1,15 @@
 import nodemailer from 'nodemailer';
 import config from '../config';
 import logger from './logger';
+import { SentMessageInfo } from 'nodemailer';
+
+interface MailOptions {
+  from?: string;
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}
 
 // Create a test account for development if SMTP settings are not provided
 const createTestTransport = async () => {
@@ -23,7 +32,7 @@ const createTestTransport = async () => {
 
     // Fallback to a mock transporter that just logs emails
     return {
-      sendMail: (mailOptions: any) => {
+      sendMail: (mailOptions: MailOptions) => {
         logger.info('Email would be sent in production:', { payload: mailOptions });
         return Promise.resolve({ messageId: 'mock-id' });
       },
@@ -86,15 +95,9 @@ export const sendVerificationCodeEmail = async (
     const info = await transporter.sendMail(mailOptions);
 
     // Check if we're using Ethereal email (test account)
-    if (
-      config.env === 'development' &&
-      typeof info === 'object' &&
-      info !== null &&
-      'user' in info
-    ) {
+    if (config.env === 'development' && 'user' in info) {
       try {
-        // Use type assertion to avoid TypeScript errors
-        const testMessageUrl = nodemailer.getTestMessageUrl(info as any);
+        const testMessageUrl = nodemailer.getTestMessageUrl(info as SentMessageInfo);
         if (testMessageUrl) {
           logger.info(`Preview URL: ${testMessageUrl}`);
         }
