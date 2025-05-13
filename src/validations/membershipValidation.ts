@@ -28,4 +28,6 @@ export const validateMembership = {
   ],
 
   deleteMembership: [param('id').isMongoId().withMessage('Invalid membership ID'), validateRequest],
+
+  acceptInvite: [param('token').isString().withMessage('Invalid invite token'), validateRequest],
 };

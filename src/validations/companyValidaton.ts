@@ -77,4 +77,11 @@ export const validateCompany = {
     body('companyId').isMongoId().withMessage('Invalid company ID'),
     validateRequest,
   ],
+  createInvite: [
+    param('id').isMongoId().withMessage('Invalid company ID'),
+    body('email').isEmail().withMessage('Invalid email format'),
+    body('role').isIn(['admin', 'instructor']).withMessage('Invalid role'),
+    validateRequest,
+  ],
+  acceptInvite: [param('token').isString().withMessage('Invalid invite token'), validateRequest],
 };

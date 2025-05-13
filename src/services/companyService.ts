@@ -5,6 +5,9 @@ import { generateVerificationCode, sendVerificationEmail } from '../utils/verifi
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 import { redisClient } from '../utils/redis';
 import { membershipService } from './membershipService';
+import crypto from 'crypto';
+import config from '../config';
+import { emailService } from '../services/emailService';
 
 const verificationStore = new Map<
   string,
@@ -132,9 +135,11 @@ export const companyService = {
     verification.verified = true;
     verificationStore.set(email, verification);
 
-    // Check if domain has organization
+    // Check if organization exists for this email domain
     const domain = email.split('@')[1];
-    const existingCompany = await Company.findOne({ domain });
+    const existingCompany = await Company.findOne({
+      name: new RegExp(`^${domain}$`, 'i'),
+    });
 
     return {
       hasOrganization: !!existingCompany,
@@ -150,7 +155,9 @@ export const companyService = {
     },
   ) => {
     const domain = email.split('@')[1];
-    const existingCompany = await Company.findOne({ domain });
+    const existingCompany = await Company.findOne({
+      name: new RegExp(`^${domain}$`, 'i'),
+    });
 
     if (existingCompany) {
       return {
@@ -160,8 +167,7 @@ export const companyService = {
     }
 
     const company = await Company.create({
-      name: organizationData.name,
-      domain,
+      name: organizationData.name || domain,
       slug: organizationData.name.toLowerCase().replace(/\s+/g, '-'),
       settings: {
         logoUrl: organizationData.logoUrl || '',
@@ -208,5 +214,27 @@ export const companyService = {
       refreshToken,
       redirectPath: role === 'admin' ? '/dashboard/admin' : '/dashboard/instructor',
     };
+  },
+
+  createInvite: async (companyId: string, email: string, role: 'admin' | 'instructor') => {
+    const company = await Company.findById(companyId);
+    if (!company) {
+      throw new Error('Company not found');
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    await redisClient.setex(
+      `invite:${token}`,
+      24 * 60 * 60,
+      JSON.stringify({ companyId, email, role }),
+    );
+
+    await emailService.sendMail({
+      to: email,
+      subject: 'Company Invitation',
+      text: `You've been invited to join. Click here to accept: ${config.appUrl}/invites/${token}`,
+    });
+
+    return { token };
   },
 };

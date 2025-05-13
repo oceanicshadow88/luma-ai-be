@@ -1,6 +1,7 @@
 import Membership from '../models/membership';
 import { Types } from 'mongoose';
 import User from '../models/user';
+import redisClient from '../utils/redisClient';
 
 interface MembershipInput {
   companyId: string;
@@ -76,5 +77,30 @@ export const membershipService = {
     });
 
     return !!membership;
+  },
+
+  acceptInvite: async (token: string) => {
+    const inviteData = await redisClient.get(`invite:${token}`);
+    if (!inviteData) {
+      throw new Error('Invalid or expired invite token');
+    }
+
+    const { companyId, email, role } = JSON.parse(inviteData);
+
+    // Create or update membership
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const membership = await membershipService.createMembership({
+      userId: user._id.toString(),
+      companyId,
+      role,
+      status: 'active',
+    });
+
+    await redisClient.del(`invite:${token}`);
+    return membership;
   },
 };

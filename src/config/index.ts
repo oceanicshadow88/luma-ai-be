@@ -31,6 +31,7 @@ interface Config {
     };
     from: string;
   };
+  appUrl: string;
 }
 
 export const config: Config = {
@@ -56,6 +57,7 @@ export const config: Config = {
     },
     from: process.env.EMAIL_FROM || 'noreply@example.com',
   },
+  appUrl: process.env.APP_URL || 'http://localhost:3000',
 };
 
 export default config;

@@ -7,10 +7,12 @@ interface EmailOptions {
   text: string;
 }
 
-export const sendMail = async (options: EmailOptions) => {
-  const transporter = nodemailer.createTransport(config.email);
-  return await transporter.sendMail({
-    from: config.email.from,
-    ...options,
-  });
+export const emailService = {
+  sendMail: async (options: EmailOptions) => {
+    const transporter = nodemailer.createTransport(config.email);
+    return await transporter.sendMail({
+      from: config.email.from,
+      ...options,
+    });
+  },
 };
