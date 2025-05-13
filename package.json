@@ -48,6 +48,7 @@
     "yarn": "^1.22.22"
   },
   "devDependencies": {
+    "@sonar/scan": "^4.3.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/express-rate-limit": "^6.0.2",
