@@ -12,6 +12,15 @@ interface JwtConfig {
 
 export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 export type SafePayload = Record<string, unknown>;
+interface SmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth: {
+    user: string;
+    pass: string;
+  };
+}
 
 interface Config {
   env: string;
@@ -31,7 +40,11 @@ interface Config {
     };
     from: string;
   };
-  appUrl: string;
+  resetCodeExpiry: number;
+  resetCodeRateLimit: number;
+  resetCodeRateLimitExpiry: number;
+  emailFrom: string;
+  smtpConfig: SmtpConfig;
 }
 
 export const config: Config = {
@@ -57,7 +70,19 @@ export const config: Config = {
     },
     from: process.env.EMAIL_FROM || 'noreply@example.com',
   },
-  appUrl: process.env.APP_URL || 'http://localhost:3000',
+  resetCodeExpiry: parseInt(process.env.RESET_CODE_EXPIRY || '300', 10), // 5 minutes in seconds
+  resetCodeRateLimit: parseInt(process.env.RESET_CODE_RATE_LIMIT || '1', 10), // 1 request allowed
+  resetCodeRateLimitExpiry: parseInt(process.env.RESET_CODE_RATE_LIMIT_EXPIRY || '60', 10), // 60 seconds
+  emailFrom: process.env.EMAIL_FROM || 'noreply@luma-ai.com',
+  smtpConfig: {
+    host: process.env.SMTP_HOST || 'smtp.example.com',
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
+    },
+  },
 };
 
 export default config;
