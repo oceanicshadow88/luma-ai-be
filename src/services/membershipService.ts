@@ -1,5 +1,6 @@
 import Membership from '../models/membership';
 import { Types } from 'mongoose';
+import User from '../models/user';
 
 interface MembershipInput {
   companyId: string;
@@ -49,5 +50,31 @@ export const membershipService = {
 
   deleteMembership: async (id: string) => {
     return await Membership.findByIdAndUpdate(id, { status: 'disabled' }, { new: true });
+  },
+
+  createInitialMembership: async (
+    userId: string,
+    companyId: string,
+    role: 'admin' | 'instructor',
+  ) => {
+    return await Membership.create({
+      userId: new Types.ObjectId(userId),
+      companyId: new Types.ObjectId(companyId),
+      role,
+      status: 'active',
+    });
+  },
+
+  checkExistingMembership: async (email: string, companyId: string) => {
+    const user = await User.findOne({ email });
+    if (!user) return false;
+
+    const membership = await Membership.findOne({
+      userId: user._id,
+      companyId,
+      status: 'active',
+    });
+
+    return !!membership;
   },
 };
