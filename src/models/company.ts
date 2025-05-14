@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface ICompany extends Document {
+export interface Company extends Document {
   name: string;
   slug: string;
   plan: string;
@@ -63,4 +63,4 @@ const companySchema = new Schema({
   },
 });
 
-export default mongoose.model<ICompany>('Company', companySchema);
+export default mongoose.model<Company>('Company', companySchema);

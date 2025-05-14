@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-export interface IUser extends Document {
+export interface User extends Document {
   firstname: string;
   lastname: string;
   username: string;
@@ -20,7 +20,7 @@ export interface IUser extends Document {
   refreshToken?: string;
 }
 
-const userSchema: Schema<IUser> = new Schema(
+const userSchema: Schema<User> = new Schema(
   {
     firstname: {
       type: String,
@@ -102,18 +102,18 @@ const userSchema: Schema<IUser> = new Schema(
 );
 
 // use this: no arrow function
-userSchema.methods.hashPassword = async function (this: IUser): Promise<void> {
+userSchema.methods.hashPassword = async function (this: User): Promise<void> {
   this.password = await bcrypt.hash(this.password, 12);
 };
 
 userSchema.methods.validatePassword = async function (
-  this: IUser,
+  this: User,
   password: string,
 ): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
 
 // Prevent duplicate model registration in development (hot reload)
-const UserModel: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
+const UserModel: Model<User> = mongoose.models.User || mongoose.model<User>('User', userSchema);
 
 export default UserModel;

@@ -1,5 +1,5 @@
 import UnauthorizedException from '../exceptions/unauthorizedException';
-import UserModel, { IUser } from '../models/user';
+import UserModel, { User } from '../models/user';
 
 export const userService = {
   // Get all users
@@ -25,7 +25,7 @@ export const userService = {
   },
 
   // Update user
-  updateUserById: async (userId: string, updates: Partial<IUser>) => {
+  updateUserById: async (userId: string, updates: Partial<User>) => {
     const user = await UserModel.findOne({ _id: userId });
     if (!user) {
       throw new UnauthorizedException('User not found');

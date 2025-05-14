@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IMembership extends Document {
+export interface Membership extends Document {
   companyId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   role: 'admin' | 'instructor' | 'student';
@@ -37,4 +37,4 @@ const membershipSchema = new Schema({
   },
 });
 
-export default mongoose.model<IMembership>('Membership', membershipSchema);
+export default mongoose.model<Membership>('Membership', membershipSchema);
