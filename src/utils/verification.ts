@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { sendMail } from '../services/emailService';
+import { emailService } from '../utils/emailService';
 
 export const generateVerificationCode = (): string => {
   // Generate a random 4-digit number
@@ -20,7 +20,7 @@ export const sendVerificationEmail = async (email: string, code: string) => {
   const subject = 'Your Verification Code';
   const text = `Your verification code is: ${code}. This code will expire in 5 minutes.`;
 
-  return await sendMail({
+  return await emailService.sendMail({
     to: email,
     subject,
     text,

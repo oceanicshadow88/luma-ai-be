@@ -1,7 +1,12 @@
 import Membership from '../models/membership';
-import { Types } from 'mongoose';
+import { Types, Document } from 'mongoose';
 import User from '../models/user';
-import redisClient from '../utils/redisClient';
+import { redisClient } from '../utils/redis';
+
+interface UserDocument extends Document {
+  _id: Types.ObjectId;
+  email: string;
+}
 
 interface MembershipInput {
   companyId: string;
@@ -67,11 +72,11 @@ export const membershipService = {
   },
 
   checkExistingMembership: async (email: string, companyId: string) => {
-    const user = await User.findOne({ email });
+    const user = (await User.findOne({ email })) as UserDocument;
     if (!user) return false;
 
     const membership = await Membership.findOne({
-      userId: user._id,
+      userId: user._id.toString(),
       companyId,
       status: 'active',
     });
@@ -86,9 +91,7 @@ export const membershipService = {
     }
 
     const { companyId, email, role } = JSON.parse(inviteData);
-
-    // Create or update membership
-    const user = await User.findOne({ email });
+    const user = (await User.findOne({ email })) as UserDocument;
     if (!user) {
       throw new Error('User not found');
     }
