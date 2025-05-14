@@ -13,6 +13,7 @@ export const authService = {
     email,
     avatarUrl,
     locale,
+    verificationRequired = false,
   }: {
     firstname: string;
     lastname: string;
@@ -21,6 +22,7 @@ export const authService = {
     email: string;
     avatarUrl?: string;
     locale?: string;
+    verificationRequired?: boolean;
   }) => {
     // check exist user
     const existUserbyUsername = await UserModel.findOne({ username });
@@ -53,7 +55,20 @@ export const authService = {
     user.refreshToken = refreshToken;
     await user.save();
 
-    return { refreshToken, accessToken };
+    const result: {
+      refreshToken: string;
+      accessToken: string;
+      verificationCode?: string;
+      verificationExpiry?: Date;
+    } = { refreshToken, accessToken };
+
+    // Only add verification details to result if verification is required
+    if (verificationRequired && user.resetCode && user.resetCodeExpiry) {
+      result.verificationCode = user.resetCode;
+      result.verificationExpiry = user.resetCodeExpiry;
+    }
+
+    return result;
   },
 
   loginUser: async ({ email, password }: { email: string; password: string }) => {
