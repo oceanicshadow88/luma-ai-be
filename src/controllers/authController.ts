@@ -218,53 +218,13 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
         success: false,
         message: 'This email is not registered',
       });
-    }
+    } // Validate the reset code
+    const validationResult = await user.validateResetCode(code);
 
-    // Check if user has a valid reset code
-    if (!user.resetCode || !user.resetCodeExpiry) {
+    if (!validationResult.isValid) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired code. Please request a new one.',
-      });
-    }
-
-    // Check if code is expired
-    if (user.resetCodeExpiry < new Date()) {
-      // Clear expired code
-      user.resetCode = undefined;
-      user.resetCodeExpiry = undefined;
-      await user.save();
-
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired code. Please request a new one.',
-      });
-    }
-
-    // Increment attempt counter to prevent brute force
-    user.resetCodeAttempts = (user.resetCodeAttempts || 0) + 1;
-
-    // Check for too many attempts (5 max)
-    if (user.resetCodeAttempts >= 5) {
-      // Clear code after too many attempts
-      user.resetCode = undefined;
-      user.resetCodeExpiry = undefined;
-      user.resetCodeAttempts = 0;
-      await user.save();
-
-      return res.status(400).json({
-        success: false,
-        message: 'Too many incorrect attempts. Please request a new verification code.',
-      });
-    }
-
-    // Verify the code (currently hardcoded to 888888)
-    if (user.resetCode !== code) {
-      await user.save(); // Save the incremented attempt counter
-
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired code. Please request a new one.',
+        message: validationResult.message,
       });
     }
 
