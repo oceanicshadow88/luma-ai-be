@@ -1,3 +1,4 @@
+import ResetCodeModel from '../models/resetCode';
 import ConflictsException from '../exceptions/conflictsException';
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import { jwtUtils } from '../lib/jwtUtils';
@@ -14,9 +15,9 @@ export const authService = {
     password,
     email,
     avatarUrl,
+    verifyCode,
     locale,
     companySlug,
-    verificationRequired = false,
   }: {
     firstname: string;
     lastname: string;
@@ -26,7 +27,7 @@ export const authService = {
     avatarUrl?: string;
     locale?: string;
     companySlug: string;
-    verificationRequired?: boolean;
+    verifyCode?: string;
   }) => {
     // check exist user
     const existUserbyUsername = await UserModel.findOne({ username });
@@ -40,6 +41,24 @@ export const authService = {
     const existCompany = await company.findOne({ slug: companySlug });
     if (!existCompany) {
       throw new UnauthorizedException('Company not found');
+    }
+
+    if (!verifyCode) {
+      throw new UnauthorizedException('Verification code is required');
+    }
+
+    // check verifyCode
+    if (verifyCode) {
+      const resetCode = await ResetCodeModel.findOne({
+        email,
+      });
+      if (!resetCode) {
+        throw new UnauthorizedException('Invalid verification code');
+      }
+      const { isValid, message } = await resetCode.validateResetCode(verifyCode);
+      if (!isValid) {
+        throw new UnauthorizedException(message);
+      }
     }
 
     // create new user
@@ -62,7 +81,7 @@ export const authService = {
     // save refreshToken
     user.refreshToken = refreshToken;
     await user.save();
-
+    
     // Create membership
     const membership = await membershipService.createMembership({
       companyId: existCompany.id,
@@ -70,20 +89,13 @@ export const authService = {
       role: 'admin',
       status: 'active',
     });
-    console.log(membership);
-
+    await membership.save();
+    
+    
     const result: {
       refreshToken: string;
       accessToken: string;
-      verificationCode?: string;
-      verificationExpiry?: Date;
     } = { refreshToken, accessToken };
-
-    // Only add verification details to result if verification is required
-    if (verificationRequired && user.resetCode && user.resetCodeExpiry) {
-      result.verificationCode = user.resetCode;
-      result.verificationExpiry = user.resetCodeExpiry;
-    }
 
     return result;
   },

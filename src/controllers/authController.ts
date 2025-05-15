@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/authServer';
 import UserModel from '../models/user';
+import ResetCodeModel from '../models/resetCode';
 import ValidationException from '../exceptions/validationException';
 import { isValidEmail, isValidPassword } from '../utils';
 import config from '../config';
@@ -18,6 +19,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       password,
       email,
       avatarUrl,
+      verifyCode,
       locale,
     }: {
       firstname: string;
@@ -26,6 +28,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       password: string;
       email: string;
       avatarUrl?: string;
+      verifyCode?: string;
       locale?: string;
     } = req.body;
 
@@ -39,6 +42,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       password,
       email,
       avatarUrl,
+      verifyCode,
       locale,
       companySlug,
     });
@@ -109,29 +113,24 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
       return next(new ValidationException('Sorry, please type a valid email'));
     }
 
-    // Find user by email
-    const user = await UserModel.findOne({ email }).exec();
-
-    // Check if user exists
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'This email is not registered',
-      });
-    }
-
-    // Check for rate limiting (using MongoDB instead of Redis)
+    // Check for existing reset code
+    const existingCode = await ResetCodeModel.findOne({ email }).exec();
     const now = new Date();
+
+    // Check for rate limiting
     if (
-      user.resetCodeExpiry &&
-      user.resetCodeExpiry > now &&
-      now.getTime() - user.resetCodeExpiry.getTime() + config.resetCodeExpiry * 1000 <
+      existingCode &&
+      existingCode.expiresAt > now &&
+      now.getTime() - existingCode.expiresAt.getTime() + config.resetCodeExpiry * 1000 <
         config.resetCodeRateLimitExpiry * 1000
     ) {
+      console.log('now.getTime():', now.getTime());
+      console.log('existingCode.expiresAt.getTime():', existingCode.expiresAt.getTime());
+      console.log('config.resetCodeExpiry * 1000:', config.resetCodeExpiry * 1000);
       // Calculate seconds remaining for cooldown
       const secondsRemaining = Math.ceil(
         (config.resetCodeRateLimitExpiry * 1000 -
-          (now.getTime() - user.resetCodeExpiry.getTime() + config.resetCodeExpiry * 1000)) /
+          (now.getTime() - existingCode.expiresAt.getTime() + config.resetCodeExpiry * 1000)) /
           1000,
       );
 
@@ -142,18 +141,25 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
       });
     }
 
-    // Generate 6-digit verification code (for real implementation we'd use generateVerificationCode())
-    const verificationCode = '888888'; // Hardcoded code for now
+    // Generate verification code
+    const verificationCode = '888888';
 
     // Calculate expiry time (current time + 15 minutes)
     const expiryTime = new Date();
     expiryTime.setMinutes(expiryTime.getMinutes() + 15);
 
-    // Store code in user document
-    user.resetCode = verificationCode;
-    user.resetCodeExpiry = expiryTime;
-    user.resetCodeAttempts = 0;
-    await user.save();
+    // Delete any existing reset codes for this email
+    if (existingCode) {
+      await existingCode.deleteOne();
+    }
+
+    // Store code in reset code collection
+    await ResetCodeModel.create({
+      email,
+      code: verificationCode,
+      expiresAt: expiryTime,
+      attempts: 0,
+    });
 
     // Skip sending email for now - this will be implemented later
     // await sendVerificationCodeEmail(email, verificationCode);
@@ -223,8 +229,21 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
         success: false,
         message: 'This email is not registered',
       });
-    } // Validate the reset code
-    const validationResult = await user.validateResetCode(code);
+    }
+
+    // Find the reset code for this email
+    const resetCode = await ResetCodeModel.findOne({ email }).exec();
+
+    // Check if reset code exists
+    if (!resetCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired code. Please request a new one.',
+      });
+    }
+
+    // Validate the reset code
+    const validationResult = await resetCode.validateResetCode(code);
 
     if (!validationResult.isValid) {
       return res.status(400).json({
@@ -237,10 +256,8 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
     user.password = newPassword;
     await user.hashPassword();
 
-    // Clear the reset code and expiry
-    user.resetCode = undefined;
-    user.resetCodeExpiry = undefined;
-    user.resetCodeAttempts = 0;
+    // Delete the reset code record
+    await resetCode.deleteOne();
 
     // Invalidate all existing sessions
     user.refreshToken = undefined;
