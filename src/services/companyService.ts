@@ -228,20 +228,11 @@ export const companyService = {
       JSON.stringify({ companyId, email, role }),
     );
 
+    const inviteLink = `${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}`;
     await emailService.sendMail({
       to: email,
       subject: `Invitation to Join ${company.name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>You've Been Invited!</h2>
-          <p>You've been invited to join ${company.name} as ${role}.</p>
-          <p>Click the link below to accept:</p>
-          <p><a href="${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}" 
-                style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-             Accept Invitation
-          </a></p>
-        </div>
-      `,
+      text: `You have been invited to join ${company.name} as ${role}.\nPlease click the link below to accept:\n${inviteLink}`,
     });
 
     return { token };
