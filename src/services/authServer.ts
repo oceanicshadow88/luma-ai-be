@@ -1,3 +1,4 @@
+import ResetCodeModel from '../models/resetCode';
 import ConflictsException from '../exceptions/conflictsException';
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import { jwtUtils } from '../lib/jwtUtils';
@@ -12,8 +13,8 @@ export const authService = {
     password,
     email,
     avatarUrl,
+    verifyCode,
     locale,
-    verificationRequired = false,
   }: {
     firstname: string;
     lastname: string;
@@ -22,7 +23,7 @@ export const authService = {
     email: string;
     avatarUrl?: string;
     locale?: string;
-    verificationRequired?: boolean;
+    verifyCode?: string;
   }) => {
     // check exist user
     const existUserbyUsername = await UserModel.findOne({ username });
@@ -32,6 +33,24 @@ export const authService = {
     const existUserbyEmail = await UserModel.findOne({ email });
     if (existUserbyEmail) {
       throw new ConflictsException(`${email} already exists`);
+    }
+
+    if (!verifyCode) {
+      throw new UnauthorizedException('Verification code is required');
+    }
+
+    // check verifyCode
+    if (verifyCode) {
+      const resetCode = await ResetCodeModel.findOne({
+        email,
+      });
+      if (!resetCode) {
+        throw new UnauthorizedException('Invalid verification code');
+      }
+      const { isValid, message } = await resetCode.validateResetCode(verifyCode);
+      if (!isValid) {
+        throw new UnauthorizedException(message);
+      }
     }
 
     // create new user
@@ -54,19 +73,10 @@ export const authService = {
     // save refreshToken
     user.refreshToken = refreshToken;
     await user.save();
-
     const result: {
       refreshToken: string;
       accessToken: string;
-      verificationCode?: string;
-      verificationExpiry?: Date;
     } = { refreshToken, accessToken };
-
-    // Only add verification details to result if verification is required
-    if (verificationRequired && user.resetCode && user.resetCodeExpiry) {
-      result.verificationCode = user.resetCode;
-      result.verificationExpiry = user.resetCodeExpiry;
-    }
 
     return result;
   },

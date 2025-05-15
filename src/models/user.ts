@@ -1,3 +1,4 @@
+// filepath: i:\00_SoftwareDevopment\luma-ai-be\src\models\user.ts
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -11,16 +12,8 @@ export interface User extends Document {
   locale: string;
   createdAt: Date;
   active: boolean;
-  // Password reset fields
-  resetCode?: string;
-  resetCodeExpiry?: Date;
-  resetCodeAttempts?: number;
   hashPassword(): Promise<void>;
   validatePassword(inputPassword: string): Promise<boolean>;
-  validateResetCode(code: string): Promise<{
-    isValid: boolean;
-    message: string;
-  }>;
   refreshToken?: string;
 }
 
@@ -90,17 +83,6 @@ const userSchema: Schema<User> = new Schema(
       type: String,
       required: false,
     },
-    // Password reset fields
-    resetCode: {
-      type: String,
-    },
-    resetCodeExpiry: {
-      type: Date,
-    },
-    resetCodeAttempts: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true },
 );
@@ -115,65 +97,6 @@ userSchema.methods.validatePassword = async function (
   password: string,
 ): Promise<boolean> {
   return bcrypt.compare(password, this.password);
-};
-
-userSchema.methods.validateResetCode = async function (
-  this: User,
-  code: string,
-): Promise<{ isValid: boolean; message: string }> {
-  // Check if user has a valid reset code
-  if (!this.resetCode || !this.resetCodeExpiry) {
-    return {
-      isValid: false,
-      message: 'Invalid or expired code. Please request a new one.',
-    };
-  }
-
-  // Check if code is expired
-  if (this.resetCodeExpiry < new Date()) {
-    // Clear expired code
-    this.resetCode = undefined;
-    this.resetCodeExpiry = undefined;
-    await this.save();
-
-    return {
-      isValid: false,
-      message: 'Invalid or expired code. Please request a new one.',
-    };
-  }
-
-  // Increment attempt counter to prevent brute force
-  this.resetCodeAttempts = (this.resetCodeAttempts || 0) + 1;
-
-  // Check for too many attempts (5 max)
-  if (this.resetCodeAttempts >= 5) {
-    // Clear code after too many attempts
-    this.resetCode = undefined;
-    this.resetCodeExpiry = undefined;
-    this.resetCodeAttempts = 0;
-    await this.save();
-
-    return {
-      isValid: false,
-      message: 'Too many incorrect attempts. Please request a new verification code.',
-    };
-  }
-
-  // Verify the code
-  if (this.resetCode !== code) {
-    await this.save(); // Save the incremented attempt counter
-
-    return {
-      isValid: false,
-      message: 'Invalid or expired code. Please request a new one.',
-    };
-  }
-
-  // If we get here, the code is valid
-  return {
-    isValid: true,
-    message: 'Code verified successfully',
-  };
 };
 
 // Prevent duplicate model registration in development (hot reload)
