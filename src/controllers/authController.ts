@@ -5,6 +5,7 @@ import UserModel from '../models/user';
 import ValidationException from '../exceptions/validationException';
 import { isValidEmail, isValidPassword } from '../utils';
 import config from '../config';
+import { extractCompanySlug } from '../middleware/extractCompanySlugFromEmail';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -28,6 +29,9 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       locale?: string;
     } = req.body;
 
+    // get company slug
+    const companySlug = extractCompanySlug(email);
+
     const { refreshToken } = await authService.registerUser({
       firstname,
       lastname,
@@ -36,6 +40,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       email,
       avatarUrl,
       locale,
+      companySlug,
     });
 
     // request

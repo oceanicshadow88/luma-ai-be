@@ -1,8 +1,10 @@
 import ConflictsException from '../exceptions/conflictsException';
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import { jwtUtils } from '../lib/jwtUtils';
+import company from '../models/company';
 import UserModel from '../models/user';
 import { Types } from 'mongoose';
+import { membershipService } from './membershipService';
 
 export const authService = {
   registerUser: async ({
@@ -13,6 +15,7 @@ export const authService = {
     email,
     avatarUrl,
     locale,
+    companySlug,
     verificationRequired = false,
   }: {
     firstname: string;
@@ -22,6 +25,7 @@ export const authService = {
     email: string;
     avatarUrl?: string;
     locale?: string;
+    companySlug: string;
     verificationRequired?: boolean;
   }) => {
     // check exist user
@@ -32,6 +36,10 @@ export const authService = {
     const existUserbyEmail = await UserModel.findOne({ email });
     if (existUserbyEmail) {
       throw new ConflictsException(`${email} already exists`);
+    }
+    const existCompany = await company.findOne({ slug: companySlug });
+    if (!existCompany) {
+      throw new UnauthorizedException('Company not found');
     }
 
     // create new user
@@ -54,6 +62,15 @@ export const authService = {
     // save refreshToken
     user.refreshToken = refreshToken;
     await user.save();
+
+    // Create membership
+    const membership = await membershipService.createMembership({
+      companyId: existCompany.id,
+      userId: user.id,
+      role: 'admin',
+      status: 'active',
+    });
+    console.log(membership);
 
     const result: {
       refreshToken: string;

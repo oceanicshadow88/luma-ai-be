@@ -2,7 +2,6 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as authController from '../../controllers/authController';
 import { validateBody } from '../../middleware/validationMiddleware';
 import authValidationSchema from '../../validations/userAuthValidation';
-
 const router = Router();
 
 // Helper function to handle async routes
@@ -17,7 +16,7 @@ const asyncHandler =
   };
 
 router.post(
-  '/register',
+  '/register/admin',
   validateBody(authValidationSchema.register),
   asyncHandler(authController.register),
 );
