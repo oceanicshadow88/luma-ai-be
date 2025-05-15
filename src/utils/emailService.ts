@@ -72,7 +72,6 @@ export const emailService = {
   sendVerificationCodeEmail: async (email: string, verificationCode: string): Promise<boolean> => {
     try {
       const transporter = await getTransporter();
-
       const mailOptions = {
         from: config.emailFrom || 'noreply@luma-ai.com',
         to: email,
@@ -80,24 +79,18 @@ export const emailService = {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Password Reset Requested</h2>
-            <p>We received a request to reset your password. Please use the following verification code to proceed with your password reset:</p>
-            
+            <p>We received a request to reset your password. Please use the following verification code to proceed:</p>
             <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 24px; letter-spacing: 5px; margin: 20px 0;">
               <strong>${verificationCode}</strong>
             </div>
-            
             <p>This code will expire in 5 minutes.</p>
-            
-            <p>If you did not request a password reset, please ignore this email or contact support if you have any concerns.</p>
-            
-            <p>Thank you,<br>The LUMA AI Team</p>
+            <p>If you did not request this, please ignore this email.</p>
           </div>
         `,
       };
 
       const info = await transporter.sendMail(mailOptions);
 
-      // Check if we're using Ethereal email (test account)
       if (config.env === 'development' && 'user' in info) {
         try {
           const testMessageUrl = nodemailer.getTestMessageUrl(info as SentMessageInfo);
@@ -109,10 +102,9 @@ export const emailService = {
         }
       }
 
-      logger.info(`Verification code email sent to ${email}`);
       return true;
     } catch (error) {
-      logger.error('Failed to send verification code email:', { payload: error });
+      logger.error('Failed to send verification code:', { payload: error });
       return false;
     }
   },

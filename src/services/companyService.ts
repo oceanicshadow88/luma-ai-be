@@ -230,10 +230,47 @@ export const companyService = {
 
     await emailService.sendMail({
       to: email,
-      subject: 'Company Invitation',
-      text: `You've been invited to join. Click here to accept: ${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}`,
+      subject: `Invitation to Join ${company.name}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>You've Been Invited!</h2>
+          <p>You've been invited to join ${company.name} as ${role}.</p>
+          <p>Click the link below to accept:</p>
+          <p><a href="${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}" 
+                style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+             Accept Invitation
+          </a></p>
+        </div>
+      `,
     });
 
     return { token };
+  },
+
+  findCompanyByEmailDomain: async (email: string) => {
+    const domain = email.split('@')[1];
+    return await Company.findOne({
+      emailDomains: domain,
+      active: true,
+    });
+  },
+
+  validateInvite: async (token: string, email: string) => {
+    const inviteData = await redisClient.get(`invite:${token}`);
+    if (!inviteData) {
+      return { valid: false, message: 'Invalid or expired invitation' };
+    }
+
+    const { companyId, invitedEmail, role } = JSON.parse(inviteData);
+    if (email !== invitedEmail) {
+      return { valid: false, message: 'Email does not match invitation' };
+    }
+
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return { valid: false, message: 'Company not found' };
+    }
+
+    return { valid: true, company, role };
   },
 };
