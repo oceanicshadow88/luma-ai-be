@@ -16,6 +16,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       username,
       password,
       email,
+      resetCode,
       avatarUrl,
       locale,
     }: {
@@ -24,6 +25,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       username: string;
       password: string;
       email: string;
+      resetCode: string;
       avatarUrl?: string;
       locale?: string;
     } = req.body;
@@ -34,6 +36,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       username,
       password,
       email,
+      resetCode,
       avatarUrl,
       locale,
     });
@@ -105,18 +108,50 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
     }
 
     // Find user by email
-    const user = await UserModel.findOne({ email }).exec();
+    let user = await UserModel.findOne({ email }).exec();
 
     // Check if user exists
+    const newUser = new UserModel({
+      firstname: 'thisisatestfirstname',
+      lastname: 'thisisatestlastname',
+      username: 'thisisatestusername',
+      password: 'thisisatestpassword123',
+      email: email,
+      locale: 'en',
+      active: false,
+    });
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'This email is not registered',
-      });
+      await newUser.save();
+      user = newUser;
     }
 
     // Check for rate limiting (using MongoDB instead of Redis)
     const now = new Date();
+
+    // Check if code was requested within the last minute (60 seconds)
+    if (
+      user.resetCodeExpiry &&
+      Math.floor(
+        (now.getTime() - (user.resetCodeExpiry.getTime() - (config.resetCodeExpiry - 14) * 1000)) /
+          1000,
+      ) < 60
+    ) {
+      // Calculate seconds remaining until they can request again
+      const secondsRemaining =
+        60 -
+        Math.floor(
+          (now.getTime() -
+            (user.resetCodeExpiry.getTime() - (config.resetCodeExpiry - 14) * 1000)) /
+            1000,
+        );
+
+      return res.status(429).json({
+        success: false,
+        message: 'Please wait before requesting a new code.',
+        cooldownSeconds: secondsRemaining,
+      });
+    }
+
     if (
       user.resetCodeExpiry &&
       user.resetCodeExpiry > now &&
@@ -218,7 +253,9 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
         success: false,
         message: 'This email is not registered',
       });
-    } // Validate the reset code
+    }
+
+    // Validate the reset code
     const validationResult = await user.validateResetCode(code);
 
     if (!validationResult.isValid) {

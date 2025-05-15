@@ -11,6 +11,7 @@ export const authService = {
     username,
     password,
     email,
+    resetCode,
     avatarUrl,
     locale,
     verificationRequired = false,
@@ -20,18 +21,30 @@ export const authService = {
     username: string;
     password: string;
     email: string;
+    resetCode: string;
     avatarUrl?: string;
     locale?: string;
     verificationRequired?: boolean;
   }) => {
     // check exist user
     const existUserbyUsername = await UserModel.findOne({ username });
-    if (existUserbyUsername) {
+    if (existUserbyUsername && existUserbyUsername.active) {
       throw new ConflictsException(`${username} already exists`);
     }
     const existUserbyEmail = await UserModel.findOne({ email });
-    if (existUserbyEmail) {
-      throw new ConflictsException(`${email} already exists`);
+    if (existUserbyEmail && existUserbyEmail.active) {
+      throw new ConflictsException(`${email} already registered`);
+    }
+
+    // Check if user exists
+    if (!existUserbyEmail) {
+      throw new ConflictsException('This email is not send the verification code');
+    }
+
+    const validationResult = await existUserbyEmail.validateResetCode(resetCode);
+
+    if (!validationResult.isValid) {
+      throw new ConflictsException('Invalid reset code');
     }
 
     // create new user
@@ -43,6 +56,7 @@ export const authService = {
       email,
       avatarUrl,
       locale,
+      active: true,
     });
     await user.hashPassword();
 

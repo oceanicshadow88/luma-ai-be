@@ -7,7 +7,8 @@ export interface User extends Document {
   username: string;
   password: string;
   email: string;
-  avatarUrl: string;
+  verifyCode?: string;
+  avatarUrl?: string;
   locale: string;
   createdAt: Date;
   active: boolean;

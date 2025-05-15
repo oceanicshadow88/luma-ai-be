@@ -62,6 +62,10 @@ const registerSchema = baseAuthSchema.keys({
     'any.only': 'Locale must be either "en" or "zh"',
   }),
 
+  resetCode: Joi.string().allow('').messages({
+    'string.empty': 'Reset code is required',
+  }),
+
   active: Joi.boolean().default(true).messages({
     'boolean.base': 'Active must be a boolean value',
   }),
