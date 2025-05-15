@@ -62,6 +62,10 @@ const registerSchema = baseAuthSchema.keys({
     'any.only': 'Locale must be either "en" or "zh"',
   }),
 
+  verifyCode: Joi.string().required().messages({
+    'string.empty': 'Verification code is required',
+  }),
+
   active: Joi.boolean().default(true).messages({
     'boolean.base': 'Active must be a boolean value',
   }),
