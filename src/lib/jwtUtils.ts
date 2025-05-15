@@ -1,5 +1,7 @@
 import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
+import UnauthorizedException from '../exceptions/unauthorizedException';
+import logger from '../utils/logger';
 
 // Default values in case configuration isn't set
 const DEFAULT_JWT_SECRET = 'your-secret-key-should-be-in-env-file';
@@ -59,11 +61,12 @@ export const jwtUtils = {
       const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
       if (decoded.purpose !== 'password-reset') {
-        throw new Error('Invalid token purpose');
+        throw new UnauthorizedException('Invalid token purpose');
       }
 
       return decoded;
     } catch (error) {
+      logger.error('Verify Password failed');
       throw error;
     }
   },
@@ -87,7 +90,7 @@ export const jwtUtils = {
       const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
       return jwt.verify(token, secret) as TokenPayload;
     } catch (error) {
-      throw error;
+      throw new UnauthorizedException('Verify Access Token failed', { payload: error });
     }
   },
 
@@ -99,7 +102,7 @@ export const jwtUtils = {
       const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
       return jwt.verify(token, secret) as TokenPayload;
     } catch (error) {
-      throw error;
+      throw new UnauthorizedException('Verify Fresh Token failed', { payload: error });
     }
   },
 };

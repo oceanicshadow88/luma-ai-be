@@ -15,7 +15,7 @@ v1Router.get('/health', (req: Request, res: Response) => {
 });
 
 // Protected test route handler
-interface IAuthUser {
+interface AuthUser {
   _id: string;
   email: string;
   role: string;
@@ -24,7 +24,7 @@ interface IAuthUser {
 
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: IAuthUser;
+    user?: AuthUser;
   }
 }
 
