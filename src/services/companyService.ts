@@ -228,12 +228,40 @@ export const companyService = {
       JSON.stringify({ companyId, email, role }),
     );
 
+    const inviteLink = `${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}`;
     await emailService.sendMail({
       to: email,
-      subject: 'Company Invitation',
-      text: `You've been invited to join. Click here to accept: ${process.env.APP_URL || 'http://localhost:3000'}/invites/${token}`,
+      subject: `Invitation to Join ${company.name}`,
+      text: `You have been invited to join ${company.name} as ${role}.\nPlease click the link below to accept:\n${inviteLink}`,
     });
 
     return { token };
+  },
+
+  findCompanyByEmailDomain: async (email: string) => {
+    const domain = email.split('@')[1];
+    return await Company.findOne({
+      emailDomains: domain,
+      active: true,
+    });
+  },
+
+  validateInvite: async (token: string, email: string) => {
+    const inviteData = await redisClient.get(`invite:${token}`);
+    if (!inviteData) {
+      return { valid: false, message: 'Invalid or expired invitation' };
+    }
+
+    const { companyId, invitedEmail, role } = JSON.parse(inviteData);
+    if (email !== invitedEmail) {
+      return { valid: false, message: 'Email does not match invitation' };
+    }
+
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return { valid: false, message: 'Company not found' };
+    }
+
+    return { valid: true, company, role };
   },
 };
