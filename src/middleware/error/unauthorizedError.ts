@@ -18,6 +18,7 @@ const unauthorizedError = (error: Error, req: Request, res: Response, next: Next
     res.status(error.statusCode).json({
       success: false,
       error: error.message,
+      ...error.payload,
     });
   }
 
