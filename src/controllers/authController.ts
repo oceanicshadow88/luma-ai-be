@@ -113,27 +113,26 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
     const now = new Date();
 
     // Check for rate limiting
-    if (
-      existingCode &&
-      existingCode.expiresAt > now &&
-      now.getTime() - existingCode.expiresAt.getTime() + config.resetCodeExpiry * 1000 <
-        config.resetCodeRateLimitExpiry * 1000
-    ) {
-      console.log('now.getTime():', now.getTime());
-      console.log('existingCode.expiresAt.getTime():', existingCode.expiresAt.getTime());
-      console.log('config.resetCodeExpiry * 1000:', config.resetCodeExpiry * 1000);
-      // Calculate seconds remaining for cooldown
-      const secondsRemaining = Math.ceil(
-        (config.resetCodeRateLimitExpiry * 1000 -
-          (now.getTime() - existingCode.expiresAt.getTime() + config.resetCodeExpiry * 1000)) /
-          1000,
+    if (existingCode) {
+      // Calculate when the code was created (expiresAt minus the expiry duration)
+      const codeCreationTime = new Date(
+        existingCode.expiresAt.getTime() - config.resetCodeExpiry * 1000,
       );
+      // Calculate how long ago the code was created
+      const timeSinceCreation = now.getTime() - codeCreationTime.getTime();
+      // If less than the rate limit cooldown time has passed since creation
+      if (timeSinceCreation < config.resetCodeRateLimitExpiry * 1000) {
+        // Calculate seconds remaining for cooldown
+        const secondsRemaining = Math.ceil(
+          (config.resetCodeRateLimitExpiry * 1000 - timeSinceCreation) / 1000,
+        );
 
-      return res.status(429).json({
-        success: false,
-        message: 'Too many requests. Please try again later.',
-        cooldownSeconds: secondsRemaining,
-      });
+        return res.status(429).json({
+          success: false,
+          message: 'Too many requests. Please try again later.',
+          cooldownSeconds: secondsRemaining,
+        });
+      }
     }
 
     // Generate verification code
@@ -178,41 +177,44 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
  */
 export const verifyResetCode = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, code, newPassword, confirmPassword } = req.body;
+    const { email, code, newPassword } = req.body;
 
     // Validation
     if (!email) {
-      return next(new ValidationException('Please enter your email address'));
+      return res.status(422).json({
+        success: false,
+        message: 'Please enter your email address',
+      });
     }
 
     if (!code) {
-      return next(new ValidationException('Please enter the verification code'));
+      return res.status(422).json({
+        success: false,
+        message: 'Please enter the verification code',
+      });
     }
 
     if (!newPassword) {
-      return next(new ValidationException('Please enter your new password'));
-    }
-
-    if (!confirmPassword) {
-      return next(new ValidationException('Please confirm your password'));
+      return res.status(422).json({
+        success: false,
+        message: 'Please enter a new password',
+      });
     }
 
     if (!isValidEmail(email)) {
-      return next(new ValidationException('Sorry, please type a valid email'));
-    }
-
-    // Check if passwords match
-    if (newPassword !== confirmPassword) {
-      return next(new ValidationException('Passwords do not match'));
+      return res.status(422).json({
+        success: false,
+        message: 'Sorry, please type a valid email',
+      });
     }
 
     // Check password strength
     if (!isValidPassword(newPassword)) {
-      return next(
-        new ValidationException(
+      return res.status(422).json({
+        success: false,
+        message:
           'Password must be 8-20 characters and contain at least one uppercase letter, lowercase letter, number and special character',
-        ),
-      );
+      });
     }
 
     // Find user by email
@@ -220,9 +222,8 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
 
     // Check if user exists
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'This email is not registered',
+      return res.status(200).json({
+        success: true,
       });
     }
 
@@ -241,7 +242,7 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
     const validationResult = await resetCode.validateResetCode(code);
 
     if (!validationResult.isValid) {
-      return res.status(400).json({
+      return res.status(429).json({
         success: false,
         message: validationResult.message,
       });
