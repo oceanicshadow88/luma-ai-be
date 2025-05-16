@@ -108,7 +108,20 @@ export const companyService = {
 
     await redisClient.setex(rateLimitKey, 60, 'true');
     await sendVerificationEmail(email, code);
-    return true;
+
+    // 在开发环境下返回验证码
+    if (process.env.NODE_ENV === 'development') {
+      return {
+        success: true,
+        message: 'Verification code sent',
+        code: code,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Verification code sent',
+    };
   },
 
   verifyCode: async (email: string, code: string) => {
