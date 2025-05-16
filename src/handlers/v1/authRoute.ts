@@ -11,13 +11,13 @@ const router = Router();
 // Helper function to handle async routes
 const asyncHandler =
   (fn: (req: Request, res: Response, next: NextFunction) => Promise<Response | void>) =>
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        await fn(req, res, next);
-      } catch (error) {
-        next(error);
-      }
-    };
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  };
 
 router.post(
   '/register/admin',

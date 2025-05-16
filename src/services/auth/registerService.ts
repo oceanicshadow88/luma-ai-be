@@ -43,7 +43,6 @@ export const authService = {
       throw new UnauthorizedException('Company not found');
     }
 
-
     // check verifyCode
     if (!verifyCode) {
       throw new UnauthorizedException('Verification code is required');
@@ -96,10 +95,4 @@ export const authService = {
 
     return result;
   },
-
-
-
-
-
-
 };
