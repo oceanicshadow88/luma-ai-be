@@ -111,13 +111,19 @@ export const companyController = {
   checkEmailAndSendCode: async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-      await companyService.checkEmailAndSendCode(email);
-      res.json({ success: true });
+      const result = await companyService.checkEmailAndSendCode(email);
+      res.status(200).json(result);
     } catch (error) {
       if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({
+          success: false,
+          message: error.message,
+        });
       } else {
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({
+          success: false,
+          message: 'Internal server error',
+        });
       }
     }
   },
