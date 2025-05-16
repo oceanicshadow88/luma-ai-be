@@ -70,7 +70,7 @@ export const config: Config = {
     },
     from: process.env.EMAIL_FROM || 'noreply@example.com',
   },
-  resetCodeExpiry: parseInt(process.env.RESET_CODE_EXPIRY || '300', 10), // 5 minutes in seconds
+  resetCodeExpiry: parseInt(process.env.RESET_CODE_EXPIRY || '900', 10), // 15 minutes in seconds
   resetCodeRateLimit: parseInt(process.env.RESET_CODE_RATE_LIMIT || '1', 10), // 1 request allowed
   resetCodeRateLimitExpiry: parseInt(process.env.RESET_CODE_RATE_LIMIT_EXPIRY || '60', 10), // 60 seconds
   emailFrom: process.env.EMAIL_FROM || 'noreply@luma-ai.com',
