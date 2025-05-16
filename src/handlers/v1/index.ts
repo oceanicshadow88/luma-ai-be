@@ -3,6 +3,7 @@ import userRoutes from './userRoute';
 import authRouter from './authRoute';
 import { authGuard } from '../../middleware/authGuard';
 import companyRoute from './companyRoute';
+import membershipRoute from './membershipRoute';
 
 const v1Router = Router();
 
@@ -10,6 +11,7 @@ const v1Router = Router();
 v1Router.use('/auth', authRouter);
 v1Router.use('/users', userRoutes);
 v1Router.use('/companies', companyRoute);
+v1Router.use('/memberships', membershipRoute);
 
 // Health check route
 v1Router.get('/health', (req: Request, res: Response) => {

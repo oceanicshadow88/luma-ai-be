@@ -81,7 +81,7 @@ export const authService = {
     // save refreshToken
     user.refreshToken = refreshToken;
     await user.save();
-    
+
     // Create membership
     const membership = await membershipService.createMembership({
       companyId: existCompany.id,
@@ -90,8 +90,7 @@ export const authService = {
       status: 'active',
     });
     await membership.save();
-    
-    
+
     const result: {
       refreshToken: string;
       accessToken: string;
