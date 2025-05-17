@@ -109,7 +109,6 @@ export const companyService = {
     await redisClient.setex(rateLimitKey, 60, 'true');
     await sendVerificationEmail(email, code);
 
-    // 在开发环境下返回验证码
     if (process.env.NODE_ENV === 'development') {
       return {
         success: true,
@@ -297,15 +296,7 @@ export const companyService = {
     firstName: string;
     lastName: string;
   }) => {
-    // 创建公司
-    const company = await Company.create({
-      name: companyName,
-      slug: companyName.toLowerCase().replace(/\s+/g, '-'),
-      settings: {},
-      plan: 'free',
-      active: true,
-    });
-
+    // Create user first
     const user = await User.create({
       email,
       password,
@@ -313,6 +304,17 @@ export const companyService = {
       active: true,
     });
 
+    // Create company with user as owner
+    const company = await Company.create({
+      name: companyName,
+      slug: companyName.toLowerCase().replace(/\s+/g, '-'),
+      settings: {},
+      plan: 'free',
+      active: true,
+      ownerId: user._id,
+    });
+
+    // Create admin membership
     await membershipService.createMembership({
       userId: (user._id as Types.ObjectId).toString(),
       companyId: (company._id as Types.ObjectId).toString(),
@@ -322,7 +324,7 @@ export const companyService = {
 
     return {
       success: true,
-      message: 'Company and account created successfully',
+      message: 'Successfully created company and account',
       company,
       user,
     };
