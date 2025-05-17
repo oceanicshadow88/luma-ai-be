@@ -95,4 +95,9 @@ export const authService = {
 
     return result;
   },
+
+  checkEmailExists: async (email: string): Promise<boolean> => {
+    const user = await UserModel.findOne({ email });
+    return !!user;
+  },
 };
