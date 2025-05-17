@@ -43,7 +43,6 @@ export const authService = {
       throw new UnauthorizedException('Company not found');
     }
 
-
     // check verifyCode
     if (!verifyCode) {
       throw new UnauthorizedException('Verification code is required');
@@ -97,9 +96,8 @@ export const authService = {
     return result;
   },
 
-
-
-
-
-
+  checkEmailExists: async (email: string): Promise<boolean> => {
+    const user = await UserModel.findOne({ email });
+    return !!user;
+  },
 };

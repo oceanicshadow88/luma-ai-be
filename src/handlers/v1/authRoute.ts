@@ -6,18 +6,24 @@ import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { refreshToken } from '../../services/auth/tokenController';
 import { requestResetCode, resetPassword, verifyResetCode } from '../../controllers/codeController';
+import {
+  checkEmail,
+  checkCompanySlug,
+  createCompanyAndAccount,
+} from '../../controllers/auth/registerController';
+
 const router = Router();
 
 // Helper function to handle async routes
 const asyncHandler =
   (fn: (req: Request, res: Response, next: NextFunction) => Promise<Response | void>) =>
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        await fn(req, res, next);
-      } catch (error) {
-        next(error);
-      }
-    };
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  };
 
 router.post(
   '/register/admin',
@@ -38,5 +44,11 @@ router.post('/logout', asyncHandler(userLogout));
 router.post('/request-reset-code', asyncHandler(requestResetCode));
 router.post('/verify-reset-code', asyncHandler(verifyResetCode));
 router.post('/reset-password', asyncHandler(resetPassword));
+
+router.post('/check-email', asyncHandler(checkEmail));
+
+router.post('/check-company-slug', asyncHandler(checkCompanySlug));
+
+router.post('/create-company', asyncHandler(createCompanyAndAccount));
 
 export default router;
