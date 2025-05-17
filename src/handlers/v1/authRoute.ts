@@ -4,7 +4,7 @@ import { validateBody } from '../../middleware/validationMiddleware';
 import authValidationSchema from '../../validations/userAuthValidation';
 import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
-import { refreshToken } from '../../services/auth/tokenController';
+import { refreshToken } from '../../controllers/auth/tokenController';
 import { requestResetCode, resetPassword, verifyResetCode } from '../../controllers/codeController';
 const router = Router();
 

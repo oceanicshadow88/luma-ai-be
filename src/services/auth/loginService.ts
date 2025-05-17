@@ -8,7 +8,7 @@ export const loginService = {
         const user = await UserModel.findOne({ email });
 
         if (!user) {
-            throw new UnauthorizedException('User not found. Redirect to register.', { payload: { redirectTo: '/v1/auth/register/admin' } });
+            throw new UnauthorizedException('User not found. Redirect to admin register.', { payload: { redirectTo: '/v1/auth/register/admin' } });
         }
         // verify password
         const isValidPassword = await user.validatePassword(password);

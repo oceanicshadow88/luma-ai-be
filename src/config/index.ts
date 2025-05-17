@@ -45,6 +45,7 @@ interface Config {
   resetCodeRateLimitExpiry: number;
   emailFrom: string;
   smtpConfig: SmtpConfig;
+
 }
 
 export const config: Config = {
@@ -83,6 +84,16 @@ export const config: Config = {
       pass: process.env.SMTP_PASS || '',
     },
   },
+
 };
+
+// Role type for membership
+export const ROLE = {
+  ADMIN: 'admin',
+  INSTRUCTOR: 'instructor',
+  STUDENT: 'student',
+} as const;
+
+export type Role = typeof ROLE[keyof typeof ROLE];
 
 export default config;

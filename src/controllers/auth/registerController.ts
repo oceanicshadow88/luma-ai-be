@@ -26,6 +26,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       verifyCode?: string;
       locale?: string;
     } = req.body;
+    // check emial exist user
 
     // get company slug
     const companySlug = extractCompanySlug(email);
