@@ -1,83 +1,47 @@
 import { Router, RequestHandler } from 'express';
-import { companyController } from '../../controllers/companyController';
 import { authGuard } from '../../middleware/authGuard';
+import { asyncHandler } from '../../middleware/asyncHandler';
+import { companyController } from '../../controllers/companyController';
 import { validateCompany } from '../../validations/companyValidaton';
 
 const router = Router();
 
-// Auth related routes
+// Public routes
 router.post(
-  ' ',
-  validateCompany.checkEmail as unknown as RequestHandler[],
-  companyController.checkEmailAndSendCode as RequestHandler,
+  '/check-company-slug',
+  validateCompany.checkCompanySlug as unknown as RequestHandler[],
+  asyncHandler(companyController.checkCompanySlug),
 );
 
 router.post(
-  '/auth/login',
-  validateCompany.verifyCode as unknown as RequestHandler[],
-  companyController.verifyCode as RequestHandler,
+  '/create-company',
+  validateCompany.createCompanyAndAccount as unknown as RequestHandler[],
+  asyncHandler(companyController.createCompanyAndAccount),
 );
 
-// Protected company routes
+// Protected routes
+router.use(authGuard);
+
+// Company management routes
+router.get('/', asyncHandler(companyController.getCompanies));
+router.get('/:id', asyncHandler(companyController.getCompanyById));
 router.post(
   '/',
-  authGuard as RequestHandler,
   validateCompany.createCompany as unknown as RequestHandler[],
-  companyController.createCompany as RequestHandler,
+  asyncHandler(companyController.createCompany),
 );
-
-router.get(
+router.patch(
   '/:id',
-  authGuard as RequestHandler,
-  validateCompany.getCompany as unknown as RequestHandler[],
-  companyController.getCompanyById as RequestHandler,
+  validateCompany.updateCompany as unknown as RequestHandler[],
+  asyncHandler(companyController.updateCompany),
 );
+router.delete('/:id', asyncHandler(companyController.deleteCompany));
 
 // Invite management
 router.post(
   '/:id/invites',
-  authGuard as RequestHandler,
   validateCompany.createInvite as unknown as RequestHandler[],
-  companyController.createInvite as RequestHandler,
-);
-
-// Get all companies for current user
-router.get('/', authGuard as RequestHandler, companyController.getCompanies as RequestHandler);
-
-// Update company
-router.patch(
-  '/:id',
-  authGuard as RequestHandler,
-  validateCompany.updateCompany as unknown as RequestHandler[],
-  companyController.updateCompany as RequestHandler,
-);
-
-// Delete company
-router.delete(
-  '/:id',
-  authGuard as RequestHandler,
-  companyController.deleteCompany as RequestHandler,
-);
-
-// Resend verification code
-router.post(
-  '/resend-code',
-  validateCompany.checkEmail as unknown as RequestHandler[],
-  companyController.resendCode as RequestHandler,
-);
-
-// Check domain and create organization if needed
-router.post(
-  '/check-domain',
-  validateCompany.completeRegistration as unknown as RequestHandler[],
-  companyController.checkDomainAndCreate as RequestHandler,
-);
-
-// Complete registration
-router.post(
-  '/complete-registration',
-  validateCompany.completeRegistration as unknown as RequestHandler[],
-  companyController.completeRegistration as RequestHandler,
+  asyncHandler(companyController.createInvite),
 );
 
 export default router;
