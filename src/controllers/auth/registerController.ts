@@ -1,9 +1,10 @@
 // authentication, authorization
 import { Request, Response, NextFunction } from 'express';
-import { authService } from '../../services/auth/registerService';
+import { registerService } from '../../services/auth/registerService';
 import { extractCompanySlug } from '../../middleware/extractCompanySlugFromEmail';
+import { jwtUtils } from '../../lib/jwtUtils';
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const adminRegister = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Validate Data - Joi validate schema: deal in route with authvalidation middleware
     // Get params from request body
@@ -26,12 +27,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       verifyCode?: string;
       locale?: string;
     } = req.body;
-    // check emial exist user
 
     // get company slug
     const companySlug = extractCompanySlug(email);
 
-    const { refreshToken } = await authService.adminRegister({
+    const { action, refreshToken } = await registerService.userRegister({
       firstname,
       lastname,
       username,
@@ -43,8 +43,37 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       companySlug,
     });
 
-    // request
-    res.status(201).json({ success: true, data: { refreshToken } });
+    switch (action) {
+      case 'redirectToCompanyRegister': {
+        //no user no coompany
+        const userData: string = jwtUtils.generateTempDataToken({
+          firstname,
+          lastname,
+          username,
+          password,
+          email,
+          avatarUrl,
+          locale,
+          verifyCode,
+        });
+
+        return res.status(302).json({
+          message: 'Company not found, redirect to company registration.',
+          redirect: `/v1/companies?userData=${userData}`,
+        });
+      }
+
+      case 'createUser': {
+        // no user but have company
+        return res.status(201).json({
+          success: true,
+          data: { refreshToken },
+        });
+      }
+
+      default:
+        return res.status(400).json({ message: 'Register unknown action' });
+    }
   } catch (error) {
     next(error);
   }

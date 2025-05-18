@@ -1,7 +1,34 @@
 import UnauthorizedException from '../exceptions/unauthorizedException';
 import UserModel, { User } from '../models/user';
 
+interface CreateUserInput {
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  email: string;
+  avatarUrl?: string;
+  locale?: string;
+}
+
 export const userService = {
+  // create users
+  createUser: async (input: CreateUserInput) => {
+    const { firstname, lastname, username, password, email, avatarUrl, locale } = input;
+    const user = new UserModel({
+      firstname,
+      lastname,
+      username,
+      password,
+      email,
+      avatarUrl,
+      locale,
+    });
+    await user.hashPassword();
+
+    return user;
+  },
+
   // Get all users
   getAllUsers: async (page: number, limit: number, q?: string) => {
     const query = q ? { $text: { $search: q } } : {};

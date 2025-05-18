@@ -10,6 +10,7 @@ const conflictsError = (error: Error, req: Request, res: Response, next: NextFun
         method: req.method,
         path: req.path,
         message: error.message,
+        trace: error.stack,
         ...error.payload,
       },
     });

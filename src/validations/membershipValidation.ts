@@ -1,5 +1,5 @@
 import { body, param } from 'express-validator';
-import { validateRequest } from '../middleware/validateRequest';
+import { validateRequest } from '../middleware/validation/validateRequest';
 
 export const validateMembership = {
   createMembership: [

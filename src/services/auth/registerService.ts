@@ -3,14 +3,14 @@ import ConflictsException from '../../exceptions/conflictsException';
 import UnauthorizedException from '../../exceptions/unauthorizedException';
 import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
-import { membershipService } from '../membershipService';
 import { generateTokenByUser } from '../../utils/token';
-import { RoleValidationResult, userValidateRole } from './userRoleValidator';
+import { userService } from '../userService';
+import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
 
-export const authService = {
+export const registerService = {
   // get adminUserInput
-  adminRegister: async ({
+  userRegister: async ({
     firstname,
     lastname,
     username,
@@ -31,84 +31,88 @@ export const authService = {
     companySlug: string;
     verifyCode?: string;
   }) => {
-    // check jump to login
-    const validateResult = await userValidateRole(email, ROLE.ADMIN);
-    if (validateResult.success) {
-      throw new UnauthorizedException('User already registed. Redirect to login.', { payload: { redirectTo: '/v1/auth/login' } });
-    }
+    // check username
+    await checkUseWithUsername(username);
+    // check company exist
+    const companyCheck = await checkCompanyWithSlug(companySlug);
+    if ('data' in companyCheck) {
+      const company = companyCheck.data!;
 
-    switch (validateResult.reason) {
-      case 'COMPANY_NOT_FOUND':
-        throw new UnauthorizedException('Company not found. Redirect to company register .', { payload: { redirectTo: '/v1/companies/auth/signup' } });
-      case 'USER_NOT_FOUND':
-      case 'MEMBERSHIP_NOT_FOUND':
-    }
+      // verify code to regist
+      if (verifyCode) {
+        await checkVerificationCode(verifyCode, email);
+      }
 
-    // check exist user
-    const existUserbyUsername = await UserModel.findOne({ username });
-    if (existUserbyUsername) {
-      throw new ConflictsException(`${username} already exists`);
-    }
-    const existUserbyEmail = await UserModel.findOne({ email });
-    if (existUserbyEmail) {
-      throw new ConflictsException(`${email} already exists`);
-    }
-    const existCompany = await CompanyModel.findOne({ slug: companySlug });
-    if (!existCompany) {
-      throw new UnauthorizedException('Company not found');
-    }
-
-    // check verifyCode
-    if (!verifyCode) {
-      throw new UnauthorizedException('Verification code is required');
-    }
-    if (verifyCode) {
-      const resetCode = await ResetCodeModel.findOne({
+      // create new user
+      const user = await userService.createUser({
+        firstname,
+        lastname,
+        username,
+        password,
         email,
+        avatarUrl,
+        locale,
       });
-      if (!resetCode) {
-        throw new UnauthorizedException('Invalid verification code');
-      }
-      const { isValid, message } = await resetCode.validateResetCode(verifyCode);
-      if (!isValid) {
-        throw new UnauthorizedException(message);
-      }
+      // generate Token
+      const { refreshToken } = await generateTokenByUser(user);
+      user.refreshToken = refreshToken;
+      await user.save();
+
+      // create membership
+      const membership = await membershipService.createMembership({
+        companyId: company.id.toString(),
+        userId: user.id.toString(),
+        role: ROLE.ADMIN,
+        status: 'active',
+      });
+      await membership.save();
+
+      return {
+        action: 'createUser',
+        refreshToken: refreshToken,
+      };
+    }
+    if ('action' in companyCheck) {
+      return { action: companyCheck.action };
     }
 
-    // create new user
-    const user = new UserModel({
-      firstname,
-      lastname,
-      username,
-      password,
-      email,
-      avatarUrl,
-      locale,
-    });
-    await user.hashPassword();
-
-    // generate Token
-    const { refreshToken, accessToken } = await generateTokenByUser(user);
-
-    // save refreshToken
-    user.refreshToken = refreshToken;
-    await user.save();
-
-
-
-    const result: {
-      refreshToken: string;
-      accessToken: string;
-    } = { refreshToken, accessToken };
-
-    return result;
+    return { action: 'error' };
   },
 };
 
-export const checkAdminWithEmail = async (email: string) => {
-  const existingUser = await UserModel.findOne({ email });
-
-  if (existingUser) {
-    throw new ConflictsException(`User with email ${email} already exists`);
+// check exist user with username
+export const checkUseWithUsername = async (username: string) => {
+  const existUser = await UserModel.findOne({ username });
+  if (existUser) {
+    // if exist user
+    throw new ConflictsException(`${username} already exists`);
   }
-}; 
+};
+
+// check company exist with company slug
+export const checkCompanyWithSlug = async (companySlug: string) => {
+  const existCompany = await CompanyModel.findOne({ slug: companySlug });
+  if (!existCompany) {
+    // no company
+    return { action: 'redirectToCompanyRegister' };
+  }
+  // exist company
+  return { data: existCompany };
+};
+
+// verify code
+export const checkVerificationCode = async (verifyCode: string, email: string) => {
+  if (!verifyCode) {
+    throw new UnauthorizedException('Verification code is required');
+  }
+
+  const resetCode = await ResetCodeModel.findOne({ email });
+  if (!resetCode) {
+    throw new UnauthorizedException('Invalid verification code');
+  }
+
+  const { isValid, message } = await resetCode.validateResetCode(verifyCode);
+  if (!isValid) {
+    throw new UnauthorizedException(message);
+  }
+};
