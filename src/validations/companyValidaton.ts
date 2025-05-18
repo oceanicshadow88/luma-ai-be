@@ -84,4 +84,21 @@ export const validateCompany = {
     validateRequest,
   ],
   acceptInvite: [param('token').isString().withMessage('Invalid invite token'), validateRequest],
+  checkCompanySlug: [
+    body('companyName')
+      .trim()
+      .notEmpty()
+      .withMessage('Company name is required')
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Company name must be between 2 and 100 characters'),
+    validateRequest,
+  ],
+  createCompanyAndAccount: [
+    body('email').isEmail().withMessage('Invalid email format'),
+    body('companyName').trim().notEmpty().withMessage('Company name is required'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('firstName').notEmpty().withMessage('First name is required'),
+    body('lastName').notEmpty().withMessage('Last name is required'),
+    validateRequest,
+  ],
 };

@@ -109,7 +109,6 @@ export const companyService = {
     await redisClient.setex(rateLimitKey, 60, 'true');
     await sendVerificationEmail(email, code);
 
-    // 在开发环境下返回验证码
     if (process.env.NODE_ENV === 'development') {
       return {
         success: true,
@@ -276,5 +275,58 @@ export const companyService = {
     }
 
     return { valid: true, company, role };
+  },
+
+  checkCompanySlugExists: async (companyName: string): Promise<boolean> => {
+    const slug = companyName.toLowerCase().replace(/\s+/g, '-');
+    const company = await Company.findOne({ slug });
+    return !!company;
+  },
+
+  createCompanyAndAccount: async ({
+    email,
+    companyName,
+    password,
+    firstName,
+    lastName,
+  }: {
+    email: string;
+    companyName: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) => {
+    // Create user first
+    const user = await User.create({
+      email,
+      password,
+      name: `${firstName} ${lastName}`,
+      active: true,
+    });
+
+    // Create company with user as owner
+    const company = await Company.create({
+      name: companyName,
+      slug: companyName.toLowerCase().replace(/\s+/g, '-'),
+      settings: {},
+      plan: 'free',
+      active: true,
+      ownerId: user._id,
+    });
+
+    // Create admin membership
+    await membershipService.createMembership({
+      userId: (user._id as Types.ObjectId).toString(),
+      companyId: (company._id as Types.ObjectId).toString(),
+      role: 'admin',
+      status: 'active',
+    });
+
+    return {
+      success: true,
+      message: 'Successfully created company and account',
+      company,
+      user,
+    };
   },
 };

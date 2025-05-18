@@ -4,6 +4,7 @@ import { generateTokenByUser } from '../../utils/token';
 
 export const loginService = {
   adminLogin: async ({ email, password }: { email: string; password: string }) => {
+
     // check user exist
     const user = await UserModel.findOne({ email });
 
