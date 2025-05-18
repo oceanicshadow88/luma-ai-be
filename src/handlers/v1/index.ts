@@ -1,16 +1,16 @@
 import { Router, Request, Response } from 'express';
 import userRoutes from './userRoute';
-import authRouter from './authRoute';
+import authRoutes from './authRoute';
 import { authGuard } from '../../middleware/authGuard';
-import companyRoute from './companyRoute';
+import companyRoutes from './companyRoute';
 import membershipRoute from './membershipRoute';
 
 const v1Router = Router();
 
 // Mount routes
-v1Router.use('/auth', authRouter);
+v1Router.use('/auth', authRoutes);
 v1Router.use('/users', userRoutes);
-v1Router.use('/companies', companyRoute);
+v1Router.use('/companies', companyRoutes);
 v1Router.use('/memberships', membershipRoute);
 
 // Health check route

@@ -1,40 +1,30 @@
-import { Request, Response, NextFunction, Router } from 'express';
-import * as authController from '../../controllers/auth/registerController';
-import { validateBody } from '../../middleware/validation/validationMiddleware';
-import authValidationSchema from '../../validations/userAuthValidation';
+import { Router, RequestHandler } from 'express';
+import { validateRegistration } from '../../middleware/validation/validateRegistration';
+import { asyncHandler } from '../../middleware/asyncHandler';
+import { companyController } from '../../controllers/companyController';
+import { adminRegister } from '../../controllers/auth/registerController';
 import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { refreshToken } from '../../controllers/auth/tokenController';
 import { requestResetCode, resetPassword, verifyResetCode } from '../../controllers/codeController';
-import { validateRegistration } from '../../middleware/validation/validateRegistration';
+import { validateCompany } from '../../validations/companyValidaton';
+
 const router = Router();
 
-// Helper function to handle async routes
-const asyncHandler =
-  (fn: (req: Request, res: Response, next: NextFunction) => Promise<Response | void>) =>
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        await fn(req, res, next);
-      } catch (error) {
-        next(error);
-      }
-    };
-
+// Registration flow
 router.post(
-  '/register/admin',
-  validateRegistration, // validate if login or regist compavalidateBody(authValidationSchema.register),
-  asyncHandler(authController.adminRegister),
+  '/check-email',
+  validateCompany.checkEmail as unknown as RequestHandler[],
+  asyncHandler(companyController.checkEmailAndSendCode),
 );
 
-router.post('/login', validateBody(authValidationSchema.login), asyncHandler(adminLogin));
+// Admin registration
+router.post('/register/admin', validateRegistration, asyncHandler(adminRegister));
 
-router.post(
-  '/refresh-token',
-  validateBody(authValidationSchema.freshToken),
-  asyncHandler(refreshToken),
-);
-
+// Other auth routes...
+router.post('/login', asyncHandler(adminLogin));
 router.post('/logout', asyncHandler(userLogout));
+router.post('/refresh-token', asyncHandler(refreshToken));
 
 router.post('/request-reset-code', asyncHandler(requestResetCode));
 router.post('/verify-reset-code', asyncHandler(verifyResetCode));

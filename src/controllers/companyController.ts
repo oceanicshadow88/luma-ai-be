@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { companyService } from '../services/companyService';
+import { getUserProps } from '../middleware/getUserProps';
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -112,19 +113,20 @@ export const companyController = {
     try {
       const { email } = req.body;
       const result = await companyService.checkEmailAndSendCode(email);
-      res.status(200).json(result);
+      res.status(200).json({
+        success: true,
+        emailExists: false,
+        nextStep: 'registration',
+        data: {
+          email,
+          ...result,
+        },
+      });
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          message: 'Internal server error',
-        });
-      }
+      res.status(400).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Error checking email',
+      });
     }
   },
 
@@ -194,6 +196,58 @@ export const companyController = {
       } else {
         res.status(500).json({ message: 'Internal server error' });
       }
+    }
+  },
+
+  createCompanyAndAccount: async (req: Request, res: Response) => {
+    try {
+      const { encryptedData, companyName } = req.body;
+      const userDataResult = await getUserProps(encryptedData);
+      if (!userDataResult.props.user) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid user data',
+        });
+      }
+      const userData = userDataResult.props.user;
+      const result = await companyService.createCompanyAndAccount({
+        email: userData.email,
+        companyName,
+        password: userData.password,
+        firstName: userData.firstname,
+        lastName: userData.lastname,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: {
+          company: result.company,
+          user: result.user,
+          redirectTo: '/login',
+        },
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to create company',
+      });
+    }
+  },
+
+  checkCompanySlug: async (req: Request, res: Response) => {
+    try {
+      const { companyName } = req.body;
+      const exists = await companyService.checkCompanySlugExists(companyName);
+      return res.json({
+        success: true,
+        hasCompanyName: exists,
+        canCreate: !exists,
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Error checking company name',
+      });
     }
   },
 };
