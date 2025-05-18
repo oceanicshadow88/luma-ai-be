@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ObjectSchema } from 'joi';
-import ValidationException from '../exceptions/validationException';
+import ValidationException from '../../exceptions/validationException';
 
 declare module 'express-serve-static-core' {
   interface Request {

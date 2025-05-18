@@ -1,5 +1,5 @@
 import { body, param, ValidationChain } from 'express-validator';
-import { validateRequest } from '../middleware/validateRequest';
+import { validateRequest } from '../middleware/validation/validateRequest';
 
 // Separate validation rules and middleware
 const createCompanyValidation: ValidationChain[] = [
@@ -60,7 +60,7 @@ export const validateCompany = {
     body('email')
       .isEmail()
       .withMessage('Invalid email format')
-      .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+      .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
       .withMessage('Invalid email domain'),
     validateRequest,
   ],

@@ -4,11 +4,12 @@ import { generateTokenByUser } from '../../utils/token';
 
 export const loginService = {
   adminLogin: async ({ email, password }: { email: string; password: string }) => {
+
     // check user exist
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-      throw new UnauthorizedException('User not found. Redirect to register.', {
+      throw new UnauthorizedException('User not found. Redirect to admin register.', {
         payload: { redirectTo: '/v1/auth/register/admin' },
       });
     }

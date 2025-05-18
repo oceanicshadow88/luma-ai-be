@@ -85,4 +85,17 @@ export const config: Config = {
   },
 };
 
+// Role type for membership
+export const ROLE = {
+  ADMIN: 'admin',
+  INSTRUCTOR: 'instructor',
+  STUDENT: 'student',
+} as const;
+
+export const ROUTES = {
+  LOGIN_USER: '/v1/auth/login',
+  REGISTER_COMPANY: '/v1/companies',
+  REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
+};
+
 export default config;

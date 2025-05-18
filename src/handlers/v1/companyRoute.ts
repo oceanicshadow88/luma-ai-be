@@ -7,7 +7,7 @@ const router = Router();
 
 // Auth related routes
 router.post(
-  '/auth/signup',
+  ' ',
   validateCompany.checkEmail as unknown as RequestHandler[],
   companyController.checkEmailAndSendCode as RequestHandler,
 );
