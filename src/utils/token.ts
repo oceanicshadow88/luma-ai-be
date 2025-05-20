@@ -1,7 +1,8 @@
 import { jwtUtils } from '../lib/jwtUtils';
 import { Types } from 'mongoose';
 import UserModel, { User } from '../models/user';
-import UnauthorizedException from '../exceptions/unauthorizedException';
+import AppException from '../exceptions/appException';
+import { HttpStatusCode } from 'axios';
 
 export const generateTokenByUser = async (user: User) => {
   // generate Token
@@ -17,7 +18,7 @@ export const refreshAuthToken = async (refreshToken: string) => {
 
   const user = await UserModel.findOne({ _id: payload.userId, refreshToken });
   if (!user) {
-    throw new UnauthorizedException('Invalid refresh token');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid refresh token');
   }
 
   const newAccessToken = jwtUtils.generateAccessToken({
