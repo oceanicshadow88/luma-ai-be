@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from '../src/middleware/morgan';
 import rateLimiter from '../src/middleware/rateLimit';
 import v1Router from '../src/handlers/v1';
-import errorMiddleware from '../src/middleware/error';
+import errorHandler from '../src/middleware/errorHandler';
 
 // Create Express app
 const app: Express = express();
@@ -21,6 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/v1', v1Router);
 
 // Error Handling
-errorMiddleware.forEach(handler => app.use(handler));
+app.use(errorHandler);
 
 export default app;
