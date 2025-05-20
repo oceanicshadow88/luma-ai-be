@@ -1,7 +1,7 @@
 import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
 import logger from '../utils/logger';
-import AppException from '../utils/appException';
+import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
 // Default values in case configuration isn't set
