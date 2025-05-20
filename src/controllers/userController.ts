@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { userService } from '../services/userService';
-import AppException from '../utils/appException';
+import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
 export const userController = {
