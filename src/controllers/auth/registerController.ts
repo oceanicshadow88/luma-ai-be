@@ -1,6 +1,6 @@
 // authentication, authorization
 import { Request, Response, NextFunction } from 'express';
-import { registerService } from '../../services/auth/registerService';
+import { RegisterAction, registerService } from '../../services/auth/registerService';
 import { extractCompanySlug } from '../../middleware/extractCompanySlugFromEmail';
 import { jwtUtils } from '../../lib/jwtUtils';
 
@@ -44,8 +44,9 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
     });
 
     switch (action) {
-      case 'redirectToCompanyRegister': {
-        //no user no coompany
+      // jump company registration
+      case RegisterAction.REDIRECT_TO_COMPANY_REGISTER: {
+        //no user no company, jump to regist company page and
         const userData: string = jwtUtils.generateTempDataToken({
           firstname,
           lastname,
@@ -63,7 +64,8 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
         });
       }
 
-      case 'createUser': {
+      // create new user
+      case RegisterAction.CREATE_USER: {
         // no user but have company
         return res.status(201).json({
           success: true,
@@ -71,8 +73,9 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
         });
       }
 
+      // Unknow error
       default:
-        return res.status(400).json({ message: 'Register unknown action' });
+        return res.status(400);
     }
   } catch (error) {
     next(error);
