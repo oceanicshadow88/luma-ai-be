@@ -1,6 +1,8 @@
-import UnauthorizedException from '../../exceptions/unauthorizedException';
 import UserModel from '../../models/user';
+import AppException from '../../exceptions/appException';
 import { generateTokenByUser } from '../../utils/token';
+import { HttpStatusCode } from 'axios';
+import { ROUTES } from '../../config';
 
 export const loginService = {
   adminLogin: async ({ email, password }: { email: string; password: string }) => {
@@ -8,14 +10,18 @@ export const loginService = {
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-      throw new UnauthorizedException('User not found. Redirect to admin register.', {
-        payload: { redirectTo: '/v1/auth/register/admin' },
-      });
+      throw new AppException(
+        HttpStatusCode.NotFound,
+        'User not found. Redirect to admin register.',
+        {
+          payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
+        },
+      );
     }
     // verify password
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid credentials');
     }
 
     // generate token
