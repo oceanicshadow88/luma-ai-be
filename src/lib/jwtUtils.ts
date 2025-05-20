@@ -1,7 +1,8 @@
 import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
-import UnauthorizedException from '../exceptions/unauthorizedException';
 import logger from '../utils/logger';
+import AppException from '../utils/appException';
+import { HttpStatusCode } from 'axios';
 
 // Default values in case configuration isn't set
 const DEFAULT_JWT_SECRET = 'your-secret-key-should-be-in-env-file';
@@ -61,7 +62,7 @@ export const jwtUtils = {
       const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
       if (decoded.purpose !== 'password-reset') {
-        throw new UnauthorizedException('Invalid token purpose');
+        throw new AppException(HttpStatusCode.Unauthorized, 'Invalid token purpose');
       }
 
       return decoded;
@@ -90,7 +91,9 @@ export const jwtUtils = {
       const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
       return jwt.verify(token, secret) as TokenPayload;
     } catch (error) {
-      throw new UnauthorizedException('Verify Access Token failed', { payload: error });
+      throw new AppException(HttpStatusCode.Unauthorized, 'Verify Access Token failed', {
+        payload: error,
+      });
     }
   },
 
@@ -102,7 +105,9 @@ export const jwtUtils = {
       const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
       return jwt.verify(token, secret) as TokenPayload;
     } catch (error) {
-      throw new UnauthorizedException('Verify Fresh Token failed', { payload: error });
+      throw new AppException(HttpStatusCode.Unauthorized, 'Verify Fresh Token failed', {
+        payload: error,
+      });
     }
   },
 
@@ -134,7 +139,9 @@ export const jwtUtils = {
       }
       return decoded;
     } catch (error) {
-      throw new UnauthorizedException('Verify temp token failed', { payload: error });
+      throw new AppException(HttpStatusCode.Unauthorized, 'Verify temp token failed', {
+        payload: error,
+      });
     }
   },
 };
