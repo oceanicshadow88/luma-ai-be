@@ -1,5 +1,6 @@
 import { parse } from 'psl';
-import ValidationException from '../exceptions/validationException';
+import AppException from '../exceptions/appException';
+import { HttpStatusCode } from 'axios';
 
 const blockedDomains = [
   'gmail.com',
@@ -17,12 +18,12 @@ const blockedDomains = [
 export function extractCompanySlug(email: string): string {
   const domain = email.split('@')[1]?.toLowerCase();
   if (!domain) {
-    throw new ValidationException('Please provide a valid email address');
+    throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
   }
 
   if (blockedDomains.includes(domain)) {
     // reject public email
-    throw new ValidationException('Public email not allowed');
+    throw new AppException(HttpStatusCode.BadRequest, 'Public email not allowed');
   }
 
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc
@@ -39,5 +40,5 @@ export function extractCompanySlug(email: string): string {
     }
   }
 
-  throw new ValidationException('Please provide a valid email address');
+  throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
 }
