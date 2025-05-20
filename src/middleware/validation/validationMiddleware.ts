@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ObjectSchema } from 'joi';
-import ValidationException from '../../exceptions/validationException';
+import AppException from '../../exceptions/appException';
+import { HttpStatusCode } from 'axios';
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -18,7 +19,11 @@ const validateBody = (schema: ObjectSchema) => {
       req.body = value;
       next();
     } catch (error) {
-      next(new ValidationException((error as Error).message, { error: error as Error }));
+      next(
+        new AppException(HttpStatusCode.BadRequest, (error as Error).message, {
+          error: error as Error,
+        }),
+      );
     }
   };
 };
@@ -33,7 +38,11 @@ const validateQuery = (schema: ObjectSchema) => {
       req.validatedQuery = value;
       next();
     } catch (error) {
-      next(new ValidationException((error as Error).message, { error: error as Error }));
+      next(
+        new AppException(HttpStatusCode.BadRequest, (error as Error).message, {
+          error: error as Error,
+        }),
+      );
     }
   };
 };
