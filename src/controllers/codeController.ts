@@ -3,7 +3,8 @@ import { isValidEmail, isValidPassword } from '../utils';
 import UserModel from '../models/user';
 import ResetCodeModel from '../models/resetCode';
 import config from '../config';
-import ValidationException from '../exceptions/validationException';
+import AppException from '../utils/appException';
+import { HttpStatusCode } from 'axios';
 
 /**
  * Request password reset code
@@ -15,11 +16,13 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
 
     // Email validation
     if (!email) {
-      return next(new ValidationException('Please enter your email address'));
+      return next(new AppException(HttpStatusCode.BadRequest, 'Please enter your email address'));
     }
 
     if (!isValidEmail(email)) {
-      return next(new ValidationException('Sorry, please type a valid email'));
+      return next(
+        new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email'),
+      );
     }
 
     // Check for existing reset code
