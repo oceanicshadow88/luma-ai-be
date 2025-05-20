@@ -10,7 +10,7 @@ export const authGuard = (req: Request, res: Response, next: NextFunction): void
     // Get auth header
     const authHeader = req.header('Authorization');
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader.startsWith('Bearer ')) {
       res.status(401).json({ error: 'Access denied. No token provided.' });
       return;
     }
