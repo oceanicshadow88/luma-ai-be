@@ -1,5 +1,6 @@
-import UnauthorizedException from '../exceptions/unauthorizedException';
+import { HttpStatusCode } from 'axios';
 import UserModel, { User } from '../models/user';
+import AppException from '../exceptions/appException';
 
 interface CreateUserInput {
   firstname: string;
@@ -37,7 +38,7 @@ export const userService = {
     const users = await UserModel.find(query).skip(skip).limit(limit).select('-password').exec();
 
     if (!users.length) {
-      throw new UnauthorizedException('User not found');
+      throw new AppException(HttpStatusCode.NotFound, 'User not found');
     }
     return users;
   },
@@ -46,7 +47,7 @@ export const userService = {
   getUserById: async (userId: string) => {
     const user = await UserModel.findOne({ _id: userId });
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new AppException(HttpStatusCode.NotFound, 'User not found');
     }
     return user;
   },
@@ -55,7 +56,7 @@ export const userService = {
   updateUserById: async (userId: string, updates: Partial<User>) => {
     const user = await UserModel.findOne({ _id: userId });
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new AppException(HttpStatusCode.NotFound, 'User not found');
     }
 
     user.set(updates);
@@ -69,7 +70,7 @@ export const userService = {
     // find user
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new AppException(HttpStatusCode.NotFound, 'User not found');
     }
 
     return await user.deleteOne();
