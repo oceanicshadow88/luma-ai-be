@@ -3,7 +3,7 @@ import { isValidEmail, isValidPassword } from '../utils';
 import UserModel from '../models/user';
 import ResetCodeModel from '../models/resetCode';
 import config from '../config';
-import AppException from '../utils/appException';
+import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
 /**
