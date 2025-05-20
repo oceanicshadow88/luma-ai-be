@@ -4,7 +4,8 @@ import { extractCompanySlug } from '../extractCompanySlugFromEmail';
 import MembershipModel from '../../models/membership';
 import { ROLE } from '../../config';
 import { membershipService } from '../../services/membershipService';
-import ValidationException from '../../exceptions/validationException';
+import AppException from '../../exceptions/appException';
+import { HttpStatusCode } from 'axios';
 
 type RoleValidationReason = 'USER_NOT_FOUND' | 'COMPANY_NOT_FOUND' | 'LOGIN' | 'Unknown';
 
@@ -30,7 +31,7 @@ export const userValidateRole = async (
     // check company
     const companySlug = extractCompanySlug(email);
     if (!companySlug) {
-      throw new ValidationException('Please provide work email');
+      throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
     }
     const company = await CompanyModel.findOne({ slug: companySlug });
     if (!company) return { success: false, reason: 'COMPANY_NOT_FOUND' };
