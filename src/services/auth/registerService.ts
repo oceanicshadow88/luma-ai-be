@@ -1,12 +1,19 @@
 import ResetCodeModel from '../../models/resetCode';
-import ConflictsException from '../../exceptions/conflictsException';
-import UnauthorizedException from '../../exceptions/unauthorizedException';
 import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
 import { generateTokenByUser } from '../../utils/token';
 import { userService } from '../userService';
 import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
+import AppException from '../../exceptions/appException';
+import { HttpStatusCode } from 'axios';
+
+// Action enum
+export enum RegisterAction {
+  CREATE_USER = 'createUser',
+  REDIRECT_TO_COMPANY_REGISTER = 'redirectToCompanyRegister',
+  ERROR = 'error',
+}
 
 export const registerService = {
   // get adminUserInput
@@ -68,7 +75,7 @@ export const registerService = {
       await membership.save();
 
       return {
-        action: 'createUser',
+        action: RegisterAction.CREATE_USER,
         refreshToken: refreshToken,
       };
     }
@@ -76,7 +83,7 @@ export const registerService = {
       return { action: companyCheck.action };
     }
 
-    return { action: 'error' };
+    return { action: RegisterAction.ERROR };
   },
 };
 
@@ -85,7 +92,7 @@ export const checkUseWithUsername = async (username: string) => {
   const existUser = await UserModel.findOne({ username });
   if (existUser) {
     // if exist user
-    throw new ConflictsException(`${username} already exists`);
+    throw new AppException(HttpStatusCode.Conflict, `${username} already exists`);
   }
 };
 
@@ -94,7 +101,7 @@ export const checkCompanyWithSlug = async (companySlug: string) => {
   const existCompany = await CompanyModel.findOne({ slug: companySlug });
   if (!existCompany) {
     // no company
-    return { action: 'redirectToCompanyRegister' };
+    return { action: RegisterAction.REDIRECT_TO_COMPANY_REGISTER };
   }
   // exist company
   return { data: existCompany };
@@ -103,16 +110,16 @@ export const checkCompanyWithSlug = async (companySlug: string) => {
 // verify code
 export const checkVerificationCode = async (verifyCode: string, email: string) => {
   if (!verifyCode) {
-    throw new UnauthorizedException('Verification code is required');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
   }
 
   const resetCode = await ResetCodeModel.findOne({ email });
   if (!resetCode) {
-    throw new UnauthorizedException('Invalid verification code');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
   }
 
   const { isValid, message } = await resetCode.validateResetCode(verifyCode);
   if (!isValid) {
-    throw new UnauthorizedException(message);
+    throw new AppException(HttpStatusCode.Unauthorized, message);
   }
 };
