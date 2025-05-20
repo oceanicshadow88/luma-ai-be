@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { userService } from '../services/userService';
-import ValidationException from '../exceptions/validationException';
+import AppException from '../utils/appException';
+import { HttpStatusCode } from 'axios';
 
 export const userController = {
   // Get all users
@@ -26,7 +27,7 @@ export const userController = {
       const userId = req.params.id;
 
       if (!userId) {
-        next(new ValidationException('User ID is required'));
+        next(new AppException(HttpStatusCode.BadRequest, 'User ID is required'));
         return;
       }
 
@@ -46,7 +47,7 @@ export const userController = {
     try {
       const userId = req.params.id;
       if (!userId) {
-        next(new ValidationException('User ID is required'));
+        next(new AppException(HttpStatusCode.BadRequest, 'User ID is required'));
         return;
       }
 
@@ -65,7 +66,7 @@ export const userController = {
     try {
       const userId = req.params.id;
       if (!userId) {
-        next(new ValidationException('User ID is required'));
+        next(new AppException(HttpStatusCode.BadRequest, 'User ID is required'));
         return;
       }
 
