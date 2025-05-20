@@ -24,12 +24,11 @@ module.exports = [
             'prettier': prettierPlugin
         },
         rules: {
-            // TypeScript 推荐规则
+            // TypeScript recommand
             '@typescript-eslint/adjacent-overload-signatures': 'error',
             '@typescript-eslint/ban-ts-comment': 'error',
-            // 添加其他你需要的推荐规则...
+            // Custom Rules
 
-            // 你的自定义规则
             '@typescript-eslint/interface-name-prefix': 'off',
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/explicit-module-boundary-types': 'off',
