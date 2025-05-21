@@ -1,6 +1,5 @@
 import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
-import logger from '../utils/logger';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
@@ -57,19 +56,15 @@ export const jwtUtils = {
    * Verify a password reset token
    */
   verifyPasswordResetToken(token: string): ResetTokenPayload {
-    try {
-      const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-      const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
-      if (decoded.purpose !== 'password-reset') {
-        throw new AppException(HttpStatusCode.Unauthorized, 'Invalid token purpose');
-      }
+    const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+    const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
-      return decoded;
-    } catch (error) {
-      logger.error('Verify Password failed');
-      throw error;
+    if (decoded.purpose !== 'password-reset') {
+      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid token purpose');
     }
+    return decoded;
+
   },
 
   /**
@@ -87,28 +82,16 @@ export const jwtUtils = {
    * Verify access token
    */
   verifyAccessToken(token: string): TokenPayload {
-    try {
-      const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-      return jwt.verify(token, secret) as TokenPayload;
-    } catch (error) {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Verify Access Token failed', {
-        payload: error,
-      });
-    }
+    const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+    return jwt.verify(token, secret) as TokenPayload;
   },
 
   /**
    * Verify refresh token
    */
   verifyRefreshToken(token: string): TokenPayload {
-    try {
-      const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
-      return jwt.verify(token, secret) as TokenPayload;
-    } catch (error) {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Verify Fresh Token failed', {
-        payload: error,
-      });
-    }
+    const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
+    return jwt.verify(token, secret) as TokenPayload;
   },
 
   /**

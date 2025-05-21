@@ -235,19 +235,13 @@ export const companyController = {
   },
 
   checkCompanySlug: async (req: Request, res: Response) => {
-    try {
-      const { companyName } = req.body;
-      const exists = await companyService.checkCompanySlugExists(companyName);
-      return res.json({
-        success: true,
-        hasCompanyName: exists,
-        canCreate: !exists,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Error checking company name',
-      });
-    }
+
+    const { companyName } = req.body;
+    const exists = await companyService.checkCompanySlugExists(companyName);
+    return res.json({
+      success: true,
+      hasCompanyName: exists,
+      canCreate: !exists,
+    });
   },
 };

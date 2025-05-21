@@ -1,7 +1,6 @@
 import Company from '../models/company';
 import { Types } from 'mongoose';
 import User from '../models/user';
-import { generateVerificationCode, sendVerificationEmail } from '../utils/verification';
 import { generateAccessToken, generateRefreshToken } from '../utils/auth';
 import { redisClient } from '../utils/redis';
 import { membershipService } from './membershipService';

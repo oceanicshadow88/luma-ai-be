@@ -11,7 +11,19 @@ interface MailOptions {
   html?: string;
 }
 
-// Create nodemailer transporter using SMTP or test account
+const createTestTransport = async () => {
+  const testAccount = await nodemailer.createTestAccount();
+  return nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass,
+    },
+  });
+};
+
 const getTransporter = async () => {
   if (
     config.env === 'development' &&
@@ -39,58 +51,24 @@ export const emailService = {
       ...options,
     });
 
-    if (config.env === 'development' && 'user' in info) {
-      try {
-        const testMessageUrl = nodemailer.getTestMessageUrl(info as SentMessageInfo);
-        if (testMessageUrl) {
-          logger.info(`Preview URL: ${testMessageUrl}`);
-        }
-      } catch (err) {
-        logger.warn('Could not get test message URL:', { payload: err });
+    if (config.env === 'development') {
+      const testUrl = nodemailer.getTestMessageUrl(info as SentMessageInfo);
+      if (testUrl) {
+        logger.info(`Preview email URL: ${testUrl}`);
       }
     }
 
     return info;
   },
 
-  sendVerificationCodeEmail: async (email: string, code: string): Promise<boolean> => {
-    try {
-      await emailService.sendMail({
-        to: email,
-        subject: 'Your Verification Code',
-        text: `Your verification code is: ${code}\nThis code will expire in 5 minutes.`,
-      });
-      logger.info(`Verification code sent to ${email}`);
-      return true;
-    } catch (error) {
-      logger.error('Failed to send verification code:', { error });
-      return false;
-    }
-  },
-};
-
-// Helper function to create test transport
-const createTestTransport = async () => {
-  try {
-    const testAccount = await nodemailer.createTestAccount();
-    return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
+  sendVerificationCodeEmail: async (email: string, code: string): Promise<void> => {
+    await emailService.sendMail({
+      to: email,
+      subject: 'Your Verification Code',
+      text: `Your verification code is: ${code}\nThis code will expire in 5 minutes.`,
     });
-  } catch (error) {
-    logger.error('Failed to create test email account:', { payload: error });
-    return {
-      sendMail: (mailOptions: MailOptions) => {
-        logger.info('Email would be sent in production:', { payload: mailOptions });
-        return Promise.resolve({ messageId: 'mock-id' });
-      },
-    };
-  }
+    logger.info(`Verification code sent to ${email}`);
+  },
 };
 
 export default emailService;

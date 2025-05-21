@@ -1,47 +1,65 @@
 import { Router, RequestHandler } from 'express';
 import { authGuard } from '../../middleware/authGuard';
-import { asyncHandler } from '../../middleware/asyncHandler';
 import { companyController } from '../../controllers/companyController';
 import { validateCompany } from '../../validations/companyValidaton';
+import { registerRoutes } from '../../utils/registerRoutes';
 
 const router = Router();
 
 // Public routes
-router.post(
-  '/check-company-slug',
-  validateCompany.checkCompanySlug as unknown as RequestHandler[],
-  asyncHandler(companyController.checkCompanySlug),
-);
-
-router.post(
-  '/create-company',
-  validateCompany.createCompanyAndAccount as unknown as RequestHandler[],
-  asyncHandler(companyController.createCompanyAndAccount),
-);
+registerRoutes(router, [
+  {
+    method: 'post',
+    path: '/check-company-slug',
+    middlewares: [validateCompany.checkCompanySlug] as unknown as RequestHandler[],
+    handler: companyController.checkCompanySlug,
+  },
+  {
+    method: 'post',
+    path: '/create-company',
+    middlewares: [validateCompany.createCompanyAndAccount] as unknown as RequestHandler[],
+    handler: companyController.createCompanyAndAccount,
+  },
+]);
 
 // Protected routes
 router.use(authGuard);
 
 // Company management routes
-router.get('/', asyncHandler(companyController.getCompanies));
-router.get('/:id', asyncHandler(companyController.getCompanyById));
-router.post(
-  '/',
-  validateCompany.createCompany as unknown as RequestHandler[],
-  asyncHandler(companyController.createCompany),
-);
-router.patch(
-  '/:id',
-  validateCompany.updateCompany as unknown as RequestHandler[],
-  asyncHandler(companyController.updateCompany),
-);
-router.delete('/:id', asyncHandler(companyController.deleteCompany));
-
-// Invite management
-router.post(
-  '/:id/invites',
-  validateCompany.createInvite as unknown as RequestHandler[],
-  asyncHandler(companyController.createInvite),
-);
+registerRoutes(router, [
+  {
+    method: 'get',
+    path: '/',
+    handler: companyController.getCompanies,
+  },
+  {
+    method: 'get',
+    path: '/:id',
+    handler: companyController.getCompanyById,
+  },
+  {
+    method: 'post',
+    path: '/',
+    middlewares: [validateCompany.createCompany] as unknown as RequestHandler[],
+    handler: companyController.createCompany,
+  },
+  {
+    method: 'patch',
+    path: '/:id',
+    middlewares: [validateCompany.updateCompany] as unknown as RequestHandler[],
+    handler: companyController.updateCompany,
+  },
+  {
+    method: 'delete',
+    path: '/:id',
+    handler: companyController.deleteCompany,
+  },
+  {
+    method: 'post',
+    path: '/:id/invites',
+    middlewares: [validateCompany.createInvite] as unknown as RequestHandler[],
+    handler: companyController.createInvite,
+  },
+]);
 
 export default router;
