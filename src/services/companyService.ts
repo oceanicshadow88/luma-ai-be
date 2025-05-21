@@ -92,34 +92,9 @@ export const companyService = {
   },
 
   checkEmailAndSendCode: async (email: string) => {
-    const rateLimitKey = `verification:${email}`;
-    const lastSent = await redisClient.get(rateLimitKey);
-    if (lastSent) {
-      throw new Error('Please wait before requesting another code');
-    }
-
-    const VERIFICATION_EXPIRES = 15 * 60;
-    const code = generateVerificationCode();
-    verificationStore.set(email, {
-      code,
-      expiresAt: new Date(Date.now() + VERIFICATION_EXPIRES * 1000),
-      verified: false,
-    });
-
-    await redisClient.setex(rateLimitKey, 60, 'true');
-    await sendVerificationEmail(email, code);
-
-    if (process.env.NODE_ENV === 'development') {
-      return {
-        success: true,
-        message: 'Verification code sent',
-        code: code,
-      };
-    }
-
     return {
       success: true,
-      message: 'Verification code sent',
+      message: `Verification code sent to ${email}`,
     };
   },
 
