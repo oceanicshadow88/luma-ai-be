@@ -52,7 +52,6 @@ export const userValidateRole = async (
         role: ROLE.ADMIN,
         status: 'active',
       });
-
     }
     // if have all 3 models
     return { success: true, reason: 'LOGIN' };

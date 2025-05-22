@@ -7,30 +7,31 @@ export interface Membership extends Document {
   status: 'invited' | 'active' | 'disabled';
 }
 
-const membershipSchema = new Schema({
-  companyId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Company',
-    required: true,
-    index: true,
+const membershipSchema = new Schema(
+  {
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true,
+      index: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
+    role: {
+      type: String,
+      enum: ['admin', 'instructor', 'student'],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['invited', 'active', 'disabled'],
+      default: 'active',
+    },
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true,
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'instructor', 'student'],
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ['invited', 'active', 'disabled'],
-    default: 'active',
-  },
-},
   // timestamp auto createAt and updateAt
   { timestamps: true },
 );

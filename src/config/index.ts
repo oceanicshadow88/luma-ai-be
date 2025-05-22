@@ -98,5 +98,7 @@ export const ROUTES = {
   REGISTER_COMPANY: '/v1/auth/signup/institution',
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
+export const COMPANY_PLANS = ['free', 'pro', 'enterprise'] as const;
+export type CompanyPlan = (typeof COMPANY_PLANS)[number];
 
 export default config;

@@ -13,5 +13,5 @@ interface MembershipInput {
 }
 
 export const membershipService = {
-  createMembership: async (data: MembershipInput) => { },
+  createMembership: async (data: MembershipInput) => {},
 };

@@ -1,15 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { COMPANY_PLANS, CompanyPlan } from '../config';
 
 export interface Company extends Document {
   name: string;
   slug: string;
-  plan: string;
+  plan: CompanyPlan;
   ownerId: mongoose.Types.ObjectId;
-  settings: {
-    timezone: string;
-    locale: string;
-    logoUrl: string;
-    primaryColor: string;
+  settings?: {
+    timezone?: string;
+    locale?: string;
+    logoUrl?: string;
+    primaryColor?: string;
   };
   active: boolean;
 }
@@ -24,9 +25,12 @@ const companySchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
     plan: {
       type: String,
+      enum: COMPANY_PLANS,
       required: true,
       default: 'free',
     },
@@ -34,6 +38,7 @@ const companySchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      unique: true,
     },
     settings: {
       timezone: {
@@ -46,11 +51,24 @@ const companySchema = new Schema(
       },
       logoUrl: {
         type: String,
+        required: false,
         default: '',
+        validate: {
+          validator: function (avatarUrl: string) {
+            return (
+              avatarUrl === '' || /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i.test(avatarUrl)
+            );
+          },
+          message: (props: { value: unknown }) => `${props.value} is not a valid image URL`,
+        },
       },
       primaryColor: {
         type: String,
         default: '#000000',
+        validate: {
+          validator: (v: string) => /^#[0-9A-Fa-f]{6}$/.test(v),
+          message: 'Invalid hex color code',
+        },
       },
     },
     active: {

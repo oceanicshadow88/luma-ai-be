@@ -6,8 +6,6 @@ import { registerRoutes } from '../../utils/registerRoutes';
 
 const router = Router();
 
-registerRoutes(router, [
-
-]);
+registerRoutes(router, []);
 
 export default router;
