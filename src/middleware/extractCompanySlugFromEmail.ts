@@ -1,29 +1,22 @@
+import freemail from 'freemail';
 import { parse } from 'psl';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-const blockedDomains = [
-  'gmail.com',
-  'yahoo.com',
-  'hotmail.com',
-  'outlook.com',
-  'icloud.com',
-  'aol.com',
-  'msn.com',
-  'live.com',
-  'mail.com',
-  'protonmail.com',
-];
-
 export function extractCompanySlug(email: string): string {
   const domain = email.split('@')[1]?.toLowerCase();
+  // email required
   if (!domain) {
     throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
   }
 
-  if (blockedDomains.includes(domain)) {
-    // reject public email
-    throw new AppException(HttpStatusCode.BadRequest, 'Public email not allowed');
+  // block public email
+  if (freemail.isFree(email)) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Public email providers are not allowed');
+  }
+
+  if (freemail.isDisposable(email)) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Disposable email addresses are not allowed');
   }
 
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc

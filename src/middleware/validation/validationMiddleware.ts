@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { ObjectSchema } from 'joi';
-import AppException from '../../exceptions/appException';
-import { HttpStatusCode } from 'axios';
 
 declare module 'express-serve-static-core' {
   interface Request {

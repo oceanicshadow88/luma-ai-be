@@ -95,7 +95,7 @@ export const ROLE = {
 // Route api
 export const ROUTES = {
   LOGIN_USER: '/v1/auth/login',
-  REGISTER_COMPANY: '/v1/companies',
+  REGISTER_COMPANY: '/v1/auth/signup/institution',
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
 

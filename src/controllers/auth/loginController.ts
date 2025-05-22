@@ -8,5 +8,4 @@ export const adminLogin = async (req: Request, res: Response, next: NextFunction
   const { refreshToken } = await loginService.adminLogin({ email, password });
 
   res.json({ success: true, data: { refreshToken } });
-
 };

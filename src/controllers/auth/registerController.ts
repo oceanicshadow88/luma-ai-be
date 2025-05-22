@@ -45,8 +45,8 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
   switch (action) {
     // jump company registration
     case RegisterAction.REDIRECT_TO_COMPANY_REGISTER: {
-      //no user no company, jump to regist company page and
-      const userData: string = jwtUtils.generateTempDataToken({
+      //no user no company, jump to regist company page and pass user data
+      const payloadToken: string = jwtUtils.generatePayloadToken({
         firstname,
         lastname,
         username,
@@ -59,7 +59,7 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
 
       return res.status(302).json({
         message: 'Company not found, redirect to company registration.',
-        redirect: `/v1/companies?userData=${userData}`,
+        redirect: `/v1/companies?payloadToken=${payloadToken}`,
       });
     }
 
@@ -76,5 +76,4 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
     default:
       return res.status(400);
   }
-
 };

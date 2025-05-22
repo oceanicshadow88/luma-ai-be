@@ -56,7 +56,6 @@ export const jwtUtils = {
    * Verify a password reset token
    */
   verifyPasswordResetToken(token: string): ResetTokenPayload {
-
     const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
     const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
@@ -64,7 +63,6 @@ export const jwtUtils = {
       throw new AppException(HttpStatusCode.Unauthorized, 'Invalid token purpose');
     }
     return decoded;
-
   },
 
   /**
@@ -100,7 +98,7 @@ export const jwtUtils = {
    * @param expiresIn - Token expiration time, default is 30 minutes
    * @returns A signed JWT string
    */
-  generateTempDataToken(payload: object, expiresIn: StringValue = '1h'): string {
+  generatePayloadToken(payload: object, expiresIn: StringValue = '1h'): string {
     const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
     const options: SignOptions = { expiresIn };
     return jwt.sign(payload, secret, options);
@@ -111,7 +109,7 @@ export const jwtUtils = {
    * @param token - The JWT string to verify
    * @returns Decoded payload object if valid, or null if invalid/expired
    */
-  verifyTempDataToken(token: string): JwtPayload | null {
+  verifyPayloadToken(token: string): JwtPayload | null {
     try {
       const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
       const decoded = jwt.verify(token, secret);

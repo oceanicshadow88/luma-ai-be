@@ -5,7 +5,6 @@ export interface Membership extends Document {
   userId: mongoose.Types.ObjectId;
   role: 'admin' | 'instructor' | 'student';
   status: 'invited' | 'active' | 'disabled';
-  joinedAt: Date;
 }
 
 const membershipSchema = new Schema({
@@ -31,10 +30,9 @@ const membershipSchema = new Schema({
     enum: ['invited', 'active', 'disabled'],
     default: 'active',
   },
-  joinedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+},
+  // timestamp auto createAt and updateAt
+  { timestamps: true },
+);
 
 export default mongoose.model<Membership>('Membership', membershipSchema);

@@ -82,7 +82,6 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
     code: verificationCode,
     expiresAt: expiryTime,
   });
-
 };
 
 /**
@@ -90,7 +89,6 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
  * Validates the verification code and resets the password in one step
  */
 export const verifyResetCode = async (req: Request, res: Response, next: NextFunction) => {
-
   const { email, code, newPassword } = req.body;
 
   // Validation
@@ -178,7 +176,6 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
     success: true,
     message: 'Password has been reset successfully',
   });
-
 };
 
 /**

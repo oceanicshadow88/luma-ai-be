@@ -37,7 +37,7 @@ const errorHandler: ErrorRequestHandler = (
 
   // Custom error handler
   if (err instanceof AppException) {
-    const responseBody: Record<string, any> = {
+    const responseBody: Record<string, unknown> = {
       success: false,
       message: err.message,
     };

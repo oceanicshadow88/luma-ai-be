@@ -72,7 +72,6 @@ export const registerService = {
         role: ROLE.ADMIN,
         status: 'active',
       });
-      await membership.save();
 
       return {
         action: RegisterAction.CREATE_USER,
