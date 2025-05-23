@@ -4,6 +4,7 @@ import companyRoutes from './companyRoute';
 
 const v1Router = Router();
 
+
 // Mount routes
 v1Router.use('/auth', authRoutes);
 v1Router.use('/companies', companyRoutes);

@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import moment from 'moment-timezone';
 
 const env: string = process.env.NODE_ENV ?? 'development';
 dotenv.config({ path: `.env.${env}` });
@@ -85,20 +86,29 @@ export const config: Config = {
   },
 };
 
-// Role type for membership
+// Role object
 export const ROLE = {
   ADMIN: 'admin',
   INSTRUCTOR: 'instructor',
   STUDENT: 'student',
 } as const;
+// type: 'admin' | 'instructor' | 'student'
+export type RoleType = typeof ROLE[keyof typeof ROLE];
+// value:['admin', 'instructor', 'student']
+export const roleList = Object.values(ROLE);
 
 // Route api
 export const ROUTES = {
   LOGIN_USER: '/v1/auth/login',
-  REGISTER_COMPANY: '/v1/auth/signup/institution',
+  REGISTER_COMPANY: '/v1/companies/register',
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
-export const COMPANY_PLANS = ['free', 'pro', 'enterprise'] as const;
-export type CompanyPlan = (typeof COMPANY_PLANS)[number];
+export const COMPANY_PLANS = ['free', 'pro', 'enterprise'] as const; // type
+export type CompanyPlan = (typeof COMPANY_PLANS)[number]; // ['free', 'pro', 'enterprise']
+
+// locales
+export const LOCALES = ['en-US', 'zh-CN'] as const;
+// all timezone
+export const TIMEZONES: string[] = moment.tz.names();
 
 export default config;

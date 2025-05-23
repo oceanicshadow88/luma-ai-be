@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { COMPANY_PLANS, CompanyPlan } from '../config';
+import { COMPANY_PLANS, CompanyPlan, TIMEZONES, LOCALES } from '../config';
 
 export interface Company extends Document {
   name: string;
@@ -43,10 +43,12 @@ const companySchema = new Schema(
     settings: {
       timezone: {
         type: String,
+        enum: TIMEZONES,
         default: 'UTC',
       },
       locale: {
         type: String,
+        enum: LOCALES,
         default: 'en-US',
       },
       logoUrl: {
@@ -70,6 +72,7 @@ const companySchema = new Schema(
           message: 'Invalid hex color code',
         },
       },
+      default: {},
     },
     active: {
       type: Boolean,

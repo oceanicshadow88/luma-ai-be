@@ -12,7 +12,7 @@ export const loginService = {
     if (!user) {
       throw new AppException(
         HttpStatusCode.NotFound,
-        'User not found. Redirect to admin register.',
+        'Invalid credentials.',
         {
           payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
         },
@@ -26,6 +26,7 @@ export const loginService = {
 
     // generate token
     const { refreshToken, accessToken } = await generateTokenByUser(user);
+    //TODO:Return user role
 
     // save refreshToken
     user.refreshToken = refreshToken;

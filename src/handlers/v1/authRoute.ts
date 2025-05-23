@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { validateRegistration } from '../../middleware/validation/validateRegistration';
 import { adminRegister } from '../../controllers/auth/registerController';
 import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
@@ -17,7 +16,9 @@ registerRoutes(router, [
     // Admin registration
     method: 'post',
     path: '/register/admin',
-    middlewares: [validateRegistration, validateBody(authValidationSchema.register)],
+    middlewares: [
+      // validateRegistration, 
+      validateBody(authValidationSchema.register)],
     handler: adminRegister,
   },
   {

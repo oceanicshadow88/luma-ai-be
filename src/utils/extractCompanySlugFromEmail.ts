@@ -15,10 +15,6 @@ export function extractCompanySlug(email: string): string {
     throw new AppException(HttpStatusCode.BadRequest, 'Public email providers are not allowed');
   }
 
-  if (freemail.isDisposable(email)) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Disposable email addresses are not allowed');
-  }
-
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc
   const parsed = parse(domain);
   if (

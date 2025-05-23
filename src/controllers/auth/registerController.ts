@@ -1,7 +1,7 @@
 // authentication, authorization
 import { Request, Response, NextFunction } from 'express';
 import { RegisterAction, registerService } from '../../services/auth/registerService';
-import { extractCompanySlug } from '../../middleware/extractCompanySlugFromEmail';
+import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import { jwtUtils } from '../../lib/jwtUtils';
 
 export const adminRegister = async (req: Request, res: Response, next: NextFunction) => {

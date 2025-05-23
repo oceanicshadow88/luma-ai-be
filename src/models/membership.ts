@@ -1,10 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { RoleType, roleList } from '../config'
 
 export interface Membership extends Document {
   companyId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  role: 'admin' | 'instructor' | 'student';
-  status: 'invited' | 'active' | 'disabled';
+  role: RoleType;
+  active: boolean;
 }
 
 const membershipSchema = new Schema(
@@ -23,17 +24,21 @@ const membershipSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'instructor', 'student'],
+      enum: roleList,
       required: true,
     },
-    status: {
-      type: String,
-      enum: ['invited', 'active', 'disabled'],
-      default: 'active',
+    active: {
+      type: Boolean,
+      default: true,
     },
   },
   // timestamp auto createAt and updateAt
   { timestamps: true },
+);
+
+membershipSchema.index(
+  { userId: 1, companyId: 1, role: 1 },
+  { unique: true }
 );
 
 export default mongoose.model<Membership>('Membership', membershipSchema);

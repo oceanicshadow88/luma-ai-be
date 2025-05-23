@@ -20,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/v1', v1Router);
 
+
 // Error Handling
 app.use(errorHandler);
 

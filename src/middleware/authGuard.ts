@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { jwtUtils } from '../lib/jwtUtils';
 
 /**
  * Middleware to verify JWT token and authorize access to protected routes
