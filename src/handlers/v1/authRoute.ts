@@ -17,8 +17,9 @@ registerRoutes(router, [
     method: 'post',
     path: '/register/admin',
     middlewares: [
-      // validateRegistration, 
-      validateBody(authValidationSchema.register)],
+      // validateRegistration,
+      validateBody(authValidationSchema.register),
+    ],
     handler: adminRegister,
   },
   {

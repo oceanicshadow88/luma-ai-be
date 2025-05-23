@@ -88,7 +88,7 @@ export const requestResetCode = async (req: Request, res: Response, next: NextFu
  * Combined verify code and reset password
  * Validates the verification code and resets the password in one step
  */
-export const verifyResetCode = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyResetCode = async (req: Request, res: Response, _next: NextFunction) => {
   const { email, code, newPassword } = req.body;
 
   // Validation

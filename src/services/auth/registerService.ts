@@ -69,10 +69,9 @@ export const registerService = {
       const membership = await membershipService.createMembership({
         companyId: company.id,
         userId: user.id,
-        role: ROLE.ADMIN
+        role: ROLE.ADMIN,
       });
       membership.save();
-
 
       return {
         action: RegisterAction.CREATE_USER,

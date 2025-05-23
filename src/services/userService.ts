@@ -2,7 +2,7 @@ import { HttpStatusCode } from 'axios';
 import UserModel, { User } from '../models/user';
 import AppException from '../exceptions/appException';
 
-interface CreateUserInput {
+export interface CreateUserInput {
   firstname: string;
   lastname: string;
   username: string;
@@ -14,7 +14,7 @@ interface CreateUserInput {
 
 export const userService = {
   // create users
-  createUser: async (input: CreateUserInput) => {
+  createUser: async (input: CreateUserInput): Promise<User> => {
     const { firstname, lastname, username, password, email, avatarUrl, locale } = input;
     const user = new UserModel({
       firstname,

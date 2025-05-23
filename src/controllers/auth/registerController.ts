@@ -2,11 +2,26 @@
 import { Request, Response, NextFunction } from 'express';
 import { RegisterAction, registerService } from '../../services/auth/registerService';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-import { jwtUtils } from '../../lib/jwtUtils';
+import AppException from '../../exceptions/appException';
+import { HttpStatusCode } from 'axios';
+import { ROUTES } from '../../config';
+import { setTempUserData } from '../../utils/tempUserDataStorage';
 
-export const adminRegister = async (req: Request, res: Response, next: NextFunction) => {
+export interface RegistUserInput {
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  email: string;
+  avatarUrl?: string;
+  locale?: string;
+  verifyCode?: string;
+}
+
+export const adminRegister = async (req: Request, res: Response, _next: NextFunction) => {
   // Validate Data - Joi validate schema: deal in route with authvalidation middleware
   // Get params from request body
+
   const {
     firstname,
     lastname,
@@ -16,19 +31,13 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
     avatarUrl,
     verifyCode,
     locale,
-  }: {
-    firstname: string;
-    lastname: string;
-    username: string;
-    password: string;
-    email: string;
-    avatarUrl?: string;
-    verifyCode?: string;
-    locale?: string;
-  } = req.body;
+  } = req.body as RegistUserInput;;
 
   // get company slug
-  const companySlug = extractCompanySlug(email);
+  const companySlug = await extractCompanySlug(email);
+  if (!companySlug) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
+  }
 
   const { action, refreshToken } = await registerService.userRegister({
     firstname,
@@ -46,7 +55,7 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
     // jump company registration
     case RegisterAction.REDIRECT_TO_COMPANY_REGISTER: {
       //no user no company, jump to regist company page and pass user data
-      const payloadToken: string = jwtUtils.generatePayloadToken({
+      const user = {
         firstname,
         lastname,
         username,
@@ -55,11 +64,12 @@ export const adminRegister = async (req: Request, res: Response, next: NextFunct
         avatarUrl,
         locale,
         verifyCode,
-      });
+      };
+      setTempUserData(user);
 
       return res.status(302).json({
         message: 'Company not found, redirect to company registration.',
-        redirect: `/v1/companies?payloadToken=${payloadToken}`,
+        redirect: `${ROUTES.REGISTER_COMPANY}`,
       });
     }
 

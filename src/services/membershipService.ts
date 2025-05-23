@@ -1,5 +1,4 @@
-import { Types, Document } from 'mongoose';
-import { RoleType } from '../config';
+import { Types } from 'mongoose';
 import MembershipModel, { Membership } from '../models/membership';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
@@ -7,13 +6,17 @@ import { HttpStatusCode } from 'axios';
 interface MembershipInput {
   companyId: string;
   userId: string;
-  role: RoleType;
+  role: string;
   status?: boolean;
 }
 
 export const membershipService = {
   // check membership exist, return boolean
-  checkMembershipExist: async (userId: string, companyId: string, role: string): Promise<boolean> => {
+  checkMembershipExist: async (
+    userId: string,
+    companyId: string,
+    role: string,
+  ): Promise<boolean> => {
     const exists = await MembershipModel.exists({
       userId: new Types.ObjectId(userId),
       companyId: new Types.ObjectId(companyId),
@@ -23,24 +26,29 @@ export const membershipService = {
     return !!exists;
   },
 
-
   // create membership if not exist, return membership
   createMembership: async (membershipInput: MembershipInput) => {
     // if membership exist, throw error
     const membershipExists = await membershipService.checkMembershipExist(
       membershipInput.userId,
       membershipInput.companyId,
-      membershipInput.role
+      membershipInput.role,
     );
     if (membershipExists) {
-      throw new AppException(HttpStatusCode.Conflict, 'Membership already exists for this user, company, and role');
+      throw new AppException(
+        HttpStatusCode.Conflict,
+        'Membership already exists for this user, company, and role',
+      );
     }
     // no membership, create
     return MembershipModel.create(membershipInput);
   },
 
   // find memebership
-  getMemebershipOne: async (userId: string, companyId: string, role: string
+  getMemebershipOne: async (
+    userId: string,
+    companyId: string,
+    role: string,
   ): Promise<Membership | null> => {
     return MembershipModel.findOne({
       userId: new Types.ObjectId(userId),
@@ -52,10 +60,9 @@ export const membershipService = {
   getUserRoles: async (userId: string, companyId: string): Promise<string[]> => {
     const roles = await MembershipModel.find({
       userId: new Types.ObjectId(userId),
-      companyId: new Types.ObjectId(userId),
+      companyId: new Types.ObjectId(companyId),
     }).select('role');
 
-    return roles.map((r) => r.role);
+    return roles.map(r => r.role);
   },
-
 };

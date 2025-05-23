@@ -5,19 +5,20 @@ import { HttpStatusCode } from 'axios';
 import CompanyModel from '../models/company';
 import { ROUTES } from 'src/config';
 
+// if company exist next, if not jump to company register
 export const checkCompanyExistByEmail = async (req: Request, res: Response, next: NextFunction) => {
-    const { email } = req.body;
-    const companySlug = await extractCompanySlug(email);
-    if (!companySlug) {
-        throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
-    };
-    const existCompany = await CompanyModel.findOne({ slug: companySlug });
-    if (!existCompany) {
-        return res.status(302).json({
-            message: 'The company does not exist',
-            redirect: ROUTES.REGISTER_COMPANY
-        });
-    };
+  const { email } = req.body;
+  const companySlug = await extractCompanySlug(email);
+  if (!companySlug) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
+  }
+  const existCompany = await CompanyModel.findOne({ slug: companySlug });
+  if (!existCompany) {
+    return res.status(302).json({
+      message: 'The company does not exist',
+      redirect: ROUTES.REGISTER_COMPANY,
+    });
+  }
 
-    next();
+  next();
 };

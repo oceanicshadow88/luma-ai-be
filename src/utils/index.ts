@@ -22,8 +22,7 @@ export const formatResponse = <T>(success: boolean, data: T, message?: string) =
  * Async handler to avoid try/catch blocks
  * @param fn - The async function to handle
  */
-export const asyncHandler =
-  (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) =>
+export const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) =>
   (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

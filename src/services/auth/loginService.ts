@@ -10,13 +10,9 @@ export const loginService = {
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-      throw new AppException(
-        HttpStatusCode.NotFound,
-        'Invalid credentials.',
-        {
-          payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
-        },
-      );
+      throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.', {
+        payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
+      });
     }
     // verify password
     const isValidPassword = await user.validatePassword(password);

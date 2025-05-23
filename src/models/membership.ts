@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { RoleType, roleList } from '../config'
+import { RoleType, roleList } from '../config';
 
 export interface Membership extends Document {
   companyId: mongoose.Types.ObjectId;
@@ -36,9 +36,6 @@ const membershipSchema = new Schema(
   { timestamps: true },
 );
 
-membershipSchema.index(
-  { userId: 1, companyId: 1, role: 1 },
-  { unique: true }
-);
+membershipSchema.index({ userId: 1, companyId: 1, role: 1 }, { unique: true });
 
 export default mongoose.model<Membership>('Membership', membershipSchema);

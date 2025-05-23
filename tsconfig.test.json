@@ -4,14 +4,17 @@
     "rootDir": ".",
     "outDir": "./dist/tests",
     "baseUrl": ".",
-    "paths": {
-      "@src/*": ["src/*"]
-    },
+    "paths": {},
     "rootDirs": [
       "src",
       "tests"
     ]
   },
-  "include": ["tests/**/*", "src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "tests/**/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

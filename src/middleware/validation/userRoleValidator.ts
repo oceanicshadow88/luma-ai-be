@@ -1,11 +1,5 @@
 // import UserModel from '../../models/user';
-// import CompanyModel from '../../models/company';
-// import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-// import MembershipModel from '../../models/membership';
 // import { ROLE } from '../../config';
-// import { membershipService } from '../../services/membershipService';
-// import AppException from '../../exceptions/appException';
-// import { HttpStatusCode } from 'axios';
 
 // type RoleValidationReason = 'USER_NOT_FOUND' | 'COMPANY_NOT_FOUND' | 'LOGIN' | 'Unknown';
 
@@ -29,7 +23,6 @@
 //   // if role = admin
 //   if (role === ROLE.ADMIN) {
 //     // check company
-
 
 //     // check membership
 //     // const membership = await MembershipModel.findOne({

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/loaders/server.js",
-    "dev": "cross-env NODE_ENV=development nodemon --exec node dist/loaders/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --ext ts --exec ts-node ./loaders/server.ts",
     "debug": "node --inspect dist/loaders/server.js",
     "lint": "eslint \"{src,loaders,tests}/**/*.ts\" --fix",
     "format": "prettier --check \"{src,tests,loaders}/**/*.ts\"",

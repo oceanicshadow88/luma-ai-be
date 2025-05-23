@@ -1,9 +1,10 @@
+// @ts-ignore
 import freemail from 'freemail';
 import { parse } from 'psl';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-export function extractCompanySlug(email: string): string {
+export const extractCompanySlug = async (email: string): Promise<string | null> => {
   const domain = email.split('@')[1]?.toLowerCase();
   // email required
   if (!domain) {
@@ -30,4 +31,4 @@ export function extractCompanySlug(email: string): string {
   }
 
   throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
-}
+};

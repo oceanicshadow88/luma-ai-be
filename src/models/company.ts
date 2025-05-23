@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 import { COMPANY_PLANS, CompanyPlan, TIMEZONES, LOCALES } from '../config';
 
 export interface Company extends Document {
-  name: string;
+  companyName: string;
   slug: string;
   plan: CompanyPlan;
   ownerId: mongoose.Types.ObjectId;
@@ -17,7 +17,7 @@ export interface Company extends Document {
 
 const companySchema = new Schema(
   {
-    name: {
+    companyName: {
       type: String,
       required: true,
     },
