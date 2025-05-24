@@ -10,11 +10,16 @@ const errorHandler: ErrorRequestHandler = (
   res: Response,
   _next: NextFunction,
 ): void => {
+  // If the response header has already been sent, skip the subsequent processing directly
+  if (res.headersSent) {
+    return;
+  }
+
   // JWT token Error
   if (err instanceof TokenExpiredError) {
     res.status(401).json({
       success: false,
-      message: 'Access token has expired',
+      message: 'Token has expired',
     });
     return;
   }
@@ -22,7 +27,7 @@ const errorHandler: ErrorRequestHandler = (
   if (err instanceof JsonWebTokenError) {
     res.status(401).json({
       success: false,
-      message: 'Invalid access token',
+      message: 'Invalid token',
     });
     return;
   }
@@ -33,6 +38,7 @@ const errorHandler: ErrorRequestHandler = (
       success: false,
       message: err.message,
     });
+    return;
   }
 
   // Custom error handler
@@ -56,6 +62,9 @@ const errorHandler: ErrorRequestHandler = (
     success: false,
     message: 'Unhandled Error',
   });
+
 };
+
+
 
 export default errorHandler;

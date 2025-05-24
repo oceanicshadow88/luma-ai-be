@@ -1,6 +1,7 @@
 // filepath: i:\00_SoftwareDevopment\luma-ai-be\src\models\user.ts
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import MembershipModel from './membership';
 
 export interface User extends Document {
   firstname: string;
@@ -98,6 +99,12 @@ userSchema.methods.validatePassword = async function (
 ): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
+
+// When deleting a user, delete the relevant membership
+userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+  await MembershipModel.deleteMany({ userId: this._id });
+  next();
+});
 
 // Prevent duplicate model registration in development (hot reload)
 const UserModel: Model<User> = mongoose.models.User || mongoose.model<User>('User', userSchema);

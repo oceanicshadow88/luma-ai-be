@@ -1,8 +1,9 @@
 import { HttpStatusCode } from 'axios';
 import UserModel, { User } from '../models/user';
 import AppException from '../exceptions/appException';
+import { Types } from 'mongoose';
 
-interface CreateUserInput {
+export interface UserCreateInput {
   firstname: string;
   lastname: string;
   username: string;
@@ -14,65 +15,46 @@ interface CreateUserInput {
 
 export const userService = {
   // create users
-  createUser: async (input: CreateUserInput) => {
-    const { firstname, lastname, username, password, email, avatarUrl, locale } = input;
-    const user = new UserModel({
-      firstname,
-      lastname,
-      username,
-      password,
-      email,
-      avatarUrl,
-      locale,
+  createUser: async (userInput: UserCreateInput): Promise<User> => {
+
+    const existingUser = await UserModel.findOne({
+      $or: [{ email: userInput.email }, { username: userInput.username }],
     });
+    if (existingUser) {
+      throw new AppException(HttpStatusCode.Conflict, 'User email or username already exist');
+    }
+
+    const user = await UserModel.create(userInput);
     await user.hashPassword();
-
-    return user;
-  },
-
-  // Get all users
-  getAllUsers: async (page: number, limit: number, q?: string) => {
-    const query = q ? { $text: { $search: q } } : {};
-    const skip = (page - 1) * limit;
-
-    const users = await UserModel.find(query).skip(skip).limit(limit).select('-password').exec();
-
-    if (!users.length) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
-    }
-    return users;
-  },
-
-  // Get user by ID
-  getUserById: async (userId: string) => {
-    const user = await UserModel.findOne({ _id: userId });
-    if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
-    }
-    return user;
-  },
-
-  // Update user
-  updateUserById: async (userId: string, updates: Partial<User>) => {
-    const user = await UserModel.findOne({ _id: userId });
-    if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
-    }
-
-    user.set(updates);
     await user.save();
 
     return user;
   },
 
-  // Delete user
-  deleteUserById: async (userId: string) => {
-    // find user
+  // Get user by ID
+  getUserById: async (userId: string): Promise<User> => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Invalid user ID');
+    }
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
+      throw new AppException(HttpStatusCode.InternalServerError, 'User not found');
     }
 
-    return await user.deleteOne();
+    return user;
+  },
+
+  // Update user
+  updateUserById: async (userId: string, updates: Partial<User>): Promise<User> => {
+    const user = await userService.getUserById(userId);
+    user.set(updates);
+    await user.save();
+    return user;
+  },
+
+  // Delete user
+  deleteUserById: async (userId: string) => {
+    const user = await userService.getUserById(userId);
+    return await user.deleteOne();//Trigger pre deleteone hook, also delete membership
   },
 };

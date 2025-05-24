@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { LOCALES } from '../config';
 
 const baseAuthSchema = Joi.object({
   email: Joi.string()
@@ -15,6 +16,7 @@ const baseAuthSchema = Joi.object({
     .required()
     .min(8)
     .max(20)
+    .trim()
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
     .messages({
       'string.empty': 'Password is required',
@@ -59,8 +61,8 @@ const registerSchema = baseAuthSchema.keys({
       'any.invalid': 'Avatar url must be a valid image URL',
     }),
 
-  locale: Joi.string().valid('en', 'zh').default('en').messages({
-    'any.only': 'Locale must be either "en" or "zh"',
+  locale: Joi.string().valid(...LOCALES).default('en').messages({
+    'any.only': `Locale must be either: ${LOCALES.join(', ')}`,
   }),
 
   verifyCode: Joi.string().required().messages({

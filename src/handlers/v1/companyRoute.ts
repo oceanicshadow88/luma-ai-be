@@ -1,17 +1,17 @@
 import { Router, RequestHandler } from 'express';
 import { companyController } from '../../controllers/companyController';
 import { registerRoutes } from '../../utils/registerRoutes';
-import { createCompanySchema } from '../../validations/companyValidaton';
+import { companyValidationSchema } from '../../validations/companyValidaton';
+import { validateBody } from '../../middleware/validation/validationMiddleware';
 
 const router = Router();
 
-// Public routes
 registerRoutes(router, [
   {
     // regist company
     method: 'post',
-    path: '/signup/institution',
-    middlewares: [createCompanySchema] as unknown as RequestHandler[],
+    path: '/register',
+    middlewares: [validateBody(companyValidationSchema)] as unknown as RequestHandler[],
     handler: companyController.createCompany,
   },
 ]);

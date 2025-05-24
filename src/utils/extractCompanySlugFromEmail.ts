@@ -1,9 +1,10 @@
+// @ts-ignore
 import freemail from 'freemail';
 import { parse } from 'psl';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-export function extractCompanySlug(email: string): string {
+export const extractCompanySlug = async (email: string): Promise<string | null> => {
   const domain = email.split('@')[1]?.toLowerCase();
   // email required
   if (!domain) {
@@ -13,10 +14,6 @@ export function extractCompanySlug(email: string): string {
   // block public email
   if (freemail.isFree(email)) {
     throw new AppException(HttpStatusCode.BadRequest, 'Public email providers are not allowed');
-  }
-
-  if (freemail.isDisposable(email)) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Disposable email addresses are not allowed');
   }
 
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc
@@ -34,4 +31,4 @@ export function extractCompanySlug(email: string): string {
   }
 
   throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
-}
+};

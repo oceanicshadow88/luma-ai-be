@@ -3,20 +3,19 @@ import AppException from '../../exceptions/appException';
 import { generateTokenByUser } from '../../utils/token';
 import { HttpStatusCode } from 'axios';
 import { ROUTES } from '../../config';
+import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
+import CompanyModel from '../../models/company';
+import { membershipService } from '../membershipService';
+import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
 
 export const loginService = {
   adminLogin: async ({ email, password }: { email: string; password: string }) => {
     // check user exist
     const user = await UserModel.findOne({ email });
-
     if (!user) {
-      throw new AppException(
-        HttpStatusCode.NotFound,
-        'User not found. Redirect to admin register.',
-        {
-          payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
-        },
-      );
+      throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.', {
+        payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
+      });
     }
     // verify password
     const isValidPassword = await user.validatePassword(password);
@@ -26,11 +25,23 @@ export const loginService = {
 
     // generate token
     const { refreshToken, accessToken } = await generateTokenByUser(user);
+    // get company
+    const companySlug = await extractCompanySlug(email);
+    const company = await CompanyModel.findOne({ slug: companySlug });
+    if (!company) { // company not exist
+      setPendingUserData(user.toObject());
+
+      throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials', {
+        payload: { redirectTo: ROUTES.REGISTER_COMPANY, user: getSafePendingUserData(), },
+      });
+    }
+    const roles = await membershipService.getUserRoles(user.id, company.id);
+    console.log(roles);
 
     // save refreshToken
     user.refreshToken = refreshToken;
     await user.save();
 
-    return { refreshToken, accessToken };
+    return { refreshToken, accessToken, username: user.username, roles };
   },
 };

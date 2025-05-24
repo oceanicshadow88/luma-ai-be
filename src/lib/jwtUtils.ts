@@ -91,38 +91,4 @@ export const jwtUtils = {
     const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
     return jwt.verify(token, secret) as TokenPayload;
   },
-
-  /**
-   * Generate a temporary token for data transfer (e.g., passing user data via cc during registration)
-   * @param payload - The temporary data to include in the token
-   * @param expiresIn - Token expiration time, default is 30 minutes
-   * @returns A signed JWT string
-   */
-  generatePayloadToken(payload: object, expiresIn: StringValue = '1h'): string {
-    const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-    const options: SignOptions = { expiresIn };
-    return jwt.sign(payload, secret, options);
-  },
-
-  /**
-   * Verify and decode a temporary token
-   * @param token - The JWT string to verify
-   * @returns Decoded payload object if valid, or null if invalid/expired
-   */
-  verifyPayloadToken(token: string): JwtPayload | null {
-    try {
-      const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
-      const decoded = jwt.verify(token, secret);
-      // jwt.verify can return string or object, ensure it's an object
-      if (typeof decoded === 'string') {
-        // If decoded is a string, treat as invalid for our use case
-        return null;
-      }
-      return decoded;
-    } catch (error) {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Verify temp token failed', {
-        payload: error,
-      });
-    }
-  },
 };

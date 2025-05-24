@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { validateRegistration } from '../../middleware/validation/validateRegistration';
 import { adminRegister } from '../../controllers/auth/registerController';
 import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
@@ -8,6 +7,7 @@ import { requestResetCode, resetPassword, verifyResetCode } from '../../controll
 import { registerRoutes } from '../../utils/registerRoutes';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import authValidationSchema from '../../validations/userAuthValidation';
+import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
 
 const router = Router();
 
@@ -17,7 +17,7 @@ registerRoutes(router, [
     // Admin registration
     method: 'post',
     path: '/register/admin',
-    middlewares: [validateRegistration, validateBody(authValidationSchema.register)],
+    middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
   },
   {
