@@ -22,10 +22,16 @@ export const companyValidationSchema = Joi.object({
   settings: Joi.object({
     timezone: Joi.string()
       .valid(...TIMEZONES)
-      .default('UTC'),
+      .default('UTC')
+      .messages({
+        'any.only': `timezone invalid, Eg:${TIMEZONES[0]}`,
+      }),
     locale: Joi.string()
       .valid(...LOCALES)
-      .default('en-US'),
+      .default('en-US')
+      .messages({
+        'any.only': `Locale must be either: ${LOCALES.join(', ')}`,
+      }),
     logoUrl: Joi.string()
       .allow('')
       .pattern(logoUrlRegex)
@@ -40,14 +46,4 @@ export const companyValidationSchema = Joi.object({
     .default({}),
 
   active: Joi.boolean().default(true).optional(),
-
-  user: Joi.object({
-    firstname: Joi.string().required(),
-    lastname: Joi.string().required(),
-    username: Joi.string().required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-    verifyCode: Joi.string().required(),
-    locale: Joi.string().valid('en', 'zh').optional(),
-  }).optional()
 });

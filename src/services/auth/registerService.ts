@@ -1,109 +1,31 @@
 import ResetCodeModel from '../../models/resetCode';
-import CompanyModel from '../../models/company';
-import UserModel from '../../models/user';
 import { generateTokenByUser } from '../../utils/token';
 import { userService } from '../userService';
 import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-
-// Action enum
-export enum RegisterAction {
-  CREATE_USER = 'createUser',
-  REDIRECT_TO_COMPANY_REGISTER = 'redirectToCompanyRegister',
-  ERROR = 'error',
-}
+import { RegistUserInput } from '../../controllers/auth/registerController';
 
 export const registerService = {
   // get adminUserInput
-  userRegister: async ({
-    firstname,
-    lastname,
-    username,
-    password,
-    email,
-    avatarUrl,
-    verifyCode,
-    locale,
-    companySlug,
-  }: {
-    firstname: string;
-    lastname: string;
-    username: string;
-    password: string;
-    email: string;
-    avatarUrl?: string;
-    locale?: string;
-    companySlug: string;
-    verifyCode?: string;
-  }) => {
-    // check username
-    await checkUseWithUsername(username);
-    // check company exist
-    const companyCheck = await checkCompanyWithSlug(companySlug);
-    if ('data' in companyCheck) {
-      const company = companyCheck.data!;
+  userRegister: async (userInput: RegistUserInput) => {
 
-      // verify code to regist
-      if (verifyCode) {
-        await checkVerificationCode(verifyCode, email);
-      }
-
-      // create new user
-      const user = await userService.createUser({
-        firstname,
-        lastname,
-        username,
-        password,
-        email,
-        avatarUrl,
-        locale,
-      });
-      // generate Token
-      const { refreshToken } = await generateTokenByUser(user);
-      user.refreshToken = refreshToken;
-      await user.save();
-
-      // create membership
-      const membership = await membershipService.createMembership({
-        companyId: company.id,
-        userId: user.id,
-        role: ROLE.ADMIN,
-      });
-      membership.save();
-
-      return {
-        action: RegisterAction.CREATE_USER,
-        refreshToken: refreshToken,
-      };
-    }
-    if ('action' in companyCheck) {
-      return { action: companyCheck.action };
+    // verify code to regist
+    if (userInput.verifyCode) {
+      await checkVerificationCode(userInput.verifyCode, userInput.email);
     }
 
-    return { action: RegisterAction.ERROR };
+    // create user
+    const newUser = await userService.createUser(userInput);
+    // generate Token
+    const { refreshToken, accessToken } = await generateTokenByUser(newUser);
+    await userService.updateUserById(newUser.id, { refreshToken });
+    // create membership
+    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+
+    return { refreshToken, accessToken };
   },
-};
-
-// check exist user with username
-export const checkUseWithUsername = async (username: string) => {
-  const existUser = await UserModel.findOne({ username });
-  if (existUser) {
-    // if exist user
-    throw new AppException(HttpStatusCode.Conflict, `${username} already exists`);
-  }
-};
-
-// check company exist with company slug
-export const checkCompanyWithSlug = async (companySlug: string) => {
-  const existCompany = await CompanyModel.findOne({ slug: companySlug });
-  if (!existCompany) {
-    // no company
-    return { action: RegisterAction.REDIRECT_TO_COMPANY_REGISTER };
-  }
-  // exist company
-  return { data: existCompany };
 };
 
 // verify code

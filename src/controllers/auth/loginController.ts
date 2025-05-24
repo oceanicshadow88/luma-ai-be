@@ -5,7 +5,11 @@ export const adminLogin = async (req: Request, res: Response, _next: NextFunctio
   // get data from request body
   const { email, password }: { email: string; password: string } = req.body;
   // call user service to do DB operation
-  const { refreshToken } = await loginService.adminLogin({ email, password });
+  const { refreshToken, accessToken, username, roles } = await loginService.adminLogin({ email, password });
 
-  res.json({ success: true, data: { refreshToken } });
+  res.json({
+    success: true,
+    redirect: '',
+    data: { refreshToken, accessToken, username, roles }
+  });
 };
