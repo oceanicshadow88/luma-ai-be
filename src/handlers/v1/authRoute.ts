@@ -3,7 +3,8 @@ import { adminRegister } from '../../controllers/auth/registerController';
 import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { refreshToken } from '../../middleware/tokenHandler';
-import { requestResetCode, resetPassword, verifyResetCode } from '../../controllers/codeController';
+import { resetPassword } from '../../controllers/auth/passwordResetController';
+import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { registerRoutes } from '../../utils/registerRoutes';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import authValidationSchema from '../../validations/userAuthValidation';
@@ -42,12 +43,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/request-reset-code',
-    handler: requestResetCode,
-  },
-  {
-    method: 'post',
-    path: '/verify-reset-code',
-    handler: verifyResetCode,
+    handler: requestVerificationCode,
   },
   {
     method: 'post',
