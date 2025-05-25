@@ -61,9 +61,12 @@ const registerSchema = baseAuthSchema.keys({
       'any.invalid': 'Avatar url must be a valid image URL',
     }),
 
-  locale: Joi.string().valid(...LOCALES).default('en').messages({
-    'any.only': `Locale must be either: ${LOCALES.join(', ')}`,
-  }),
+  locale: Joi.string()
+    .valid(...LOCALES)
+    .default('en')
+    .messages({
+      'any.only': `Locale must be either: ${LOCALES.join(', ')}`,
+    }),
 
   verifyCode: Joi.string().required().messages({
     'string.empty': 'Verification code is required',
