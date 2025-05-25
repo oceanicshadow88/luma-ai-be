@@ -43,9 +43,6 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     });
     return;
   }
-
-
-
   // company exist, user not exist
   next();
 };

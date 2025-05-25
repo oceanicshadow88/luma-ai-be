@@ -28,11 +28,12 @@ export const loginService = {
     // get company
     const companySlug = await extractCompanySlug(email);
     const company = await CompanyModel.findOne({ slug: companySlug });
-    if (!company) { // company not exist
+    if (!company) {
+      // company not exist
       setPendingUserData(user.toObject());
 
       throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials', {
-        payload: { redirectTo: ROUTES.REGISTER_COMPANY, user: getSafePendingUserData(), },
+        payload: { redirectTo: ROUTES.REGISTER_COMPANY, user: getSafePendingUserData() },
       });
     }
     const roles = await membershipService.getUserRoles(user.id, company.id);

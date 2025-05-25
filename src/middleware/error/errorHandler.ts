@@ -62,9 +62,6 @@ const errorHandler: ErrorRequestHandler = (
     success: false,
     message: 'Unhandled Error',
   });
-
 };
-
-
 
 export default errorHandler;
