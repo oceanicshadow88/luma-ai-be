@@ -19,7 +19,6 @@ import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidaton';
 
 const router = Router();
-console.log(1);
 
 // ----------------- AUTH ROUTES -----------------
 registerRoutes(router, [

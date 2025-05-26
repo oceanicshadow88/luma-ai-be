@@ -108,7 +108,7 @@ export const verifyCode = async (req: Request, res: Response) => {
   if (!resetCode) {
     throw new AppException(
       HttpStatusCode.BadRequest,
-      'Invalid or expired code. Please request a new one.'
+      'Invalid or expired code. Please request a new one.',
     );
   }
 
