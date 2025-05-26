@@ -37,11 +37,11 @@ export const loginService = {
       });
     }
 
-    // get user all roles
-    const roles = await membershipService.getUserRoles(user.id, company.id);
     // save refreshToken
     user.refreshToken = refreshToken;
     await user.save();
+    // get user all roles
+    const roles = await membershipService.getUserRolesCompany(user.id);
 
     return { refreshToken, accessToken, username: user.username, roles };
   },
