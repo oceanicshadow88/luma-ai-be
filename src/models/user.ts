@@ -1,7 +1,10 @@
 // filepath: i:\00_SoftwareDevopment\luma-ai-be\src\models\user.ts
-import mongoose, { Document, Schema, Model } from 'mongoose';
+import mongoose, { Document, Schema, Model, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import MembershipModel from './membership';
+import { jwtUtils } from '../lib/jwtUtils';
+import AppException from '../exceptions/appException';
+import { HttpStatusCode } from 'axios';
 
 export interface User extends Document {
   firstname: string;
@@ -13,9 +16,14 @@ export interface User extends Document {
   locale: string;
   createdAt: Date;
   active: boolean;
+  refreshToken?: string;
   hashPassword(): Promise<void>;
   validatePassword(inputPassword: string): Promise<boolean>;
-  refreshToken?: string;
+  generateTokens(): Promise<{ accessToken: string; refreshToken: string }>;
+}
+
+export interface UserModel extends Model<User> {
+  refreshAuthToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }>;
 }
 
 const userSchema: Schema<User> = new Schema(
@@ -100,6 +108,42 @@ userSchema.methods.validatePassword = async function (
   return bcrypt.compare(password, this.password);
 };
 
+userSchema.methods.generateTokens = async function (
+  this: User,
+): Promise<{ accessToken: string; refreshToken: string }> {
+  const userId = (this._id as Types.ObjectId).toString();
+  const accessToken = jwtUtils.generateAccessToken({ userId });
+  const refreshToken = jwtUtils.generateRefreshToken({ userId });
+
+  return { accessToken, refreshToken };
+};
+
+userSchema.statics.refreshAuthToken = async function (
+  refreshToken: string,
+): Promise<{ accessToken: string; refreshToken: string }> {
+  const payload = jwtUtils.verifyRefreshToken(refreshToken);
+
+  const user = await this.findOne({ _id: payload.userId, refreshToken });
+  if (!user) {
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid refresh token');
+  }
+
+  const newAccessToken = jwtUtils.generateAccessToken({
+    userId: (user._id as Types.ObjectId).toString(),
+  });
+  const newRefreshToken = jwtUtils.generateRefreshToken({
+    userId: (user._id as Types.ObjectId).toString(),
+  });
+
+  user.refreshToken = newRefreshToken;
+  await user.save();
+
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  };
+};
+
 // When deleting a user, delete the relevant membership
 userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
   await MembershipModel.deleteMany({ user: this._id });
@@ -107,6 +151,6 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function (ne
 });
 
 // Prevent duplicate model registration in development (hot reload)
-const UserModel: Model<User> = mongoose.models.User || mongoose.model<User>('User', userSchema);
+const UserModel = (mongoose.models.User || mongoose.model<User>('User', userSchema)) as UserModel;
 
 export default UserModel;

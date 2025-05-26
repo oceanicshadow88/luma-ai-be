@@ -1,6 +1,5 @@
 import UserModel from '../../models/user';
 import AppException from '../../exceptions/appException';
-import { generateTokenByUser } from '../../utils/token';
 import { HttpStatusCode } from 'axios';
 import { ROUTES } from '../../config';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
@@ -15,15 +14,14 @@ export const loginService = {
       throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.', {
         payload: { redirectTo: ROUTES.REGISTER_USER_ADMIN },
       });
-    }
-    // verify password
+    } // verify password
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
       throw new AppException(HttpStatusCode.Unauthorized, 'Invalid credentials');
     }
 
     // generate token
-    const { refreshToken, accessToken } = await generateTokenByUser(user);
+    const { refreshToken, accessToken } = await user.generateTokens();
     // get company
     const companySlug = await extractCompanySlug(email);
     const company = await CompanyModel.findOne({ slug: companySlug });
