@@ -1,5 +1,4 @@
 import ResetCodeModel from '../../models/resetCode';
-import { generateTokenByUser } from '../../utils/token';
 import { userService } from '../userService';
 import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
@@ -13,12 +12,10 @@ export const registerService = {
     // verify code to regist
     if (userInput.verifyCode) {
       await checkVerificationCode(userInput.verifyCode, userInput.email);
-    }
-
-    // create user
+    } // create user
     const newUser = await userService.createUser(userInput);
     // generate Token
-    const { refreshToken, accessToken } = await generateTokenByUser(newUser);
+    const { refreshToken, accessToken } = await newUser.generateTokens();
     await userService.updateUserById(newUser.id, { refreshToken });
     // create membership
     await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
