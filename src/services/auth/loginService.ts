@@ -36,7 +36,6 @@ export const loginService = {
         payload: { redirectTo: ROUTES.REGISTER_COMPANY, user: getSafePendingUserData() },
       });
     }
-    const roles = await membershipService.getUserRoles(user.id, company.id);
 
     // save refreshToken
     user.refreshToken = refreshToken;
