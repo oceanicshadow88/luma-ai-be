@@ -11,7 +11,7 @@ import { RegistUserInput } from '../../controllers/auth/registerController';
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
   if (!email) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Email is required'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
 
   // check company

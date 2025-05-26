@@ -17,7 +17,7 @@ export const companyController = {
     // Check fields
     const { companyName, plan, settings } = req.body;
     if (!companyName || !plan) {
-      return next(new AppException(HttpStatusCode.BadRequest, 'Missing required fields'));
+      throw new AppException(HttpStatusCode.BadRequest, 'Missing required fields');
     }
 
     // get user from user register
