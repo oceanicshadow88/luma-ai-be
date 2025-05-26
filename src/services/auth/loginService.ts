@@ -36,7 +36,6 @@ export const loginService = {
       });
     }
     const roles = await membershipService.getUserRoles(user.id, company.id);
-    console.log(roles);
 
     // save refreshToken
     user.refreshToken = refreshToken;
