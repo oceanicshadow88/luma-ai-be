@@ -1,7 +1,7 @@
-import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler';
 
-type AsyncHandlerFn = (req: Request, res: Response, next: NextFunction) => Promise<void | Response>;
+type AsyncHandlerFn = (req: Request, res: Response) => Promise<void | Response>;
 
 type RouteDefinition = {
   method: 'get' | 'post' | 'put' | 'delete' | 'patch';

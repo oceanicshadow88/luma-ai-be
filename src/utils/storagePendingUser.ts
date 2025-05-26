@@ -13,8 +13,8 @@ export const getSafePendingUserData = (): Omit<
 > | null => {
   if (!pendingUserData) return null;
 
-  const { password: _password, verifyCode: _verifyCode, ...rest } = pendingUserData;
-  return rest;
+  const { firstname, lastname, username, email } = pendingUserData;
+  return { firstname, lastname, username, email };
 };
 
 export const clearPendingUserData = () => {

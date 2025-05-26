@@ -102,7 +102,7 @@ userSchema.methods.validatePassword = async function (
 
 // When deleting a user, delete the relevant membership
 userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-  await MembershipModel.deleteMany({ userId: this._id });
+  await MembershipModel.deleteMany({ user: this._id });
   next();
 });
 

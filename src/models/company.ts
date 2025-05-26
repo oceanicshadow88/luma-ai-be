@@ -6,7 +6,7 @@ export interface Company extends Document {
   companyName: string;
   slug: string;
   plan: CompanyPlan;
-  ownerId: mongoose.Types.ObjectId;
+  owner: mongoose.Types.ObjectId;
   settings?: {
     timezone?: string;
     locale?: string;
@@ -35,7 +35,7 @@ const companySchema = new Schema(
       required: true,
       default: 'free',
     },
-    ownerId: {
+    owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -86,7 +86,7 @@ const companySchema = new Schema(
 
 // When deleting a company, delete the relevant membership
 companySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-  await MembershipModel.deleteMany({ userId: this._id });
+  await MembershipModel.deleteMany({ user: this._id });
   next();
 });
 

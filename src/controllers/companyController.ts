@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
@@ -13,11 +13,11 @@ import { RegistUserInput } from './auth/registerController';
 import UserModel, { User } from '../models/user';
 
 export const companyController = {
-  createCompany: async (req: Request, res: Response, next: NextFunction) => {
+  createCompany: async (req: Request, res: Response) => {
     // Check fields
     const { companyName, plan, settings } = req.body;
     if (!companyName || !plan) {
-      return next(new AppException(HttpStatusCode.BadRequest, 'Missing required fields'));
+      throw new AppException(HttpStatusCode.BadRequest, 'Missing required fields');
     }
 
     // get user from user register
@@ -45,14 +45,14 @@ export const companyController = {
       companyName,
       slug,
       plan,
-      ownerId: newUser._id as Types.ObjectId,
+      owner: newUser._id as Types.ObjectId,
       settings,
     });
 
     // create membership
     const newMembership = await membershipService.createMembership({
-      userId: newUser.id,
-      companyId: newCompany.id,
+      user: newUser.id,
+      company: newCompany.id,
       role: ROLE.ADMIN,
       status: true,
     });
@@ -62,9 +62,9 @@ export const companyController = {
       message: 'User, Company and Membership created successfully',
       redirect: ROUTES.LOGIN_USER,
       data: {
-        userId: newUser._id,
-        companyId: newCompany._id,
-        membershipId: newMembership._id,
+        user: newUser._id,
+        company: newCompany._id,
+        membership: newMembership._id,
       },
     });
   },

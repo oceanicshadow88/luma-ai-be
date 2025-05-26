@@ -17,7 +17,7 @@ export const companyValidationSchema = Joi.object({
     .default('free')
     .required(),
 
-  ownerId: Joi.string().length(24).hex().optional(),
+  owner: Joi.string().length(24).hex().optional(),
 
   settings: Joi.object({
     timezone: Joi.string()

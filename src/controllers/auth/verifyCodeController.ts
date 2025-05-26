@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { isValidEmail } from '../../utils';
 import ResetCodeModel from '../../models/resetCode';
 import config from '../../config';
@@ -10,18 +10,16 @@ import { HttpStatusCode } from 'axios';
  * Accepts an email, validates it, and generates a verification code that can be used
  * for password reset or account registration
  */
-export const requestVerificationCode = async (req: Request, res: Response, next: NextFunction) => {
+export const requestVerificationCode = async (req: Request, res: Response) => {
   const { email } = req.body;
 
   // Email validation
   if (!email) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Please enter your email address'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
   }
 
   if (!isValidEmail(email)) {
-    return next(
-      new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email'),
-    );
+    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
 
   // Check for existing code
@@ -89,32 +87,28 @@ export const requestVerificationCode = async (req: Request, res: Response, next:
  * This is a generic verification function that can be used by both
  * password reset and registration flows
  */
-export const verifyCode = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyCode = async (req: Request, res: Response) => {
   const { email, code } = req.body;
 
   // Validation
   if (!email) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Please enter your email address'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
   }
 
   if (!code) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Please enter the verification code'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter the verification code');
   }
 
   if (!isValidEmail(email)) {
-    return next(
-      new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email'),
-    );
+    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
   // Find the code for this email
   const resetCode = await ResetCodeModel.findOne({ email }).exec();
   // Check if code exists
   if (!resetCode) {
-    return next(
-      new AppException(
-        HttpStatusCode.BadRequest,
-        'Invalid or expired code. Please request a new one.',
-      ),
+    throw new AppException(
+      HttpStatusCode.BadRequest,
+      'Invalid or expired code. Please request a new one.'
     );
   }
 
@@ -122,7 +116,7 @@ export const verifyCode = async (req: Request, res: Response, next: NextFunction
   const validationResult = await resetCode.validateResetCode(code);
 
   if (!validationResult.isValid) {
-    return next(new AppException(HttpStatusCode.TooManyRequests, validationResult.message));
+    throw new AppException(HttpStatusCode.TooManyRequests, validationResult.message);
   }
 
   // Code is valid

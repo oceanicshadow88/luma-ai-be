@@ -1,13 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { userService } from '../services/userService';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
 export const userController = {
-  deleteUser: async (req: Request, res: Response, next: NextFunction) => {
+  deleteUser: async (req: Request, res: Response) => {
     const { userId } = req.params;
     if (!userId) {
-      return next(new AppException(HttpStatusCode.BadRequest, 'Missing userId parameter'));
+      throw new AppException(HttpStatusCode.BadRequest, 'Missing userId parameter');
     }
 
     await userService.deleteUserById(userId);

@@ -6,7 +6,7 @@ import { HttpStatusCode } from 'axios';
 export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 
 interface TokenPayload extends JwtPayload {
-  userId: string;
+  user: string;
   name?: string;
   email?: string;
   role?: string;
