@@ -10,7 +10,6 @@ import { RegistUserInput } from '../../controllers/auth/registerController';
 export const registerService = {
   // get adminUserInput
   userRegister: async (userInput: RegistUserInput) => {
-
     // verify code to regist
     if (userInput.verifyCode) {
       await checkVerificationCode(userInput.verifyCode, userInput.email);

@@ -26,9 +26,14 @@ module.exports = [
         rules: {
             // TypeScript recommand
             '@typescript-eslint/adjacent-overload-signatures': 'error',
-            '@typescript-eslint/ban-ts-comment': 'error',
+            '@typescript-eslint/ban-ts-comment': [
+                'error', {
+                    'ts-ignore': false,         // allow @ts-ignore
+                    'ts-expect-error': true,    // @ts-expect-error work
+                    'ts-nocheck': true,
+                    'ts-check': false
+                }],
             // Custom Rules
-
             '@typescript-eslint/interface-name-prefix': 'off',
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -41,7 +46,9 @@ module.exports = [
                     argsIgnorePattern: '^_',
                     varsIgnorePattern: '^_'
                 }
-            ]
+            ],
+            // forbid console.log
+            'no-console': 'error'
         }
     }
 ];

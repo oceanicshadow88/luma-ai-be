@@ -7,7 +7,7 @@ import { companyService } from '../services/companyService';
 import { Types } from 'mongoose';
 import { membershipService } from '../services/membershipService';
 import { ROLE, ROUTES } from '../config';
-import { clearPendingUserData, getPendingUserData, } from '../utils/storagePendingUser';
+import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
 import { checkVerificationCode } from '../services/auth/registerService';
 import { RegistUserInput } from './auth/registerController';
 import UserModel, { User } from '../models/user';

@@ -7,10 +7,13 @@ export const setPendingUserData = (userData: RegistUserInput) => {
 };
 
 export const getPendingUserData = () => pendingUserData;
-export const getSafePendingUserData = (): Omit<RegistUserInput, 'password' | 'verifyCode'> | null => {
+export const getSafePendingUserData = (): Omit<
+  RegistUserInput,
+  'password' | 'verifyCode'
+> | null => {
   if (!pendingUserData) return null;
 
-  const { password, verifyCode, ...rest } = pendingUserData;
+  const { password: _password, verifyCode: _verifyCode, ...rest } = pendingUserData;
   return rest;
 };
 

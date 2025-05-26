@@ -63,8 +63,21 @@ export const membershipService = {
     return MembershipModel.findOne({ userId, companyId, role });
   },
 
-  getUserRoles: async (userId: Types.ObjectId, companyId: Types.ObjectId): Promise<string[]> => {
-    const roles = await MembershipModel.find({ userId, companyId }).select('role');
-    return roles.map(r => r.role);
+
+  getUserRolesCompany: async (userId: Types.ObjectId): Promise<{ companyId: Types.ObjectId; roles: string[] }[]> => {
+    const memberships = await MembershipModel.find({ userId }).select('companyId role').lean(); // lean(): return object
+
+    // Each company ID corresponds to multiple roles
+    const roleMap = new Map<string, { companyId: Types.ObjectId; roles: string[] }>(); // 
+    memberships.forEach(m => {
+      const key = m.companyId.toString();
+      if (!roleMap.has(key)) {
+        roleMap.set(key, { companyId: m.companyId, roles: [] });
+      }
+      roleMap.get(key)!.roles.push(m.role);
+    });
+
+    return Array.from(roleMap.values());
   },
+
 };

@@ -18,9 +18,7 @@ export interface CompanyCreateInput {
 }
 
 export const companyService = {
-
   createCompany: async (companyInput: CompanyCreateInput): Promise<Company> => {
-
     // Check conflict
     const existCompany = await CompanyModel.findOne({ slug: companyInput.slug });
     if (existCompany) {
