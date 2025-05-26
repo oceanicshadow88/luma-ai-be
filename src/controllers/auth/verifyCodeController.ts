@@ -15,7 +15,7 @@ export const requestVerificationCode = async (req: Request, res: Response, next:
 
   // Email validation
   if (!email) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Please enter your email address'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
   }
 
   if (!isValidEmail(email)) {
@@ -94,27 +94,23 @@ export const verifyCode = async (req: Request, res: Response, next: NextFunction
 
   // Validation
   if (!email) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Please enter your email address'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
   }
 
   if (!code) {
-    return next(new AppException(HttpStatusCode.BadRequest, 'Please enter the verification code'));
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter the verification code');
   }
 
   if (!isValidEmail(email)) {
-    return next(
-      new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email'),
-    );
+    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
   // Find the code for this email
   const resetCode = await ResetCodeModel.findOne({ email }).exec();
   // Check if code exists
   if (!resetCode) {
-    return next(
-      new AppException(
-        HttpStatusCode.BadRequest,
-        'Invalid or expired code. Please request a new one.',
-      ),
+    throw new AppException(
+      HttpStatusCode.BadRequest,
+      'Invalid or expired code. Please request a new one.',
     );
   }
 
@@ -122,7 +118,7 @@ export const verifyCode = async (req: Request, res: Response, next: NextFunction
   const validationResult = await resetCode.validateResetCode(code);
 
   if (!validationResult.isValid) {
-    return next(new AppException(HttpStatusCode.TooManyRequests, validationResult.message));
+    throw new AppException(HttpStatusCode.TooManyRequests, validationResult.message);
   }
 
   // Code is valid

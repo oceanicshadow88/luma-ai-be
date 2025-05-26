@@ -7,7 +7,7 @@ export const userController = {
   deleteUser: async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     if (!userId) {
-      return next(new AppException(HttpStatusCode.BadRequest, 'Missing userId parameter'));
+      throw new AppException(HttpStatusCode.BadRequest, 'Missing userId parameter');
     }
 
     await userService.deleteUserById(userId);
