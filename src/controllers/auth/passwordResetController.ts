@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { isValidEmail, isValidPassword } from '../../utils';
 import UserModel from '../../models/user';
 import ResetCodeModel from '../../models/resetCode';
@@ -7,7 +7,7 @@ import ResetCodeModel from '../../models/resetCode';
  * Combined verify code and reset password
  * Validates the verification code and resets the password in one step
  */
-export const verifyResetCode = async (req: Request, res: Response, _next: NextFunction) => {
+export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, code, newPassword } = req.body;
 
   // Validation
@@ -102,6 +102,6 @@ export const verifyResetCode = async (req: Request, res: Response, _next: NextFu
  * This function is kept as a placeholder so existing routes still work
  * It redirects to the combined verifyResetCode function
  */
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-  return verifyResetCode(req, res, next);
+export const resetPassword = async (req: Request, res: Response) => {
+  return verifyResetCode(req, res);
 };

@@ -7,8 +7,8 @@ import CompanyModel from '../models/company';
 import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
 
 interface MembershipInput {
-  companyId: Types.ObjectId;
-  userId: Types.ObjectId;
+  company: Types.ObjectId;
+  user: Types.ObjectId;
   role: string;
   status?: boolean;
 }
@@ -16,11 +16,11 @@ interface MembershipInput {
 export const membershipService = {
   // check membership exist, return boolean
   checkMembershipExist: async (
-    userId: Types.ObjectId,
-    companyId: Types.ObjectId,
+    user: Types.ObjectId,
+    company: Types.ObjectId,
     role: string,
   ): Promise<boolean> => {
-    const exists = await MembershipModel.exists({ userId, companyId, role });
+    const exists = await MembershipModel.exists({ user: user, company: company, role });
     // Forcefully convert any value to a boolean value
     return !!exists;
   },
@@ -28,8 +28,8 @@ export const membershipService = {
   // create membership if not exist, return membership
   createMembership: async (membershipInput: MembershipInput): Promise<Membership> => {
     const membershipExists = await membershipService.checkMembershipExist(
-      membershipInput.userId,
-      membershipInput.companyId,
+      membershipInput.user,
+      membershipInput.company,
       membershipInput.role,
     );
     if (membershipExists) {
@@ -48,36 +48,9 @@ export const membershipService = {
       throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');
     }
     return membershipService.createMembership({
-      userId: user._id as Types.ObjectId,
-      companyId: existCompany._id as Types.ObjectId,
+      user: user._id as Types.ObjectId,
+      company: existCompany._id as Types.ObjectId,
       role,
     });
   },
-
-  // find membership
-  getMembershipOne: async (
-    userId: Types.ObjectId,
-    companyId: Types.ObjectId,
-    role: string,
-  ): Promise<Membership | null> => {
-    return MembershipModel.findOne({ userId, companyId, role });
-  },
-
-
-  getUserRolesCompany: async (userId: Types.ObjectId): Promise<{ companyId: Types.ObjectId; roles: string[] }[]> => {
-    const memberships = await MembershipModel.find({ userId }).select('companyId role').lean(); // lean(): return object
-
-    // Each company ID corresponds to multiple roles
-    const roleMap = new Map<string, { companyId: Types.ObjectId; roles: string[] }>(); // 
-    memberships.forEach(m => {
-      const key = m.companyId.toString();
-      if (!roleMap.has(key)) {
-        roleMap.set(key, { companyId: m.companyId, roles: [] });
-      }
-      roleMap.get(key)!.roles.push(m.role);
-    });
-
-    return Array.from(roleMap.values());
-  },
-
 };
