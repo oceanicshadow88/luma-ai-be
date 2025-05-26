@@ -1,13 +1,13 @@
-import { Request, Response, ErrorRequestHandler } from 'express';
+import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
 import AppException from '../../exceptions/appException';
 import logger from '../../utils/logger';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import Joi from 'joi';
 
-const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response): void => {
+const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
-    return;
+    return next(err);
   }
 
   // JWT token Error

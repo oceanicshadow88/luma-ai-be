@@ -112,8 +112,8 @@ userSchema.methods.generateTokens = async function (
   this: User,
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const userId = (this._id as Types.ObjectId).toString();
-  const accessToken = jwtUtils.generateAccessToken({ userId });
-  const refreshToken = jwtUtils.generateRefreshToken({ userId });
+  const accessToken = jwtUtils.generateAccessToken({ user: userId });
+  const refreshToken = jwtUtils.generateRefreshToken({ user: userId });
 
   return { accessToken, refreshToken };
 };
@@ -129,10 +129,10 @@ userSchema.statics.refreshAuthToken = async function (
   }
 
   const newAccessToken = jwtUtils.generateAccessToken({
-    userId: (user._id as Types.ObjectId).toString(),
+    user: (user._id as Types.ObjectId).toString(),
   });
   const newRefreshToken = jwtUtils.generateRefreshToken({
-    userId: (user._id as Types.ObjectId).toString(),
+    user: (user._id as Types.ObjectId).toString(),
   });
 
   user.refreshToken = newRefreshToken;
