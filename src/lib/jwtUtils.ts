@@ -3,11 +3,6 @@ import { config } from '../config';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-// Default values in case configuration isn't set
-const DEFAULT_JWT_SECRET = 'your-secret-key-should-be-in-env-file';
-const DEFAULT_JWT_EXPIRES_IN = '1d';
-const DEFAULT_JWT_REFRESH_EXPIRES_IN = '7d';
-
 export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 
 interface TokenPayload extends JwtPayload {
@@ -29,9 +24,9 @@ export const jwtUtils = {
    * Generate access token for authentication
    */
   generateAccessToken(payload: TokenPayload): string {
-    const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+    const secret: Secret = config.jwt?.secret;
     const options: SignOptions = {
-      expiresIn: (config.jwt?.expiresIn as StringValue) || DEFAULT_JWT_EXPIRES_IN,
+      expiresIn: (config.jwt?.expiresIn as StringValue) || '1d',
     };
     return jwt.sign(payload, secret, options);
   },
@@ -45,7 +40,7 @@ export const jwtUtils = {
     payload: object,
     expiresIn: StringValue = '15m' as StringValue,
   ): string {
-    const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+    const secret = config.jwt?.secret;
     const options: SignOptions = {
       expiresIn,
     };
@@ -56,7 +51,7 @@ export const jwtUtils = {
    * Verify a password reset token
    */
   verifyPasswordResetToken(token: string): ResetTokenPayload {
-    const secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+    const secret = config.jwt?.secret;
     const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
     if (decoded.purpose !== 'password-reset') {
@@ -69,9 +64,9 @@ export const jwtUtils = {
    * Generate refresh token
    */
   generateRefreshToken(payload: TokenPayload): string {
-    const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
+    const secret: Secret = config.jwt?.refreshSecret;
     const options: SignOptions = {
-      expiresIn: (config.jwt?.refreshExpiresIn as StringValue) || DEFAULT_JWT_REFRESH_EXPIRES_IN,
+      expiresIn: (config.jwt?.refreshExpiresIn as StringValue) || '7d',
     };
     return jwt.sign(payload, secret, options);
   },
@@ -80,7 +75,7 @@ export const jwtUtils = {
    * Verify access token
    */
   verifyAccessToken(token: string): TokenPayload {
-    const secret: Secret = config.jwt?.secret || DEFAULT_JWT_SECRET;
+    const secret: Secret = config.jwt?.secret;
     return jwt.verify(token, secret) as TokenPayload;
   },
 
@@ -88,7 +83,7 @@ export const jwtUtils = {
    * Verify refresh token
    */
   verifyRefreshToken(token: string): TokenPayload {
-    const secret: Secret = config.jwt?.refreshSecret || DEFAULT_JWT_SECRET;
+    const secret: Secret = config.jwt?.refreshSecret;
     return jwt.verify(token, secret) as TokenPayload;
   },
 };
