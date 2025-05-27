@@ -8,7 +8,7 @@ export interface CompanyCreateInput {
   companyName: string;
   slug: string;
   plan: CompanyPlan;
-  ownerId: mongoose.Types.ObjectId;
+  owner: mongoose.Types.ObjectId;
   settings?: {
     timezone?: string;
     locale?: string;
@@ -24,7 +24,7 @@ export const companyService = {
     if (existCompany) {
       throw new AppException(HttpStatusCode.Conflict, 'Company already exists');
     }
-    const ownedCompany = await CompanyModel.findOne({ ownerId: companyInput.ownerId });
+    const ownedCompany = await CompanyModel.findOne({ owner: companyInput.owner });
     if (ownedCompany) {
       throw new AppException(HttpStatusCode.Conflict, 'Owner already has a company');
     }

@@ -1,54 +1,68 @@
 import { Router } from 'express';
+import { registerRoutes } from '../../utils/registerRoutes';
+
+// Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
 import { adminLogin } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
-import { refreshToken } from '../../middleware/tokenHandler';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
-import { registerRoutes } from '../../utils/registerRoutes';
+import { companyController } from '../../controllers/companyController';
+
+// Middlewares
+import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
-import authValidationSchema from '../../validations/userAuthValidation';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+
+// Validation Schemas
+import authValidationSchema from '../../validations/userAuthValidation';
+import { companyValidationSchema } from '../../validations/companyValidaton';
 
 const router = Router();
 
-// Registration flow
+// ----------------- AUTH ROUTES -----------------
 registerRoutes(router, [
   {
-    // Admin registration
     method: 'post',
-    path: '/register/admin',
+    path: '/auth/register/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
   },
   {
-    // Login
     method: 'post',
-    path: '/login',
+    path: '/auth/login',
     middlewares: [validateBody(authValidationSchema.login)],
     handler: adminLogin,
   },
   {
-    // Logout
     method: 'post',
-    path: '/logout',
+    path: '/auth/logout',
     handler: userLogout,
   },
-  // token
   {
     method: 'post',
-    path: '/refresh-token',
+    path: '/auth/refresh-token',
     handler: refreshToken,
   },
   {
     method: 'post',
-    path: '/request-reset-code',
+    path: '/auth/request-reset-code',
     handler: requestVerificationCode,
   },
   {
     method: 'post',
-    path: '/reset-password',
+    path: '/auth/reset-password',
     handler: resetPassword,
+  },
+]);
+
+// ----------------- COMPANY ROUTES -----------------
+registerRoutes(router, [
+  {
+    method: 'post',
+    path: '/company/register',
+    middlewares: [validateBody(companyValidationSchema)],
+    handler: companyController.createCompany,
   },
 ]);
 

@@ -1,10 +1,9 @@
 import UserModel from '../../models/user';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { ROUTES } from '../../config';
+import { ROLE, ROUTES } from '../../config';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import CompanyModel from '../../models/company';
-import { membershipService } from '../membershipService';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
 
 export const loginService = {
@@ -39,8 +38,7 @@ export const loginService = {
     user.refreshToken = refreshToken;
     await user.save();
     // get user all roles
-    const roles = await membershipService.getUserRolesCompany(user.id);
 
-    return { refreshToken, accessToken, username: user.username, roles };
+    return { refreshToken, accessToken, username: user.username, role: ROLE.ADMIN };
   },
 };

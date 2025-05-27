@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
 import AppException from '../../exceptions/appException';
 import logger from '../../utils/logger';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
@@ -8,8 +8,8 @@ const errorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
   res: Response,
-  _next: NextFunction,
-): void => {
+  next: NextFunction,
+) => {
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
     return;

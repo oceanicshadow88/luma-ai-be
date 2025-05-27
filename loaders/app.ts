@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from '../src/middleware/morgan';
 import rateLimiter from '../src/middleware/rateLimit';
-import v1Router from '../src/handlers/v1';
+import v1Router from '../src/handlers/v1/api';
 import errorHandler from '../src/middleware/error/errorHandler';
 
 // Create Express app
@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/v1', v1Router);
+app.use('/api/v1', v1Router);
 
 // Error Handling
 app.use(errorHandler);
