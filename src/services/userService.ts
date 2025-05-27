@@ -1,56 +1,59 @@
-import User, { IUser } from '../models/User';
+import { HttpStatusCode } from 'axios';
+import UserModel, { User } from '../models/user';
+import AppException from '../exceptions/appException';
+import { Types } from 'mongoose';
+
+export interface UserCreateInput {
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  email: string;
+  avatarUrl?: string;
+  locale?: string;
+}
 
 export const userService = {
-  // Get all users
-  getAllUsers: async (): Promise<IUser[]> => {
-    try {
-      return await User.find().select('-password');
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      return [];
+  // create users
+  createUser: async (userInput: UserCreateInput): Promise<User> => {
+    const existingUser = await UserModel.findOne({
+      $or: [{ email: userInput.email }, { username: userInput.username }],
+    });
+    if (existingUser) {
+      throw new AppException(HttpStatusCode.Conflict, 'User email or username already exist');
     }
+
+    const user = await UserModel.create(userInput);
+    await user.hashPassword();
+    await user.save();
+
+    return user;
   },
 
   // Get user by ID
-  getUserById: async (userId: string): Promise<IUser | null> => {
-    try {
-      return await User.findById(userId).select('-password');
-    } catch (error) {
-      console.error(`Error fetching user with ID ${userId}:`, error);
-      return null;
+  getUserById: async (userId: string): Promise<User> => {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Invalid user ID');
     }
-  },
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new AppException(HttpStatusCode.InternalServerError, 'User not found');
+    }
 
-  // Create new user
-  createUser: async (userData: Partial<IUser>): Promise<IUser> => {
-    try {
-      return await User.create(userData);
-    } catch (error) {
-      console.error('Error creating user:', error);
-      throw error; // Re-throw to allow controller to handle appropriately
-    }
+    return user;
   },
 
   // Update user
-  updateUser: async (userId: string, userData: Partial<IUser>): Promise<IUser | null> => {
-    try {
-      return await User.findByIdAndUpdate(userId, userData, {
-        new: true,
-        runValidators: true,
-      }).select('-password');
-    } catch (error) {
-      console.error(`Error updating user with ID ${userId}:`, error);
-      return null;
-    }
+  updateUserById: async (userId: string, updates: Partial<User>): Promise<User> => {
+    const user = await userService.getUserById(userId);
+    user.set(updates);
+    await user.save();
+    return user;
   },
 
   // Delete user
-  deleteUser: async (userId: string): Promise<IUser | null> => {
-    try {
-      return await User.findByIdAndDelete(userId);
-    } catch (error) {
-      console.error(`Error deleting user with ID ${userId}:`, error);
-      return null;
-    }
+  deleteUserById: async (userId: string) => {
+    const user = await userService.getUserById(userId);
+    return await user.deleteOne(); //Trigger pre deleteone hook, also delete membership
   },
 };

@@ -1,7 +1,10 @@
 .env.test
 .env.development
 .env.production
+.env
 node_modules
 dist
 .DS_Store
 logs
+coverage
+.scannerwork

@@ -22,6 +22,7 @@ src/
 ├── config/             # Configuration files
 ├── controllers/        # Route controllers
 ├── database/           # Database connection and setup
+├── exceptions/         # Error Exception class
 ├── error/              # Error handling classes
 ├── lib/                # Reusable libraries and utilities
 ├── middleware/         # Express middleware
@@ -62,8 +63,13 @@ yarn install
 
 ```
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/luma-ai
+LOG_LEVEL=info
 NODE_ENV=development
+
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT=100
+
+MONGODB_URI=mongodb://localhost:27017/luma-ai
 JWT_SECRET=your_jwt_secret
 ```
 
@@ -124,6 +130,65 @@ For the best development experience in VS Code, install the ESLint and Prettier 
   "eslint.validate": ["typescript"]
 }
 ```
+
+### SonarQube 
+1. Build sonarqube by docker (.env.development edit by own)
+
+  ```bash
+  docker-compose up -d 
+  ```
+
+2. then vist http://localhost:9000 to configure project,username:admin, password:admin
+3. Configure environment variables in .env.development
+##### .env.development
+SONAR_HOST_URL=http://localhost:9000                       # website 
+SONAR_TOKEN=your_token                                     # own generate token
+4. load environment variables
+
+```bash
+export $(cat .env.development | xargs)
+```
+5. run sonarqube scanner (after login in Sonar web)
+
+  ```bash
+  npx @sonar/scan   # then visit web: show scanner report
+  ```
+
+#### Other commands
+- stop sonarqube
+
+  ```bash
+  docker-compose stop
+  ```
+- start sonarqube
+
+  ```bash
+  docker-compose start
+  ```
+
+- remove sonarqube
+
+  ```bash
+  docker-compose down
+  ```
+
+#### SonarQube configure (edit by own configuration)
+##### sonar-project.properties
+sonar.projectKey=luma-ai
+sonar.projectName=luma-ai
+
+sonar.host.url=${SONAR_HOST_URL}                          # visit website after run sonarqube docker
+sonar.token=${SONAR_TOKEN}                                # edit by own generate token
+sonar.login=admin                                         # login with admin, password admin
+
+##### docker-compose.yml
+ports:                                                     # edit port
+      - "9000:9000"
+    env_file:                                              # load environment virable
+      - .env.development
+##### .env.development
+SONAR_HOST_URL=http://localhost:9000                       # website 
+SONAR_TOKEN=your_token                                     # own generate token
 
 ### Production
 
