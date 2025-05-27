@@ -12,7 +12,7 @@ const errorHandler: ErrorRequestHandler = (
 ) => {
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
-    return next(err);
+    return;
   }
 
   // JWT token Error

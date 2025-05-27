@@ -1,7 +1,7 @@
 import UserModel from '../../models/user';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { ROUTES } from '../../config';
+import { ROLE, ROUTES } from '../../config';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import CompanyModel from '../../models/company';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
@@ -39,6 +39,6 @@ export const loginService = {
     await user.save();
     // get user all roles
 
-    return { refreshToken, accessToken, username: user.username, roles: 'Admin' };
+    return { refreshToken, accessToken, username: user.username, role: ROLE.ADMIN };
   },
 };
