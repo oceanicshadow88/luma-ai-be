@@ -5,6 +5,7 @@ import MembershipModel from './membership';
 import { jwtUtils } from '../lib/jwtUtils';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import { DEFAULT_LOCALE, LOCALES } from '../config';
 
 export interface User extends Document {
   firstname: string;
@@ -85,8 +86,8 @@ const userSchema: Schema<User> = new Schema(
     locale: {
       type: String,
       required: false,
-      enum: ['en', 'zh'],
-      default: 'en',
+      enum: LOCALES,
+      default: DEFAULT_LOCALE,
     },
     refreshToken: {
       type: String,

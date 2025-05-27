@@ -108,6 +108,7 @@ export type CompanyPlan = (typeof COMPANY_PLANS)[number]; // ['free', 'pro', 'en
 
 // locales
 export const LOCALES = ['en-US', 'zh-CN'] as const;
+export const DEFAULT_LOCALE = LOCALES[0];
 // all timezone
 export const TIMEZONES: string[] = moment.tz.names();
 
