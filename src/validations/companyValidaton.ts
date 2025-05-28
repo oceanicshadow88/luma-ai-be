@@ -20,6 +20,8 @@ export const companyValidationSchema = Joi.object({
   slug: Joi.string().trim().lowercase().optional(),
 
   plan: Joi.string()
+    .trim()
+    .lowercase()
     .valid(...COMPANY_PLAN_LIST)
     .default(DEFAULT_COMPANY_PLAN)
     .required(),
@@ -29,13 +31,15 @@ export const companyValidationSchema = Joi.object({
   settings: Joi.object({
     timezone: Joi.string()
       .valid(...TIMEZONES)
+      .trim()
       .default(DEFAULT_TIMEZONE)
       .messages({
-        'any.only': `timezone invalid, Eg:${DEFAULT_TIMEZONE}`,
+        'any.only': `timezone invalid, Eg:${TIMEZONES.join(',')}`,
       }),
     locale: Joi.string()
       .valid(...LOCALE_LIST)
       .default(DEFAULT_LOCALE)
+      .trim()
       .messages({
         'any.only': `Locale must be either: ${LOCALE_LIST.join(',')}`,
       }),

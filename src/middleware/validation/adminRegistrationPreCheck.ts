@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { ROUTES } from '../../config';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';

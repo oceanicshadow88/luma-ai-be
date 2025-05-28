@@ -64,6 +64,7 @@ const registerSchema = baseAuthSchema.keys({
   locale: Joi.string()
     .valid(...LOCALE_LIST)
     .default(DEFAULT_LOCALE)
+    .trim()
     .messages({
       'any.only': `Locale must be either: ${LOCALE_LIST.join(', ')}`,
     }),
