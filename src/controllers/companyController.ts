@@ -6,7 +6,7 @@ import { userService } from '../services/userService';
 import { companyService } from '../services/companyService';
 import { Types } from 'mongoose';
 import { membershipService } from '../services/membershipService';
-import { ROLE } from '../config';
+import { ROLE, ROUTES } from '../config';
 import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
 import { checkVerificationCode } from '../services/auth/registerService';
 import { RegistUserInput } from './auth/registerController';
@@ -54,11 +54,13 @@ export const companyController = {
       user: newUser.id,
       company: newCompany.id,
       role: ROLE.ADMIN,
+      status: true,
     });
 
     clearPendingUserData();
     return res.status(201).json({
       message: 'User, Company and Membership created successfully',
+      redirect: ROUTES.LOGIN_USER,
       data: {
         user: newUser._id,
         company: newCompany._id,

@@ -1,11 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { MEMBERSHIP_STATUS, MembershipStatusType, RoleType, roleList } from '../config';
+import { RoleType, roleList } from '../config';
 
 export interface Membership extends Document {
   company: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   role: RoleType;
-  status: MembershipStatusType;
+  active: boolean;
 }
 
 const membershipSchema = new Schema(
@@ -27,10 +27,9 @@ const membershipSchema = new Schema(
       enum: roleList,
       required: true,
     },
-    status: {
-      type: String,
-      enum: MEMBERSHIP_STATUS,
-      default: MEMBERSHIP_STATUS.ACTIVE,
+    active: {
+      type: Boolean,
+      default: true,
     },
   },
   // timestamp auto createAt and updateAt

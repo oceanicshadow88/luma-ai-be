@@ -2,7 +2,6 @@ import { HttpStatusCode } from 'axios';
 import UserModel, { User } from '../models/user';
 import AppException from '../exceptions/appException';
 import { Types } from 'mongoose';
-import { LocaleType } from 'src/config';
 
 export interface UserCreateInput {
   firstname: string;
@@ -11,7 +10,7 @@ export interface UserCreateInput {
   password: string;
   email: string;
   avatarUrl?: string;
-  locale?: LocaleType;
+  locale?: string;
 }
 
 export const userService = {
@@ -24,7 +23,7 @@ export const userService = {
       throw new AppException(HttpStatusCode.Conflict, 'User email or username already exist');
     }
 
-    const user = new UserModel(userInput);
+    const user = await UserModel.create(userInput);
     await user.hashPassword();
     await user.save();
 
@@ -38,7 +37,7 @@ export const userService = {
     }
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
+      throw new AppException(HttpStatusCode.InternalServerError, 'User not found');
     }
 
     return user;

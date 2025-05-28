@@ -8,7 +8,6 @@ const errorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
   res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ) => {
   // If the response header has already been sent, skip the subsequent processing directly

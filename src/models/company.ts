@@ -1,23 +1,15 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import {
-  COMPANY_PLANS,
-  TIMEZONES,
-  LOCALES,
-  DEFAULT_LOCALE,
-  DEFAULT_COMPANY_PLAN,
-  CompanyPlanType,
-  LocaleType,
-} from '../config';
+import { COMPANY_PLANS, CompanyPlan, TIMEZONES, LOCALES } from '../config';
 import MembershipModel from './membership';
 
 export interface Company extends Document {
   companyName: string;
   slug: string;
-  plan: CompanyPlanType;
+  plan: CompanyPlan;
   owner: mongoose.Types.ObjectId;
   settings?: {
     timezone?: string;
-    locale?: LocaleType;
+    locale?: string;
     logoUrl?: string;
     primaryColor?: string;
   };
@@ -41,7 +33,7 @@ const companySchema = new Schema(
       type: String,
       enum: COMPANY_PLANS,
       required: true,
-      default: DEFAULT_COMPANY_PLAN,
+      default: 'free',
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -53,12 +45,12 @@ const companySchema = new Schema(
       timezone: {
         type: String,
         enum: TIMEZONES,
-        default: TIMEZONES[0],
+        default: 'UTC',
       },
       locale: {
         type: String,
         enum: LOCALES,
-        default: DEFAULT_LOCALE,
+        default: 'en-US',
       },
       logoUrl: {
         type: String,
@@ -94,7 +86,7 @@ const companySchema = new Schema(
 
 // When deleting a company, delete the relevant membership
 companySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-  await MembershipModel.deleteMany({ company: this._id });
+  await MembershipModel.deleteMany({ user: this._id });
   next();
 });
 

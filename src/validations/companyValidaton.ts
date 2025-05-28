@@ -1,12 +1,5 @@
 import Joi from 'joi';
-import {
-  COMPANY_PLAN_LIST,
-  DEFAULT_COMPANY_PLAN,
-  DEFAULT_LOCALE,
-  DEFAULT_TIMEZONE,
-  LOCALE_LIST,
-  TIMEZONES,
-} from '../config';
+import { COMPANY_PLANS, LOCALES, TIMEZONES } from '../config';
 
 // logoUrl
 const logoUrlRegex = /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i;
@@ -20,10 +13,8 @@ export const companyValidationSchema = Joi.object({
   slug: Joi.string().trim().lowercase().optional(),
 
   plan: Joi.string()
-    .trim()
-    .lowercase()
-    .valid(...COMPANY_PLAN_LIST)
-    .default(DEFAULT_COMPANY_PLAN)
+    .valid(...COMPANY_PLANS)
+    .default('free')
     .required(),
 
   owner: Joi.string().length(24).hex().optional(),
@@ -31,17 +22,15 @@ export const companyValidationSchema = Joi.object({
   settings: Joi.object({
     timezone: Joi.string()
       .valid(...TIMEZONES)
-      .trim()
-      .default(DEFAULT_TIMEZONE)
+      .default('UTC')
       .messages({
-        'any.only': `timezone invalid, Eg:${TIMEZONES.join(',')}`,
+        'any.only': `timezone invalid, Eg:${TIMEZONES[0]}`,
       }),
     locale: Joi.string()
-      .valid(...LOCALE_LIST)
-      .default(DEFAULT_LOCALE)
-      .trim()
+      .valid(...LOCALES)
+      .default('en-US')
       .messages({
-        'any.only': `Locale must be either: ${LOCALE_LIST.join(',')}`,
+        'any.only': `Locale must be either: ${LOCALES.join(', ')}`,
       }),
     logoUrl: Joi.string()
       .allow('')
