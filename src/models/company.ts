@@ -14,7 +14,7 @@ import MembershipModel from './membership';
 export interface Company extends Document {
   companyName: string;
   slug: string;
-  plan: CompanyPlanType;
+  plan?: CompanyPlanType;
   owner: mongoose.Types.ObjectId;
   settings?: {
     timezone?: string;
@@ -41,7 +41,6 @@ const companySchema = new Schema(
     plan: {
       type: String,
       enum: COMPANY_PLANS,
-      required: true,
       default: DEFAULT_COMPANY_PLAN,
     },
     owner: {

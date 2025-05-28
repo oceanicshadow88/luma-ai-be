@@ -3,7 +3,7 @@ import config from '../config';
 
 const rateLimiter = rateLimit({
   windowMs: config.rateLimitWindowMS,
-  max: config.rateLimitWindowMS,
+  max: config.rateLimit,
   legacyHeaders: false,
   skip: () => config.env !== 'production',
 });
