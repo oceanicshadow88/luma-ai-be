@@ -7,6 +7,7 @@ import {
   DEFAULT_COMPANY_PLAN,
   CompanyPlanType,
   LocaleType,
+  DEFAULT_TIMEZONE,
 } from '../config';
 import MembershipModel from './membership';
 
@@ -53,7 +54,7 @@ const companySchema = new Schema(
       timezone: {
         type: String,
         enum: TIMEZONES,
-        default: TIMEZONES[0],
+        default: DEFAULT_TIMEZONE,
       },
       locale: {
         type: String,
