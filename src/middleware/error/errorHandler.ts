@@ -8,12 +8,12 @@ const errorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
   res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ) => {
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
-    return;
+    logger.error('[HeadersSent Error]', err);
+    return next(err);//Error passed to express for default handling
   }
 
   // JWT token Error

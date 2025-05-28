@@ -3,7 +3,7 @@ import { registerRoutes } from '../../utils/registerRoutes';
 
 // Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
-import { adminLogin } from '../../controllers/auth/loginController';
+import { login } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
@@ -32,7 +32,7 @@ registerRoutes(router, [
     method: 'post',
     path: '/auth/login',
     middlewares: [validateBody(authValidationSchema.login)],
-    handler: adminLogin,
+    handler: login,
   },
   {
     method: 'post',

@@ -15,41 +15,34 @@ export interface LoginResult {
 }
 
 export const loginService = {
-  adminLogin: async ({
+  login: async ({
     email,
     password,
   }: {
     email: string;
     password: string;
   }): Promise<LoginResult> => {
-    // check user exist
     const user = await UserModel.findOne({ email });
     if (!user) {
       throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.');
     }
-    // verify password
+
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
       throw new AppException(HttpStatusCode.Unauthorized, 'Invalid credentials');
     }
-    // check membership
+
     const memberships = await MembershipModel.find({ user: user._id });
     if (!memberships.length) {
-      // no membership
-      throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid credentials.');
     }
-    const adminMembership = memberships.find(m => m.role === ROLE.ADMIN); // find role = admin
+    const adminMembership = memberships.find(m => m.role === ROLE.ADMIN);
     if (adminMembership) {
-      // have admin
       if (memberships.length > 1) {
-        throw new AppException(
-          HttpStatusCode.BadRequest,
-          'Admin should not belong to multiple companies',
-        );
+        throw new AppException(HttpStatusCode.InternalServerError, 'Invalid credentials.');
       }
     }
 
-    // gerate token
     const { refreshToken, accessToken } = await user.generateTokens();
     user.refreshToken = refreshToken;
     await user.save();
