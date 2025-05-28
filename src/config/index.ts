@@ -86,30 +86,51 @@ export const config: Config = {
   },
 };
 
-// Role object
-export const ROLE = {
-  ADMIN: 'admin',
-  INSTRUCTOR: 'instructor',
-  STUDENT: 'student',
-} as const;
-// type: 'admin' | 'instructor' | 'student'
-export type RoleType = (typeof ROLE)[keyof typeof ROLE];
-// value:['admin', 'instructor', 'student']
-export const roleList = Object.values(ROLE);
-
 // Route api
 export const ROUTES = {
   LOGIN_USER: '/v1/auth/login',
   REGISTER_COMPANY: '/v1/companies/register',
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
-export const COMPANY_PLANS = ['free', 'pro', 'enterprise'] as const; // type
-export type CompanyPlan = (typeof COMPANY_PLANS)[number]; // ['free', 'pro', 'enterprise']
 
+
+
+// Mongoose DB type and default value
+// companyPlan
+export const COMPANY_PLANS = {
+  FREE: 'free',
+  PRO: 'pro',
+  ENTERPRISE: 'enterprise',
+} as const;
+export type CompanyPlanType = typeof COMPANY_PLANS[keyof typeof COMPANY_PLANS];
+export const COMPANY_PLAN_LIST = Object.values(COMPANY_PLANS);
+export const DEFAULT_COMPANY_PLAN = COMPANY_PLANS.FREE;
 // locales
-export const LOCALES = ['en-US', 'zh-CN'] as const;
-export const DEFAULT_LOCALE = LOCALES[0];
+export const LOCALES = {
+  EN_US: 'en-US',
+  ZH_CN: 'zh-CN',
+} as const;
+export type LocaleType = typeof LOCALES[keyof typeof LOCALES];
+export const LOCALE_LIST = Object.values(LOCALES);
+export const DEFAULT_LOCALE = LOCALES.EN_US;
 // all timezone
 export const TIMEZONES: string[] = moment.tz.names();
+export const DEFAULT_TIMEZONE = TIMEZONES[0];
+// Membership Role
+export const ROLE = {
+  ADMIN: 'admin',
+  INSTRUCTOR: 'instructor',
+  STUDENT: 'student',
+} as const;
+export type RoleType = (typeof ROLE)[keyof typeof ROLE];
+export const roleList = Object.values(ROLE);// value:['admin', 'instructor', 'student']
+// membership status
+export const MEMBERSHIP_STATUS = {
+  ACTIVE: 'active',
+  INVITED: 'invited',
+  DISABLED: 'disabled',
+} as const;
+export type MembershipStatusType = typeof MEMBERSHIP_STATUS[keyof typeof MEMBERSHIP_STATUS];
+export const DEFAULT_MEMBERSHIP_STATUS = MEMBERSHIP_STATUS.ACTIVE;
 
 export default config;

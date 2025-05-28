@@ -5,7 +5,7 @@ import MembershipModel from './membership';
 import { jwtUtils } from '../lib/jwtUtils';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { DEFAULT_LOCALE, LOCALES } from '../config';
+import { DEFAULT_LOCALE, LOCALES, LocaleType } from '../config';
 
 export interface User extends Document {
   firstname: string;
@@ -14,7 +14,7 @@ export interface User extends Document {
   password: string;
   email: string;
   avatarUrl: string;
-  locale: string;
+  locale: LocaleType;
   createdAt: Date;
   active: boolean;
   refreshToken?: string;
