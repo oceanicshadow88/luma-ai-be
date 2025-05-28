@@ -16,7 +16,7 @@ export const companyController = {
   createCompany: async (req: Request, res: Response) => {
     // Check fields
     const { companyName, plan, settings } = req.body;
-    if (!companyName || !plan) {
+    if (!companyName) {
       throw new AppException(HttpStatusCode.BadRequest, 'Missing required fields');
     }
 

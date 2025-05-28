@@ -15,7 +15,7 @@ const logoUrlRegex = /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i;
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
 
 export const companyValidationSchema = Joi.object({
-  companyName: Joi.string().trim().required(),
+  companyName: Joi.string().trim().min(2).required(),
 
   slug: Joi.string().trim().lowercase().optional(),
 
@@ -24,7 +24,7 @@ export const companyValidationSchema = Joi.object({
     .lowercase()
     .valid(...COMPANY_PLAN_LIST)
     .default(DEFAULT_COMPANY_PLAN)
-    .required(),
+    .optional(),
 
   owner: Joi.string().length(24).hex().optional(),
 
