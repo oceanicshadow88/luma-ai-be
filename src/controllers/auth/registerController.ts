@@ -1,6 +1,7 @@
 // authentication, authorization
 import { Request, Response } from 'express';
 import { registerService } from '../../services/auth/registerService';
+import { LocaleType } from 'src/config';
 export interface RegistUserInput {
   firstname: string;
   lastname: string;
@@ -8,7 +9,7 @@ export interface RegistUserInput {
   password: string;
   email: string;
   avatarUrl?: string;
-  locale?: string;
+  locale?: LocaleType;
   verifyCode?: string;
 }
 

@@ -5,12 +5,13 @@ import { HttpStatusCode } from 'axios';
 import { User } from '../models/user';
 import CompanyModel from '../models/company';
 import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
+import { MembershipStatusType, RoleType } from 'src/config';
 
-interface MembershipInput {
+export interface MembershipInput {
   company: Types.ObjectId;
   user: Types.ObjectId;
-  role: string;
-  status?: boolean;
+  role: RoleType;
+  status?: MembershipStatusType;
 }
 
 export const membershipService = {
@@ -18,9 +19,9 @@ export const membershipService = {
   checkMembershipExist: async (
     user: Types.ObjectId,
     company: Types.ObjectId,
-    role: string,
+    role: RoleType,
   ): Promise<boolean> => {
-    const exists = await MembershipModel.exists({ user: user, company: company, role });
+    const exists = await MembershipModel.exists({ user, company, role });
     // Forcefully convert any value to a boolean value
     return !!exists;
   },
@@ -41,8 +42,11 @@ export const membershipService = {
     return await MembershipModel.create(membershipInput);
   },
 
-  createMembershipByUser: async (user: User, role: string): Promise<Membership> => {
+  createMembershipByUser: async (user: User, role: RoleType): Promise<Membership> => {
     const slug = await extractCompanySlug(user.email);
+    if (!slug) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Cannot extract company from email');
+    }
     const existCompany = await CompanyModel.findOne({ slug });
     if (!existCompany) {
       throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');

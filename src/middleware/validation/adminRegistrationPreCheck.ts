@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { ROUTES } from '../../config';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
@@ -27,7 +26,6 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
 
     res.status(302).json({
       message: 'The company does not exist',
-      redirect: ROUTES.REGISTER_COMPANY,
       user: getSafePendingUserData(),
     });
     return;
@@ -39,7 +37,6 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     // user and company all exist
     res.status(302).json({
       message: 'User already exist, please login',
-      redirect: ROUTES.LOGIN_USER,
     });
     return;
   }

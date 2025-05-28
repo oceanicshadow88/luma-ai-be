@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { LOCALES } from '../config';
+import { DEFAULT_LOCALE, LOCALE_LIST } from '../config';
 
 const baseAuthSchema = Joi.object({
   email: Joi.string()
@@ -62,10 +62,11 @@ const registerSchema = baseAuthSchema.keys({
     }),
 
   locale: Joi.string()
-    .valid(...LOCALES)
-    .default('en')
+    .valid(...LOCALE_LIST)
+    .default(DEFAULT_LOCALE)
+    .trim()
     .messages({
-      'any.only': `Locale must be either: ${LOCALES.join(', ')}`,
+      'any.only': `Locale must be either: ${LOCALE_LIST.join(', ')}`,
     }),
 
   verifyCode: Joi.string().required().messages({
