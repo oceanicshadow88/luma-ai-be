@@ -1,5 +1,12 @@
 import Joi from 'joi';
-import { COMPANY_PLAN_LIST, COMPANY_PLANS, DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE, LOCALE_LIST, LOCALES, TIMEZONES } from '../config';
+import {
+  COMPANY_PLAN_LIST,
+  DEFAULT_COMPANY_PLAN,
+  DEFAULT_LOCALE,
+  DEFAULT_TIMEZONE,
+  LOCALE_LIST,
+  TIMEZONES,
+} from '../config';
 
 // logoUrl
 const logoUrlRegex = /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i;

@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { DEFAULT_LOCALE, LOCALE_LIST, LOCALES } from '../config';
+import { DEFAULT_LOCALE, LOCALE_LIST } from '../config';
 
 const baseAuthSchema = Joi.object({
   email: Joi.string()

@@ -54,13 +54,11 @@ export const companyController = {
       user: newUser.id,
       company: newCompany.id,
       role: ROLE.ADMIN,
-      status: true,
     });
 
     clearPendingUserData();
     return res.status(201).json({
       message: 'User, Company and Membership created successfully',
-      redirect: ROUTES.LOGIN_USER,
       data: {
         user: newUser._id,
         company: newCompany._id,

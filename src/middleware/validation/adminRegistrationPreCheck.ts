@@ -27,7 +27,6 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
 
     res.status(302).json({
       message: 'The company does not exist',
-      redirect: ROUTES.REGISTER_COMPANY,
       user: getSafePendingUserData(),
     });
     return;
@@ -39,7 +38,6 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     // user and company all exist
     res.status(302).json({
       message: 'User already exist, please login',
-      redirect: ROUTES.LOGIN_USER,
     });
     return;
   }

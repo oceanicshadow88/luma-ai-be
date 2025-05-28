@@ -93,8 +93,6 @@ export const ROUTES = {
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
 
-
-
 // Mongoose DB type and default value
 // companyPlan
 export const COMPANY_PLANS = {
@@ -102,7 +100,7 @@ export const COMPANY_PLANS = {
   PRO: 'pro',
   ENTERPRISE: 'enterprise',
 } as const;
-export type CompanyPlanType = typeof COMPANY_PLANS[keyof typeof COMPANY_PLANS];
+export type CompanyPlanType = (typeof COMPANY_PLANS)[keyof typeof COMPANY_PLANS];
 export const COMPANY_PLAN_LIST = Object.values(COMPANY_PLANS);
 export const DEFAULT_COMPANY_PLAN = COMPANY_PLANS.FREE;
 // locales
@@ -110,7 +108,7 @@ export const LOCALES = {
   EN_US: 'en-US',
   ZH_CN: 'zh-CN',
 } as const;
-export type LocaleType = typeof LOCALES[keyof typeof LOCALES];
+export type LocaleType = (typeof LOCALES)[keyof typeof LOCALES];
 export const LOCALE_LIST = Object.values(LOCALES);
 export const DEFAULT_LOCALE = LOCALES.EN_US;
 // all timezone
@@ -123,14 +121,14 @@ export const ROLE = {
   STUDENT: 'student',
 } as const;
 export type RoleType = (typeof ROLE)[keyof typeof ROLE];
-export const roleList = Object.values(ROLE);// value:['admin', 'instructor', 'student']
+export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'student']
 // membership status
 export const MEMBERSHIP_STATUS = {
   ACTIVE: 'active',
   INVITED: 'invited',
   DISABLED: 'disabled',
 } as const;
-export type MembershipStatusType = typeof MEMBERSHIP_STATUS[keyof typeof MEMBERSHIP_STATUS];
+export type MembershipStatusType = (typeof MEMBERSHIP_STATUS)[keyof typeof MEMBERSHIP_STATUS];
 export const DEFAULT_MEMBERSHIP_STATUS = MEMBERSHIP_STATUS.ACTIVE;
 
 export default config;

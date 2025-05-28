@@ -1,5 +1,13 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { COMPANY_PLANS, TIMEZONES, LOCALES, DEFAULT_LOCALE, DEFAULT_COMPANY_PLAN, CompanyPlanType, LocaleType } from '../config';
+import {
+  COMPANY_PLANS,
+  TIMEZONES,
+  LOCALES,
+  DEFAULT_LOCALE,
+  DEFAULT_COMPANY_PLAN,
+  CompanyPlanType,
+  LocaleType,
+} from '../config';
 import MembershipModel from './membership';
 
 export interface Company extends Document {

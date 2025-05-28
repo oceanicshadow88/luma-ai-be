@@ -2,16 +2,17 @@ import mongoose from 'mongoose';
 import CompanyModel, { Company } from '../models/company';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { CompanyPlan } from '../config';
+import { CompanyPlanType, LocaleType } from '../config';
+import UserModel from '../models/user';
 
 export interface CompanyCreateInput {
   companyName: string;
   slug: string;
-  plan: CompanyPlan;
+  plan: CompanyPlanType;
   owner: mongoose.Types.ObjectId;
   settings?: {
     timezone?: string;
-    locale?: string;
+    locale?: LocaleType;
     logoUrl?: string;
     primaryColor?: string;
   };
@@ -23,6 +24,10 @@ export const companyService = {
     const existCompany = await CompanyModel.findOne({ slug: companyInput.slug });
     if (existCompany) {
       throw new AppException(HttpStatusCode.Conflict, 'Company already exists');
+    }
+    const existOwner = await UserModel.exists({ _id: companyInput.owner });
+    if (!existOwner) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Owner user not found');
     }
     const ownedCompany = await CompanyModel.findOne({ owner: companyInput.owner });
     if (ownedCompany) {
