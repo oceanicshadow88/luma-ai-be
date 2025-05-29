@@ -8,7 +8,7 @@ import UserModel from '../models/user';
 export interface CompanyCreateInput {
   companyName: string;
   slug: string;
-  plan: CompanyPlanType;
+  plan?: CompanyPlanType;
   owner: mongoose.Types.ObjectId;
   settings?: {
     timezone?: string;

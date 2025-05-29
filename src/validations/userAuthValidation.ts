@@ -17,7 +17,8 @@ const baseAuthSchema = Joi.object({
     .min(8)
     .max(20)
     .trim()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
+    )
     .messages({
       'string.empty': 'Password is required',
       'string.min': 'Password must be at least 8 characters long',

@@ -16,7 +16,7 @@ export const companyController = {
   createCompany: async (req: Request, res: Response) => {
     // Check fields
     const { companyName, plan, settings } = req.body;
-    if (!companyName || !plan) {
+    if (!companyName) {
       throw new AppException(HttpStatusCode.BadRequest, 'Missing required fields');
     }
 
@@ -39,6 +39,9 @@ export const companyController = {
     // create user
     let newUser: User | null = await UserModel.findOne({ email: pendingUser.email });
     newUser ??= await userService.createUser(pendingUser);
+    if (!newUser || !newUser._id) {
+      throw new AppException(HttpStatusCode.InternalServerError, 'User creation failed');
+    }
 
     // create company
     const newCompany = await companyService.createCompany({
@@ -48,6 +51,9 @@ export const companyController = {
       owner: newUser._id as Types.ObjectId,
       settings,
     });
+    if (!newCompany || !newCompany._id) {
+      throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
+    }
 
     // create membership
     const newMembership = await membershipService.createMembership({
