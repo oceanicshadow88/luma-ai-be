@@ -1,8 +1,9 @@
 {
     // Format on save
     "editor.formatOnSave": true,
-    // Use Prettier as default formatter
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     // Files to validate with ESLint
     "eslint.validate": [
         "javascript",
@@ -12,18 +13,13 @@
     ],
     // Auto fix ESLint errors on save
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
+        "source.fixAll.eslint": "always"
     },
-    // Auto update imports on file move
     "typescript.updateImportsOnFileMove.enabled": "always",
     // Use relative imports in TS
     "typescript.preferences.importModuleSpecifier": "relative",
-    // Disable editor preview mode
     "workbench.editor.enablePreview": false,
-    // Fold imports by default
     "editor.foldingImportsByDefault": true,
     "less.format.enable": false,
-    "notebook.defaultFormatter": "esbenp.prettier-vscode",
-    "json.format.enable": true,
-    
+    "json.format.enable": true
 }
