@@ -23,15 +23,14 @@ src/
 ├── controllers/        # Route controllers
 ├── database/           # Database connection and setup
 ├── exceptions/         # Error Exception class
-├── error/              # Error handling classes
+├── handlers            # Express routes
 ├── lib/                # Reusable libraries and utilities
 ├── middleware/         # Express middleware
-├── models/             # Mongoose models
-├── routes/             # Express routes
+├── models/             # Mongoose models            
 ├── services/           # Business logic
+├── types               # TypeScript type
 ├── utils/              # Utility functions
 ├── validations/        # Input validation
-└── server.ts           # Application entry point
 tests/                  # Test scripts
 ```
 
