@@ -14,17 +14,13 @@ export default [
       globals: {
         node: true,
       },
-      env: {
-        node: true,
-        es2021: true,
-      },
     },
     plugins: {
       '@typescript-eslint': typescriptPlugin,
       prettier: prettierPlugin,
     },
     rules: {
-      // TypeScript recommand
+      // TypeScript  recommend
       '@typescript-eslint/adjacent-overload-signatures': 'error',
       '@typescript-eslint/ban-ts-comment': [
         'error',

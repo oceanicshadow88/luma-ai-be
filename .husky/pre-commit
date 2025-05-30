@@ -1,5 +1,3 @@
 #!/bin/sh
 yarn lint-staged
-
-yarn cspell:check
-yarn check
+yarn spell
