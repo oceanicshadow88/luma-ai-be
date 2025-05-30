@@ -85,7 +85,23 @@ To start the development server with hot-reloading:
 ```bash
 yarn dev
 ```
+### Git Hooks with Husky
 
+This project uses Husky to manage Git hooks for better code quality and workflow automation.
+
+#### Setup Husky
+
+Run this once after cloning the repo:
+
+```bash
+yarn husky install
+```
+
+Add a pre-commit hook (if not added yet)
+
+```bash
+npx husky add .husky/pre-commit "yarn check && yarn lint"
+```
 ### Code Quality and Formatting
 
 This project uses ESLint and Prettier to ensure code quality and consistent formatting.
