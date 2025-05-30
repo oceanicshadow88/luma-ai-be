@@ -34,9 +34,9 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
     );
     // Calculate how long ago the code was created
     const timeSinceCreation = now.getTime() - codeCreationTime.getTime();
-    // If less than the rate limit cooldown time has passed since creation
+    // If less than the rate limit coolDown time has passed since creation
     if (timeSinceCreation < config.resetCodeRateLimitExpiry * 1000) {
-      // Calculate seconds remaining for cooldown
+      // Calculate seconds remaining for coolDown
       const secondsRemaining = Math.ceil(
         (config.resetCodeRateLimitExpiry * 1000 - timeSinceCreation) / 1000,
       );
@@ -44,7 +44,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
       return res.status(429).json({
         success: false,
         message: 'Too many requests. Please try again later.',
-        cooldownSeconds: secondsRemaining,
+        coolDownSeconds: secondsRemaining,
       });
     }
   }

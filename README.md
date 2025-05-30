@@ -153,7 +153,7 @@ For the best development experience in VS Code, install the ESLint and Prettier 
   docker-compose up -d 
   ```
 
-2. then vist http://localhost:9000 to configure project,username:admin, password:admin
+2. then visit http://localhost:9000 to configure project,username:admin, password:admin
 3. Configure environment variables in .env.development
 ##### .env.development
 SONAR_HOST_URL=http://localhost:9000                       # website 
@@ -199,7 +199,7 @@ sonar.login=admin                                         # login with admin, pa
 ##### docker-compose.yml
 ports:                                                     # edit port
       - "9000:9000"
-    env_file:                                              # load environment virable
+    env_file:                                              # load environment variable
       - .env.development
 ##### .env.development
 SONAR_HOST_URL=http://localhost:9000                       # website 

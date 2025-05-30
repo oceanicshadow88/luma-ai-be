@@ -1,4 +1,3 @@
-// filepath: i:\00_SoftwareDevopment\luma-ai-be\src\models\user.ts
 import mongoose, { Document, Schema, Model, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import MembershipModel from './membership';

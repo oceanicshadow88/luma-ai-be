@@ -9,7 +9,7 @@ import { membershipService } from '../services/membershipService';
 import { ROLE } from '../config';
 import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
 import { checkVerificationCode } from '../services/auth/registerService';
-import { RegistUserInput } from './auth/registerController';
+import { RegisterUserInput } from './auth/registerController';
 import UserModel, { User } from '../models/user';
 
 export const companyController = {
@@ -21,7 +21,7 @@ export const companyController = {
     }
 
     // get user from user register
-    const pendingUser = getPendingUserData() as RegistUserInput;
+    const pendingUser = getPendingUserData() as RegisterUserInput;
     if (!pendingUser) {
       return res.status(400).json({ message: 'Missing user registration data' });
     }

@@ -12,7 +12,7 @@
     ],
     // Auto fix ESLint errors on save
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
     // Auto update imports on file move
     "typescript.updateImportsOnFileMove.enabled": "always",
@@ -22,5 +22,8 @@
     "workbench.editor.enablePreview": false,
     // Fold imports by default
     "editor.foldingImportsByDefault": true,
+    "less.format.enable": false,
+    "notebook.defaultFormatter": "esbenp.prettier-vscode",
+    "json.format.enable": true,
     
 }

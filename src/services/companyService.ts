@@ -41,7 +41,7 @@ export const companyService = {
   deleteCompanyById: async (companyId: string) => {
     const company = await CompanyModel.findById(companyId);
     if (!company) throw new AppException(HttpStatusCode.BadRequest, 'Company not found');
-    await company.deleteOne(); //Trigger pre deleteone hook, also delete membership
+    await company.deleteOne(); //Trigger pre deleteOne hook, also delete membership
     return true;
   },
 };
