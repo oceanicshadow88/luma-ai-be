@@ -31,7 +31,7 @@
     "*.{md,json}": [
       "prettier --write"
     ],
-    "*": "cspell"
+    "*.{ts,tsx,json,md}": "cspell"
   },
   "keywords": [
     "express",

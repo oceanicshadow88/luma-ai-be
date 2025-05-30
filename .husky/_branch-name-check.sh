@@ -2,7 +2,7 @@
 
 branch_name=$(git symbolic-ref --short HEAD)
 
-pattern="^(feature|bugfix|hotfix|chore|refactor|test|doc)\/([a-zA-Z0-9]+-)?[a-z0-9\-]+$"
+pattern="^(feature|bugfix|hotfix|chore|refactor|test|doc)\/([a-zA-Z0-9]+-)?[a-zA-Z0-9\-]+$"
 
 if ! echo "$branch_name" | grep -qE "$pattern"; then
   echo "❌ ERROR: Branch name '$branch_name' does not follow naming convention!"
@@ -11,6 +11,5 @@ if ! echo "$branch_name" | grep -qE "$pattern"; then
   echo "Examples:"
   echo "  feature/user-login"
   echo "  bugfix/LA13-email-validation"
-  echo "  refactor/cleanup-auth-flow"
   exit 1
 fi
