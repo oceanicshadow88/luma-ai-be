@@ -1,2 +1,17 @@
 #!/bin/sh
-npx --no-install commitlint --edit $1
+
+npx --no-install commitlint --edit "$1"
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo ""
+  echo "❗ Commit message format error!"
+  echo "Commit message should follow the conventional commits format."
+  echo ""
+  echo "Examples:"
+  echo "  feat: add user login feature"
+  echo "  fix: correct token validation bug"
+  echo ""
+  echo "Note: There must be exactly one space after the colon (:)"
+  exit 1
+fi
