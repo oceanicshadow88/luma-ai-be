@@ -57,5 +57,5 @@
   "maxlength",
   "codepaths"
 ],
-  "ignorePaths": ["dist", "node_modules", "coverage"]
+  "ignorePaths": ["dist", "node_modules", "coverage", ".husky/**"]
 }
