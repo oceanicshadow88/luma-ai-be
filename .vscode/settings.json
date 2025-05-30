@@ -1,9 +1,6 @@
 {
     // Format on save
     "editor.formatOnSave": true,
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
     // Files to validate with ESLint
     "eslint.validate": [
         "javascript",

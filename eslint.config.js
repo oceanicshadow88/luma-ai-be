@@ -1,6 +1,6 @@
-import typescriptParser from '@typescript-eslint/parser';
-import typescriptPlugin from '@typescript-eslint/eslint-plugin';
-import prettierPlugin from 'eslint-plugin-prettier';
+const typescriptParser = require('@typescript-eslint/parser');
+const typescriptPlugin = require('@typescript-eslint/eslint-plugin');
+const prettierPlugin = require('eslint-plugin-prettier');
 
 const noCommentedCodeRule = {
   meta: {
@@ -76,7 +76,14 @@ const noDevNotesRule = {
   },
 };
 
-export default [
+const localRulesPlugin = {
+  rules: {
+    'no-commented-code': noCommentedCodeRule,
+    'no-dev-notes': noDevNotesRule,
+  },
+};
+
+module.exports = [
   {
     files: ['**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx'],
     languageOptions: {
@@ -92,15 +99,10 @@ export default [
     plugins: {
       '@typescript-eslint': typescriptPlugin,
       prettier: prettierPlugin,
-      localRules: {
-        rules: {
-          'no-commented-code': noCommentedCodeRule,
-          'no-dev-notes': noDevNotesRule,
-        },
-      },
+      local: localRulesPlugin,
     },
     rules: {
-      // TypeScript  recommend
+      // TypeScript recommended rules
       '@typescript-eslint/adjacent-overload-signatures': 'error',
       '@typescript-eslint/ban-ts-comment': [
         'error',
@@ -115,14 +117,13 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['error'],
       'prettier/prettier': 'error',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error'],
       'no-console': 'error',
       'no-debugger': 'error',
-      // use local rules
-      'localRules/no-commented-code': 'error',
-      'localRules/no-dev-notes': 'error',
+      'local/no-commented-code': 'error',
+      'local/no-dev-notes': 'error',
     },
   },
 ];
