@@ -75,10 +75,6 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   // Return success response with the code (in production, this would be removed)
   return res.status(200).json({
     success: true,
-    message: 'Verification code has been generated.',
-    // Only for development/testing - would be removed in production
-    code: verificationCode,
-    expiresAt: expiryTime,
   });
 };
 
