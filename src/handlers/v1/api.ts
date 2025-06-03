@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
-// Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
@@ -8,13 +7,14 @@ import { resetPassword } from '../../controllers/auth/passwordResetController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { companyController } from '../../controllers/companyController';
 import { generateInvitation } from '../../controllers/invitationController';
-
-// Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-
-// Validation Schemas
+import {
+  createFileUploader,
+  ALLOWED_IMAGE_TYPES,
+  wrapMulterMiddleware,
+} from '../../middleware/fileUploader';
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
 import { invitationSchema } from '../../validations/invitationValidation';
@@ -68,11 +68,20 @@ registerRoutes(router, [
 ]);
 
 // ----------------- COMPANY ROUTES -----------------
+const logoUploader = createFileUploader({
+  folderName: 'company-logos',
+  allowedMimeTypes: ALLOWED_IMAGE_TYPES.companyLogo,
+  maxSizeMB: 5,
+});
+
 registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/institution',
-    middlewares: [validateBody(companyValidationSchema)],
+    middlewares: [
+      wrapMulterMiddleware(logoUploader.single('logo')),
+      validateBody(companyValidationSchema),
+    ],
     handler: companyController.createCompany,
   },
 ]);
