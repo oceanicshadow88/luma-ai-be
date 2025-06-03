@@ -1,32 +1,43 @@
 import ResetCodeModel from '../../models/resetCode';
 import { userService } from '../userService';
 import { membershipService } from '../membershipService';
-import { ROLE } from '../../config';
+import { ROLE, RoleType } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { RegistUserInput } from '../../controllers/auth/registerController';
+import { RegisterUserInput } from '../../controllers/auth/registerController';
+
+const registerUser = async (userInput: RegisterUserInput, role: RoleType) => {
+  const newUser = await userService.createUser(userInput);
+  // generate Token
+  const { refreshToken, accessToken } = await newUser.generateTokens();
+  await userService.updateUserById(newUser.id, { refreshToken });
+  // create membership
+  await membershipService.createMembershipByUser(newUser, role);
+
+  return { refreshToken, accessToken };
+};
 
 export const registerService = {
   // get adminUserInput
-  userRegister: async (userInput: RegistUserInput) => {
-    // verify code to regist
-    if (userInput.verifyCode) {
-      await checkVerificationCode(userInput.verifyCode, userInput.email);
+  teacherRegister: async (userInput: RegisterUserInput) => {
+    //this need to be change to email
+    if (userInput.verifyValue) {
+      await checkVerificationCode(userInput.verifyValue, userInput.email);
     } // create user
-    const newUser = await userService.createUser(userInput);
-    // generate Token
-    const { refreshToken, accessToken } = await newUser.generateTokens();
-    await userService.updateUserById(newUser.id, { refreshToken });
-    // create membership
-    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
-
-    return { refreshToken, accessToken };
+    return registerUser(userInput, ROLE.INSTRUCTOR);
+  },
+  adminRegister: async (userInput: RegisterUserInput) => {
+    // verify code to register
+    if (userInput.verifyValue) {
+      await checkVerificationCode(userInput.verifyValue, userInput.email);
+    } // create user
+    return registerUser(userInput, ROLE.ADMIN);
   },
 };
 
 // verify code
-export const checkVerificationCode = async (verifyCode: string, email: string) => {
-  if (!verifyCode) {
+export const checkVerificationCode = async (verifyValue: string, email: string) => {
+  if (!verifyValue) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
   }
 
@@ -35,7 +46,7 @@ export const checkVerificationCode = async (verifyCode: string, email: string) =
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
   }
 
-  const { isValid, message } = await resetCode.validateResetCode(verifyCode);
+  const { isValid, message } = await resetCode.validateResetCode(verifyValue);
   if (!isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, message);
   }

@@ -17,8 +17,7 @@ const baseAuthSchema = Joi.object({
     .min(8)
     .max(20)
     .trim()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
-    )
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/)
     .messages({
       'string.empty': 'Password is required',
       'string.min': 'Password must be at least 8 characters long',
@@ -28,12 +27,12 @@ const baseAuthSchema = Joi.object({
 });
 
 const registerSchema = baseAuthSchema.keys({
-  firstname: Joi.string().required().messages({
-    'string.empty': 'Firstname is required',
+  firstName: Joi.string().required().messages({
+    'string.empty': 'First name is required',
   }),
 
-  lastname: Joi.string().required().messages({
-    'string.empty': 'Lastname is required',
+  lastName: Joi.string().required().messages({
+    'string.empty': 'Last name is required',
   }),
   username: Joi.string()
     .required()
@@ -70,7 +69,7 @@ const registerSchema = baseAuthSchema.keys({
       'any.only': `Locale must be either: ${LOCALE_LIST.join(', ')}`,
     }),
 
-  verifyCode: Joi.string().required().messages({
+  verifyValue: Joi.string().required().messages({
     'string.empty': 'Verification code is required',
   }),
 

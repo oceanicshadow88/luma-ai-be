@@ -8,8 +8,8 @@ import { HttpStatusCode } from 'axios';
 import { DEFAULT_LOCALE, LOCALES, LocaleType } from '../config';
 
 export interface User extends Document {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   username: string;
   password: string;
   email: string;
@@ -29,11 +29,11 @@ export interface UserModel extends Model<User> {
 
 const userSchema: Schema<User> = new Schema(
   {
-    firstname: {
+    firstName: {
       type: String,
       required: true,
     },
-    lastname: {
+    lastName: {
       type: String,
       required: true,
     },

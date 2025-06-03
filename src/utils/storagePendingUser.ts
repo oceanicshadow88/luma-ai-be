@@ -1,20 +1,20 @@
-import { RegistUserInput } from '../controllers/auth/registerController';
+import { RegisterUserInput } from '../controllers/auth/registerController';
 
-let pendingUserData: RegistUserInput | null = null;
+let pendingUserData: RegisterUserInput | null = null;
 
-export const setPendingUserData = (userData: RegistUserInput) => {
+export const setPendingUserData = (userData: RegisterUserInput) => {
   pendingUserData = userData;
 };
 
 export const getPendingUserData = () => pendingUserData;
 export const getSafePendingUserData = (): Omit<
-  RegistUserInput,
-  'password' | 'verifyCode'
+  RegisterUserInput,
+  'password' | 'verifyValue'
 > | null => {
   if (!pendingUserData) return null;
 
-  const { firstname, lastname, username, email } = pendingUserData;
-  return { firstname, lastname, username, email };
+  const { firstName, lastName, username, email } = pendingUserData;
+  return { firstName, lastName, username, email };
 };
 
 export const clearPendingUserData = () => {

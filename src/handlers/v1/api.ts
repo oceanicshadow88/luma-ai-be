@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 
 // Controllers
-import { adminRegister } from '../../controllers/auth/registerController';
+import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
 import { login } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -12,11 +12,11 @@ import { companyController } from '../../controllers/companyController';
 // Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { validateRegistration } from '../../middleware/validation/adminRegistrationPreCheck';
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
-import { companyValidationSchema } from '../../validations/companyValidaton';
+import { companyValidationSchema } from '../../validations/companyValidation';
 
 const router = Router();
 
@@ -25,8 +25,14 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/register/admin',
-    middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
+    middlewares: [validateBody(authValidationSchema.register), validateRegistration],
     handler: adminRegister,
+  },
+  {
+    method: 'post',
+    path: '/auth/register/teacher',
+    middlewares: [validateBody(authValidationSchema.register), validateRegistration],
+    handler: teacherRegister,
   },
   {
     method: 'post',
