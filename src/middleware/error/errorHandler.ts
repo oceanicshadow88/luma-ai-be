@@ -54,9 +54,6 @@ const errorHandler: ErrorRequestHandler = (
       case 'LIMIT_UNEXPECTED_FILE':
         message = 'Invalid file type';
         break;
-      default: 
-        message= 'File upload error';
-        break;
     }
 
     res.status(400).json({ message });
