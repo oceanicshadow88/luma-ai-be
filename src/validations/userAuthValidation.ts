@@ -78,6 +78,18 @@ const registerSchema = baseAuthSchema.keys({
   }),
 });
 
+const studentRegisterSchema = registerSchema.keys({
+  confirmPassword: Joi.string().required().valid(Joi.ref('password')).messages({
+    'string.empty': 'Please confirm your password',
+    'any.only': 'Passwords do not match',
+  }),
+
+  termsAccepted: Joi.boolean().valid(true).required().messages({
+    'any.only': 'You must agree to the terms to continue',
+    'any.required': 'You must agree to the terms to continue',
+  }),
+});
+
 const freshTokenSchema = Joi.object({
   refreshToken: Joi.string().required().messages({
     'string.empty': 'RefreshToken is required',
@@ -86,6 +98,7 @@ const freshTokenSchema = Joi.object({
 
 const authValidationSchema = {
   register: registerSchema,
+  studentRegister: studentRegisterSchema,
   login: baseAuthSchema,
   freshToken: freshTokenSchema,
 };
