@@ -21,7 +21,7 @@ export interface RegisterUserInput {
 export const studentRegister = async (req: Request, res: Response) => {
   // Validate Data - Joi validate schema: deal in route with authvalidation middleware
   // Get params from request body
-  const userInput = req.body as RegistUserInput;
+  const userInput = req.body as RegisterUserInput;
   const { organizationId } = req.params;
 
   if (!organizationId) {
