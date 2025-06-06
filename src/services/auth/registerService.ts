@@ -13,7 +13,8 @@ export const registerService = {
     // verify code to register
     if (userInput.verifyCode) {
       await checkVerificationCode(userInput.verifyCode, userInput.email);
-    } // create user
+    }
+    // create user
     const newUser = await userService.createUser(userInput);
     // generate Token
     const { refreshToken, accessToken } = await newUser.generateTokens();
@@ -51,4 +52,7 @@ export const checkVerificationCode = async (verifyCode: string, email: string) =
   if (!isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, message);
   }
+
+  // Delete the code after successful verification
+  await resetCode.deleteOne();
 };
