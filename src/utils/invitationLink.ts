@@ -1,6 +1,6 @@
 import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
-import { RoleType } from '../config';
+import { RoleType, EXPIRES_TIME_CONFIG } from '../config';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import ResetCodeModel from '../models/resetCode';
@@ -26,18 +26,17 @@ export async function generateInvitationLink(email: string, role: RoleType): Pro
   };
 
   const options: SignOptions = {
-    expiresIn: '24h', // 24 hours expiration
+    expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_JWT, // 24 hours expiration
   };
 
   const token = jwt.sign(payload, secret, options);
 
-  // Store the token in the database (similar to reset code)
-  // Remove any existing invitation tokens for this email
+  // Store the token in the database (similar to reset code)  // Remove any existing invitation tokens for this email
   await ResetCodeModel.deleteMany({ email, code: { $regex: '^invitation_' } });
 
   // Store the new invitation token with prefix to distinguish from reset codes
   const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours from now
+  expiresAt.setHours(expiresAt.getHours() + EXPIRES_TIME_CONFIG.EXPIRES_IN_HOURS); // 24 hours from now
 
   await ResetCodeModel.create({
     email,

@@ -1,17 +1,6 @@
-import { RoleType } from '../config';
 import { generateInvitationLink } from '../utils/invitationLink';
-
-export interface GenerateInvitationRequest {
-  email: string;
-  role: RoleType;
-}
-
-export interface GenerateInvitationResponse {
-  invitationLink: string;
-  email: string;
-  role: RoleType;
-  expiresIn: string;
-}
+import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
+import { EXPIRES_TIME_CONFIG } from '../config';
 
 export class InvitationService {
   static async generateInvitation({
@@ -24,7 +13,7 @@ export class InvitationService {
       invitationLink,
       email,
       role,
-      expiresIn: '24 hours',
+      expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
     };
   }
 }
