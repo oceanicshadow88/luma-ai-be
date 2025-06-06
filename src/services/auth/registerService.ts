@@ -4,7 +4,12 @@ import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+<<<<<<< HEAD
 import { RegisterUserInput } from '../../controllers/auth/registerController';
+=======
+import { RegistUserInput } from '../../controllers/auth/registerController';
+import { Types } from 'mongoose';
+>>>>>>> e6974a8 (feat: add student registration logic)
 
 export const registerService = {
   // get adminUserInput
@@ -20,7 +25,18 @@ export const registerService = {
     // create membership
     await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
 
-    return { refreshToken, accessToken };
+    return { refreshToken, accessToken, user: newUser };
+  },
+
+  studentRegister: async (userInput: RegistUserInput, organizationId: string) => {
+    const result = await registerService.userRegister(userInput);
+    // Create student membership directly
+    await membershipService.createMembership({
+      user: result.user._id as Types.ObjectId,
+      company: new Types.ObjectId(organizationId),
+      role: ROLE.STUDENT,
+    });
+    return { refreshToken: result.refreshToken, accessToken: result.accessToken };
   },
 };
 
