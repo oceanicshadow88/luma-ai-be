@@ -2,6 +2,9 @@
 import { Request, Response } from 'express';
 import { registerService } from '../../services/auth/registerService';
 import { LocaleType } from 'src/config';
+import { checkVerificationCode } from '../../services/auth/registerService';
+import AppException from '../../exceptions/appException';
+
 export interface RegisterUserInput {
   firstname: string;
   lastname: string;
@@ -36,18 +39,40 @@ export const studentRegister = async (req: Request, res: Response) => {
     });
   }
 
-  // create user
-  const { refreshToken, accessToken } = await registerService.studentRegister(
-    userInput,
-    organizationId,
-  );
+  // Validate verification code
+  if (!userInput.verifyCode) {
+    return res.status(400).json({
+      message: 'Verification code is required',
+    });
+  }
 
-  res.status(201).json({
-    message: 'Successfully signed up! Redirecting...',
-    refreshToken,
-    accessToken,
-    redirectUrl: `/organizations/${organizationId}/dashboard`,
-  });
+  try {
+    // Verify the code
+    await checkVerificationCode(userInput.verifyCode, userInput.email);
+
+    // Create user and membership
+    const { refreshToken, accessToken } = await registerService.studentRegister(
+      userInput,
+      organizationId,
+    );
+
+    res.status(201).json({
+      message: 'Successfully signed up! Redirecting...',
+      refreshToken,
+      accessToken,
+      redirectUrl: `/organizations/${organizationId}/dashboard`,
+      redirectDelay: 3000, // 3 seconds delay
+    });
+  } catch (error: unknown) {
+    if (error instanceof AppException) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+    return res.status(500).json({
+      message: 'An error occurred during registration',
+    });
+  }
 };
 
 export const adminRegister = async (req: Request, res: Response) => {
