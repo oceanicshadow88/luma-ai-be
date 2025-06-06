@@ -1,14 +1,12 @@
 import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
-
 // Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
-import { login } from '../../controllers/auth/loginController';
+import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { companyController } from '../../controllers/companyController';
-
 // Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
@@ -30,9 +28,15 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/login',
+    path: '/auth/login/enterprise',
     middlewares: [validateBody(authValidationSchema.login)],
-    handler: login,
+    handler: loginEnterprise,
+  },
+  {
+    method: 'post',
+    path: '/auth/login/learner',
+    middlewares: [validateBody(authValidationSchema.login)],
+    handler: loginLearner,
   },
   {
     method: 'post',
