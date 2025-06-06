@@ -17,8 +17,7 @@ const baseAuthSchema = Joi.object({
     .min(8)
     .max(20)
     .trim()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
-    )
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/)
     .messages({
       'string.empty': 'Password is required',
       'string.min': 'Password must be at least 8 characters long',
@@ -29,11 +28,11 @@ const baseAuthSchema = Joi.object({
 
 const registerSchema = baseAuthSchema.keys({
   firstname: Joi.string().required().messages({
-    'string.empty': 'Firstname is required',
+    'string.empty': 'First Name is required',
   }),
 
   lastname: Joi.string().required().messages({
-    'string.empty': 'Lastname is required',
+    'string.empty': 'Last Name is required',
   }),
   username: Joi.string()
     .required()

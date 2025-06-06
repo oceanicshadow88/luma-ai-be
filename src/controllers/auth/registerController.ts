@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { registerService } from '../../services/auth/registerService';
 import { LocaleType } from 'src/config';
-export interface RegistUserInput {
+export interface RegisterUserInput {
   firstname: string;
   lastname: string;
   username: string;
@@ -47,9 +47,9 @@ export const studentRegister = async (req: Request, res: Response) => {
 };
 
 export const adminRegister = async (req: Request, res: Response) => {
-  // Validate Data - Joi validate schema: deal in route with authvalidation middleware
+  // Validate Data - Joi validate schema: deal in route with authValidation middleware
   // Get params from request body
-  const userInput = req.body as RegistUserInput;
+  const userInput = req.body as RegisterUserInput;
 
   // create user
   const { refreshToken, accessToken } = await registerService.userRegister(userInput);

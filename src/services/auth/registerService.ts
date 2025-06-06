@@ -4,13 +4,13 @@ import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { RegistUserInput } from '../../controllers/auth/registerController';
+import { RegisterUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
 
 export const registerService = {
   // get adminUserInput
-  userRegister: async (userInput: RegistUserInput) => {
-    // verify code to regist
+  userRegister: async (userInput: RegisterUserInput) => {
+    // verify code to register
     if (userInput.verifyCode) {
       await checkVerificationCode(userInput.verifyCode, userInput.email);
     } // create user

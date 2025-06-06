@@ -15,13 +15,7 @@ export interface LoginResult {
 }
 
 export const loginService = {
-  login: async ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }): Promise<LoginResult> => {
+  login: async ({ email, password }: { email: string; password: string }): Promise<LoginResult> => {
     const user = await UserModel.findOne({ email });
     if (!user) {
       throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.');
