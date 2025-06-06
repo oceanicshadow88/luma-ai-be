@@ -8,6 +8,7 @@ import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { companyController } from '../../controllers/companyController';
+import { generateInvitation } from '../../controllers/invitationController';
 
 // Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
@@ -17,6 +18,7 @@ import { validateRegistration as adminRegistrationPreCheck } from '../../middlew
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidaton';
+import { invitationSchema } from '../../validations/invitationValidation';
 
 const router = Router();
 
@@ -63,6 +65,16 @@ registerRoutes(router, [
     path: '/company/register',
     middlewares: [validateBody(companyValidationSchema)],
     handler: companyController.createCompany,
+  },
+]);
+
+// ----------------- INVITATION ROUTES -----------------
+registerRoutes(router, [
+  {
+    method: 'post',
+    path: '/invitation/generate',
+    middlewares: [validateBody(invitationSchema)],
+    handler: generateInvitation,
   },
 ]);
 

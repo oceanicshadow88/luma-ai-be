@@ -91,6 +91,7 @@ export const ROUTES = {
   LOGIN_USER: '/v1/auth/login',
   REGISTER_COMPANY: '/v1/companies/register',
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
+  GENERATE_INVITATION: '/v1/invitation/generate',
 };
 
 // Mongoose DB type and default value
