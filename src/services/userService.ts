@@ -55,6 +55,6 @@ export const userService = {
   // Delete user
   deleteUserById: async (userId: string) => {
     const user = await userService.getUserById(userId);
-    return await user.deleteOne(); //Trigger pre deleteone hook, also delete membership
+    return await user.deleteOne(); //Trigger pre deleteOne hook, also delete membership
   },
 };

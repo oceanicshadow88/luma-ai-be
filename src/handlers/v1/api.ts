@@ -16,7 +16,7 @@ import { validateRegistration as adminRegistrationPreCheck } from '../../middlew
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
-import { companyValidationSchema } from '../../validations/companyValidaton';
+import { companyValidationSchema } from '../../validations/companyValidation';
 
 const router = Router();
 

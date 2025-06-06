@@ -5,7 +5,7 @@ import { HttpStatusCode } from 'axios';
 import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
-import { RegistUserInput } from '../../controllers/auth/registerController';
+import { RegisterUserInput } from '../../controllers/auth/registerController';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
@@ -21,7 +21,7 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
   const existCompany = await CompanyModel.findOne({ slug: companySlug });
   if (!existCompany) {
     // company not exist, jump to company register and pass user data
-    const user = req.body as RegistUserInput;
+    const user = req.body as RegisterUserInput;
     setPendingUserData(user);
 
     res.status(302).json({
