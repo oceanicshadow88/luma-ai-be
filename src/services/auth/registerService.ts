@@ -5,6 +5,7 @@ import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { RegistUserInput } from '../../controllers/auth/registerController';
+import { Types } from 'mongoose';
 
 export const registerService = {
   // get adminUserInput
@@ -20,7 +21,18 @@ export const registerService = {
     // create membership
     await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
 
-    return { refreshToken, accessToken };
+    return { refreshToken, accessToken, user: newUser };
+  },
+
+  studentRegister: async (userInput: RegistUserInput, organizationId: string) => {
+    const result = await registerService.userRegister(userInput);
+    // Create student membership directly
+    await membershipService.createMembership({
+      user: result.user._id as Types.ObjectId,
+      company: new Types.ObjectId(organizationId),
+      role: ROLE.STUDENT,
+    });
+    return { refreshToken: result.refreshToken, accessToken: result.accessToken };
   },
 };
 

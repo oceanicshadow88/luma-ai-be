@@ -3,6 +3,7 @@ import { registerRoutes } from '../../utils/registerRoutes';
 
 // Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
+import { studentRegister } from '../../controllers/auth/registerController';
 import { login } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -13,6 +14,7 @@ import { companyController } from '../../controllers/companyController';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { validateStudentRegistration } from '../../middleware/validation/studentRegistrationPreCheck';
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
@@ -27,6 +29,12 @@ registerRoutes(router, [
     path: '/auth/register/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
+  },
+  {
+    method: 'post',
+    path: '/auth/register/student/:organizationId',
+    middlewares: [validateBody(authValidationSchema.register), validateStudentRegistration],
+    handler: studentRegister,
   },
   {
     method: 'post',
