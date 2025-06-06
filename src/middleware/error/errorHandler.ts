@@ -55,7 +55,7 @@ const errorHandler: ErrorRequestHandler = (
         message = 'Invalid file type';
         break;
       default: 
-        Message= 'File upload error';
+        message= 'File upload error';
         break;
     }
 
