@@ -24,7 +24,7 @@ export const registerService = {
     return { refreshToken, accessToken, user: newUser };
   },
 
-  studentRegister: async (userInput: RegistUserInput, organizationId: string) => {
+  studentRegister: async (userInput: RegisterUserInput, organizationId: string) => {
     const result = await registerService.userRegister(userInput);
     // Create student membership directly
     await membershipService.createMembership({
