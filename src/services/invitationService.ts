@@ -1,7 +1,5 @@
 import { RoleType } from '../config';
 import { generateInvitationLink } from '../utils/invitationLink';
-import AppException from '../exceptions/appException';
-import { HttpStatusCode } from 'axios';
 
 export interface GenerateInvitationRequest {
   email: string;
@@ -20,20 +18,13 @@ export class InvitationService {
     email,
     role,
   }: GenerateInvitationRequest): Promise<GenerateInvitationResponse> {
-    try {
-      const invitationLink = await generateInvitationLink(email, role);
+    const invitationLink = await generateInvitationLink(email, role);
 
-      return {
-        invitationLink,
-        email,
-        role,
-        expiresIn: '24 hours',
-      };
-    } catch {
-      throw new AppException(
-        HttpStatusCode.InternalServerError,
-        'Failed to generate invitation link',
-      );
-    }
+    return {
+      invitationLink,
+      email,
+      role,
+      expiresIn: '24 hours',
+    };
   }
 }

@@ -57,61 +57,39 @@ export async function generateInvitationLink(email: string, role: RoleType): Pro
  * @throws AppException if token is invalid, expired, or not found in database
  */
 export async function verifyInvitationToken(token: string): Promise<InvitationTokenPayload> {
-  try {
-    // First, verify the JWT token structure and signature
-    const secret: Secret = config.jwt?.secret;
-    const decoded = jwt.verify(token, secret) as InvitationTokenPayload;
+  // First, verify the JWT token structure and signature
+  const secret: Secret = config.jwt?.secret;
+  const decoded = jwt.verify(token, secret) as InvitationTokenPayload;
 
-    if (decoded.purpose !== 'invitation') {
-      throw new AppException(
-        HttpStatusCode.Unauthorized,
-        'Invalid token purpose. This is not an invitation token.',
-      );
-    }
-
-    // Check if token exists in database
-    const invitationRecord = await ResetCodeModel.findOne({
-      email: decoded.email,
-      code: `invitation_${token}`,
-    });
-
-    if (!invitationRecord) {
-      throw new AppException(
-        HttpStatusCode.Unauthorized,
-        'Invitation token not found or has been used.',
-      );
-    }
-
-    // Use the existing validateResetCode method to check expiration and attempts
-    const validation = await invitationRecord.validateResetCode(`invitation_${token}`);
-
-    if (!validation.isValid) {
-      throw new AppException(HttpStatusCode.Unauthorized, validation.message);
-    }
-
-    // If validation is successful, delete the token (one-time use)
-    await invitationRecord.deleteOne();
-
-    return decoded;
-  } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      throw new AppException(
-        HttpStatusCode.Unauthorized,
-        'Invitation token has expired. Please request a new invitation.',
-      );
-    }
-
-    if (error instanceof jwt.JsonWebTokenError) {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid invitation token.');
-    }
-
-    if (error instanceof AppException) {
-      throw error;
-    }
-
+  if (decoded.purpose !== 'invitation') {
     throw new AppException(
-      HttpStatusCode.InternalServerError,
-      'Failed to verify invitation token.',
+      HttpStatusCode.Unauthorized,
+      'Invalid token purpose. This is not an invitation token.',
     );
   }
+
+  // Check if token exists in database
+  const invitationRecord = await ResetCodeModel.findOne({
+    email: decoded.email,
+    code: `invitation_${token}`,
+  });
+
+  if (!invitationRecord) {
+    throw new AppException(
+      HttpStatusCode.Unauthorized,
+      'Invitation token not found or has been used.',
+    );
+  }
+
+  // Use the existing validateResetCode method to check expiration and attempts
+  const validation = await invitationRecord.validateResetCode(`invitation_${token}`);
+
+  if (!validation.isValid) {
+    throw new AppException(HttpStatusCode.Unauthorized, validation.message);
+  }
+
+  // If validation is successful, delete the token (one-time use)
+  await invitationRecord.deleteOne();
+
+  return decoded;
 }

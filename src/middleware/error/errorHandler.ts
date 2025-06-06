@@ -13,7 +13,7 @@ const errorHandler: ErrorRequestHandler = (
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
     logger.error('[HeadersSent Error]', err);
-    return next(err);//Error passed to express for default handling
+    return next(err); //Error passed to express for default handling
   }
 
   // JWT token Error
