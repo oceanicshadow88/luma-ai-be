@@ -9,7 +9,7 @@ import { membershipService } from '../services/membershipService';
 import { ROLE } from '../config';
 import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
 import { checkVerificationCode } from '../services/auth/registerService';
-import { RegistUserInput } from './auth/registerController';
+import { RegisterUserInput } from './auth/registerController';
 import UserModel, { User } from '../models/user';
 
 export const companyController = {
@@ -21,7 +21,7 @@ export const companyController = {
     }
 
     // get user from user register
-    const pendingUser = getPendingUserData() as RegistUserInput;
+    const pendingUser = getPendingUserData() as RegisterUserInput;
     if (!pendingUser) {
       return res.status(400).json({ message: 'Missing user registration data' });
     }
@@ -39,7 +39,7 @@ export const companyController = {
     // create user
     let newUser: User | null = await UserModel.findOne({ email: pendingUser.email });
     newUser ??= await userService.createUser(pendingUser);
-    if (!newUser || !newUser._id) {
+    if (!newUser?._id) {
       throw new AppException(HttpStatusCode.InternalServerError, 'User creation failed');
     }
 
@@ -51,7 +51,7 @@ export const companyController = {
       owner: newUser._id as Types.ObjectId,
       settings,
     });
-    if (!newCompany || !newCompany._id) {
+    if (!newCompany._id) {
       throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
     }
 

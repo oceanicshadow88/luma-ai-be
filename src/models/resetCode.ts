@@ -1,4 +1,3 @@
-// filepath: i:\00_SoftwareDevopment\luma-ai-be\src\models\resetCode.ts
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import config from '../config';
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+. "$(dirname "$0")/_branch-name-check.sh"
+

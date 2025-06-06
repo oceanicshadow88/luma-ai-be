@@ -57,7 +57,6 @@ const errorHandler: ErrorRequestHandler = (
     return;
   }
 
-  // Unknow error
   logger.error('[Unhandled Error]', err);
   res.status(500).json({
     success: false,
