@@ -8,9 +8,6 @@ import {
   TIMEZONES,
 } from '../config';
 
-// logoUrl
-const logoUrlRegex = /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i;
-
 // hex color
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
 
@@ -43,11 +40,6 @@ export const companyValidationSchema = Joi.object({
       .messages({
         'any.only': `Locale must be either: ${LOCALE_LIST.join(',')}`,
       }),
-    logoUrl: Joi.string()
-      .allow('')
-      .pattern(logoUrlRegex)
-      .messages({ 'string.pattern.base': 'logoUrl must be a valid image URL' })
-      .default(''),
     primaryColor: Joi.string()
       .pattern(hexColorRegex)
       .messages({ 'string.pattern.base': 'primaryColor must be a valid hex color code' })

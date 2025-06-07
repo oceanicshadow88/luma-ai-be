@@ -10,10 +10,10 @@ export interface CompanyCreateInput {
   slug: string;
   plan?: CompanyPlanType;
   owner: mongoose.Types.ObjectId;
+  logoUrl?: string;
   settings?: {
     timezone?: string;
     locale?: LocaleType;
-    logoUrl?: string;
     primaryColor?: string;
   };
 }

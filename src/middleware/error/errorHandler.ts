@@ -3,6 +3,7 @@ import AppException from '../../exceptions/appException';
 import logger from '../../utils/logger';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import Joi from 'joi';
+import multer from 'multer';
 
 const errorHandler: ErrorRequestHandler = (
   err: Error,
@@ -39,6 +40,23 @@ const errorHandler: ErrorRequestHandler = (
       success: false,
       message: err.message,
     });
+    return;
+  }
+
+  //File upload
+  if (err instanceof multer.MulterError) {
+    let message = 'File upload error';
+
+    switch (err.code) {
+      case 'LIMIT_FILE_SIZE':
+        message = 'File size exceeds 5MB limit';
+        break;
+      case 'LIMIT_UNEXPECTED_FILE':
+        message = 'Invalid file type';
+        break;
+    }
+
+    res.status(400).json({ message });
     return;
   }
 

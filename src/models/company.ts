@@ -16,10 +16,10 @@ export interface Company extends Document {
   slug: string;
   plan?: CompanyPlanType;
   owner: mongoose.Types.ObjectId;
+  logoUrl?: string;
   settings?: {
     timezone?: string;
     locale?: LocaleType;
-    logoUrl?: string;
     primaryColor?: string;
   };
   active: boolean;
@@ -49,6 +49,11 @@ const companySchema = new Schema(
       required: true,
       unique: true,
     },
+    logoUrl: {
+      type: String,
+      required: false,
+      default: '',
+    },
     settings: {
       timezone: {
         type: String,
@@ -59,19 +64,6 @@ const companySchema = new Schema(
         type: String,
         enum: LOCALES,
         default: DEFAULT_LOCALE,
-      },
-      logoUrl: {
-        type: String,
-        required: false,
-        default: '',
-        validate: {
-          validator: function (avatarUrl: string) {
-            return (
-              avatarUrl === '' || /^https?:\/\/.*\.(jpeg|jpg|png|gif|webp|svg)$/i.test(avatarUrl)
-            );
-          },
-          message: (props: { value: unknown }) => `${props.value} is not a valid image URL`,
-        },
       },
       primaryColor: {
         type: String,
