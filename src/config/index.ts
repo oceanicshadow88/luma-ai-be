@@ -93,6 +93,13 @@ export const ROUTES = {
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
 
+// Invitation configuration
+export const EXPIRES_TIME_CONFIG = {
+  EXPIRES_IN_JWT: '24h', // JWT token expiration (for jwt.sign)
+  EXPIRES_IN_HOURS: 24, // Hours for database expiration calculation
+  EXPIRES_IN_DISPLAY: '24 hours', // Display text for API responses
+} as const;
+
 // Mongoose DB type and default value
 // companyPlan
 export const COMPANY_PLANS = {
