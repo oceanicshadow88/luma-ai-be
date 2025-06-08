@@ -14,7 +14,6 @@ export interface RegisterUserInput {
   avatarUrl?: string;
   locale?: LocaleType;
   verifyCode?: string;
-  termsAccepted?: boolean;
 }
 
 export const studentRegister = async (req: Request, res: Response) => {
@@ -26,12 +25,6 @@ export const studentRegister = async (req: Request, res: Response) => {
   if (!organizationId) {
     return res.status(400).json({
       message: 'Organization ID is required',
-    });
-  }
-
-  if (!userInput.termsAccepted) {
-    return res.status(400).json({
-      message: 'You must agree to the terms to continue.',
     });
   }
 
@@ -57,7 +50,6 @@ export const studentRegister = async (req: Request, res: Response) => {
       refreshToken,
       accessToken,
       redirectUrl: `/organizations/${organizationId}/dashboard`,
-      redirectDelay: 3000, // 3 seconds delay
     });
   } catch (error: unknown) {
     if (error instanceof AppException) {
