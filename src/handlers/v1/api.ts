@@ -14,7 +14,6 @@ import { generateInvitation } from '../../controllers/invitationController';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { validateStudentRegistration as studentRegistrationPreCheck } from '../../middleware/validation/studentRegistrationPreCheck';
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
@@ -33,8 +32,8 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/register/student/:organizationId',
-    middlewares: [validateBody(authValidationSchema.studentRegister), studentRegistrationPreCheck],
+    path: '/auth/register/student',
+    middlewares: [validateBody(authValidationSchema.studentRegister)],
     handler: studentRegister,
   },
   {

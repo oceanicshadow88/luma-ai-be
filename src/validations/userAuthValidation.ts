@@ -73,22 +73,20 @@ const registerSchema = baseAuthSchema.keys({
     'string.empty': 'Verification code is required',
   }),
 
-  active: Joi.boolean().default(true).messages({
-    'boolean.base': 'Active must be a boolean value',
-  }),
-});
-
-const studentRegisterSchema = registerSchema.keys({
   confirmPassword: Joi.string().required().valid(Joi.ref('password')).messages({
-    'string.empty': 'Please confirm your password',
     'any.only': 'Passwords do not match',
   }),
 
   termsAccepted: Joi.boolean().valid(true).required().messages({
     'any.only': 'You must agree to the terms to continue',
-    'any.required': 'You must agree to the terms to continue',
+  }),
+
+  active: Joi.boolean().default(true).messages({
+    'boolean.base': 'Active must be a boolean value',
   }),
 });
+
+const studentRegisterSchema = registerSchema;
 
 const freshTokenSchema = Joi.object({
   refreshToken: Joi.string().required().messages({

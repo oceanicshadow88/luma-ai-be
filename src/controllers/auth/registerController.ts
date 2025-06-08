@@ -4,6 +4,8 @@ import { registerService } from '../../services/auth/registerService';
 import { LocaleType } from 'src/config';
 import { checkVerificationCode } from '../../services/auth/registerService';
 import AppException from '../../exceptions/appException';
+import { extractSubdomain } from '../../lib/extractSubdomain';
+import CompanyModel from '../../models/company';
 
 export interface RegisterUserInput {
   firstname: string;
@@ -17,39 +19,40 @@ export interface RegisterUserInput {
 }
 
 export const studentRegister = async (req: Request, res: Response) => {
-  // Validate Data - Joi validate schema: deal in route with authvalidation middleware
-  // Get params from request body
   const userInput = req.body as RegisterUserInput;
-  const { organizationId } = req.params;
-
-  if (!organizationId) {
-    return res.status(400).json({
-      message: 'Organization ID is required',
-    });
-  }
-
-  // Validate verification code
-  if (!userInput.verifyCode) {
-    return res.status(400).json({
-      message: 'Verification code is required',
-    });
-  }
 
   try {
+    // Get company slug from subdomain
+    const companySlug = await extractSubdomain(req);
+
+    // Find company by slug
+    const company = await CompanyModel.findOne({ slug: companySlug });
+    if (!company || !company._id) {
+      return res.status(400).json({
+        message: 'Organization not found',
+      });
+    }
+
+    // Verify code existence
+    if (!userInput.verifyCode) {
+      return res.status(400).json({
+        message: 'Verification code is required',
+      });
+    }
+
     // Verify the code
     await checkVerificationCode(userInput.verifyCode, userInput.email);
 
     // Create user and membership
     const { refreshToken, accessToken } = await registerService.studentRegister(
       userInput,
-      organizationId,
+      company._id.toString(),
     );
 
     res.status(201).json({
-      message: 'Successfully signed up! Redirecting...',
+      message: 'Successfully signed up!',
       refreshToken,
       accessToken,
-      redirectUrl: `/organizations/${organizationId}/dashboard`,
     });
   } catch (error: unknown) {
     if (error instanceof AppException) {
