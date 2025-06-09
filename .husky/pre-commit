@@ -2,6 +2,8 @@
 
 . "$(dirname "$0")/_branch-name-check.sh"
 . "$(dirname "$0")/_no-chinese-check.sh"
+. "$(dirname "$0")/_rebase-check.sh"
+
 
 yarn lint-staged
 yarn spell
