@@ -14,7 +14,7 @@ interface InvitationTokenPayload extends JwtPayload {
 /**
  * Generate an invitation link with JWT token and store in database
  * @param email - The email address of the invitee
- * @param role - The role to be assigned (INSTRUCTOR or STUDENT)
+ * @param role - The role to be assigned (INSTRUCTOR or LEARNER)
  * @returns A complete signup URL with the invitation token
  */
 export async function generateInvitationLink(email: string, role: RoleType): Promise<string> {

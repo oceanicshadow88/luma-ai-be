@@ -18,7 +18,7 @@ export interface RegisterUserInput {
   verifyCode?: string;
 }
 
-export const studentRegister = async (req: Request, res: Response) => {
+export const learnerRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
 
   try {
@@ -44,7 +44,7 @@ export const studentRegister = async (req: Request, res: Response) => {
     await checkVerificationCode(userInput.verifyCode, userInput.email);
 
     // Create user and membership
-    const { refreshToken, accessToken } = await registerService.studentRegister(
+    const { refreshToken, accessToken } = await registerService.learnerRegister(
       userInput,
       company._id.toString(),
     );

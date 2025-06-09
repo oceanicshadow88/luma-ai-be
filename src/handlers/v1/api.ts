@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 // Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
-import { studentRegister } from '../../controllers/auth/registerController';
+import { learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -32,9 +32,9 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/register/student',
-    middlewares: [validateBody(authValidationSchema.studentRegister)],
-    handler: studentRegister,
+    path: '/auth/register/learner',
+    middlewares: [validateBody(authValidationSchema.learnerRegister)],
+    handler: learnerRegister,
   },
   {
     method: 'post',

@@ -33,15 +33,15 @@ export const registerService = {
     return { refreshToken, accessToken };
   },
 
-  // Register student user and create student membership for specific organization
-  studentRegister: async (userInput: RegisterUserInput, organizationId: string) => {
+  // Register learner user and create learner membership for specific organization
+  learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
-    // Create student membership with organization association
+    // Create learner membership with organization association
     await membershipService.createMembership({
       user: newUser._id as Types.ObjectId,
       company: new Types.ObjectId(organizationId),
-      role: ROLE.STUDENT,
+      role: ROLE.LEARNER,
     });
 
     return { refreshToken, accessToken };
