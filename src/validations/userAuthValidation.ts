@@ -86,7 +86,7 @@ const registerSchema = baseAuthSchema.keys({
   }),
 });
 
-const studentRegisterSchema = registerSchema;
+const learnerRegisterSchema = registerSchema;
 
 const freshTokenSchema = Joi.object({
   refreshToken: Joi.string().required().messages({
@@ -96,7 +96,7 @@ const freshTokenSchema = Joi.object({
 
 const authValidationSchema = {
   register: registerSchema,
-  studentRegister: studentRegisterSchema,
+  learnerRegister: learnerRegisterSchema,
   login: baseAuthSchema,
   freshToken: freshTokenSchema,
 };
