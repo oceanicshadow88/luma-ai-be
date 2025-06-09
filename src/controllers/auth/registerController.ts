@@ -1,4 +1,4 @@
-// authentication, authorization
+// Authentication and authorization
 import { Request, Response } from 'express';
 import { registerService } from '../../services/auth/registerService';
 import { LocaleType } from 'src/config';
@@ -55,25 +55,28 @@ export const studentRegister = async (req: Request, res: Response) => {
       refreshToken,
       accessToken,
     });
-  } catch (error: unknown) {
-    if (error instanceof AppException) {
-      return res.status(error.statusCode).json({
-        message: error.message,
-      });
-    }
-    return res.status(500).json({
-      message: 'An error occurred during registration',
+  } catch (error) {
+    res.status(error instanceof AppException ? error.statusCode : 500).json({
+      message:
+        error instanceof AppException ? error.message : 'An error occurred during registration',
     });
   }
 };
 
 export const adminRegister = async (req: Request, res: Response) => {
-  // Validate Data - Joi validate schema: deal in route with authValidation middleware
-  // Get params from request body
   const userInput = req.body as RegisterUserInput;
 
-  // create user
-  const { refreshToken, accessToken } = await registerService.userRegister(userInput);
-
-  res.status(201).json({ refreshToken, accessToken });
+  try {
+    const { refreshToken, accessToken } = await registerService.adminRegister(userInput);
+    res.status(201).json({
+      message: 'Successfully signed up!',
+      refreshToken,
+      accessToken,
+    });
+  } catch (error) {
+    res.status(error instanceof AppException ? error.statusCode : 500).json({
+      message:
+        error instanceof AppException ? error.message : 'An error occurred during registration',
+    });
+  }
 };

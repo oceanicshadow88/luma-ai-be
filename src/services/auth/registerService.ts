@@ -4,44 +4,51 @@ import { membershipService } from '../membershipService';
 import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-<<<<<<< HEAD
 import { RegisterUserInput } from '../../controllers/auth/registerController';
-=======
-import { RegistUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
->>>>>>> e6974a8 (feat: add student registration logic)
+
+// Create user and generate authentication tokens
+const createUserAndTokens = async (userInput: RegisterUserInput) => {
+  // Validate verification code if provided
+  if (userInput.verifyCode) {
+    await checkVerificationCode(userInput.verifyCode, userInput.email);
+  }
+  // Create new user
+  const newUser = await userService.createUser(userInput);
+  // Generate authentication tokens
+  const { refreshToken, accessToken } = await newUser.generateTokens();
+  await userService.updateUserById(newUser.id, { refreshToken });
+
+  return { newUser, refreshToken, accessToken };
+};
 
 export const registerService = {
-  // get adminUserInput
-  userRegister: async (userInput: RegisterUserInput) => {
-    // verify code to register
-    if (userInput.verifyCode) {
-      await checkVerificationCode(userInput.verifyCode, userInput.email);
-    }
-    // create user
-    const newUser = await userService.createUser(userInput);
-    // generate Token
-    const { refreshToken, accessToken } = await newUser.generateTokens();
-    await userService.updateUserById(newUser.id, { refreshToken });
-    // create membership
-    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
+  // Register admin user and create admin membership
+  adminRegister: async (userInput: RegisterUserInput) => {
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
-    return { refreshToken, accessToken, user: newUser };
+    // Create admin membership
+    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+
+    return { refreshToken, accessToken };
   },
 
+  // Register student user and create student membership for specific organization
   studentRegister: async (userInput: RegisterUserInput, organizationId: string) => {
-    const result = await registerService.userRegister(userInput);
-    // Create student membership directly
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+
+    // Create student membership with organization association
     await membershipService.createMembership({
-      user: result.user._id as Types.ObjectId,
+      user: newUser._id as Types.ObjectId,
       company: new Types.ObjectId(organizationId),
       role: ROLE.STUDENT,
     });
-    return { refreshToken: result.refreshToken, accessToken: result.accessToken };
+
+    return { refreshToken, accessToken };
   },
 };
 
-// verify code
+// Verify the provided verification code
 export const checkVerificationCode = async (verifyCode: string, email: string) => {
   if (!verifyCode) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
@@ -57,6 +64,6 @@ export const checkVerificationCode = async (verifyCode: string, email: string) =
     throw new AppException(HttpStatusCode.Unauthorized, message);
   }
 
-  // Delete the code after successful verification
+  // Remove used verification code
   await resetCode.deleteOne();
 };
