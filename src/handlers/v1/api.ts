@@ -20,6 +20,8 @@ import { companyValidationSchema } from '../../validations/companyValidation';
 import { invitationSchema } from '../../validations/invitationValidation';
 import { userController } from '../../controllers/userController';
 import { authGuard } from '../../middleware/authGuard';
+import { quizzesController } from '../../controllers/dashboard/quizzesController';
+import { roadmapsController } from '../../controllers/dashboard/roadmapsController';
 
 const router = Router();
 
@@ -65,16 +67,6 @@ registerRoutes(router, [
   },
 ]);
 
-// ----------------- USER ROUTES -----------------
-registerRoutes(router, [
-  {
-    method: 'get',
-    path: '/dashboard',
-    middlewares: [authGuard],
-    handler: userController.getCurrentUser,
-  },
-]);
-
 // ----------------- COMPANY ROUTES -----------------
 registerRoutes(router, [
   {
@@ -92,6 +84,28 @@ registerRoutes(router, [
     path: '/invitation/generate',
     middlewares: [validateBody(invitationSchema)],
     handler: generateInvitation,
+  },
+]);
+
+// ----------------- DASHBOARD ROUTES -----------------
+registerRoutes(router, [
+  {
+    method: 'get',
+    path: '/dashboard/me',
+    middlewares: [authGuard],
+    handler: userController.getCurrentUser,
+  },
+  {
+    method: 'get',
+    path: '/dashboard/quizzes',
+    middlewares: [authGuard],
+    handler: quizzesController,
+  },
+  {
+    method: 'get',
+    path: '/dashboard/roadmaps',
+    middlewares: [authGuard],
+    handler: roadmapsController,
   },
 ]);
 
