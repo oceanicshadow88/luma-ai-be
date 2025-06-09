@@ -18,6 +18,8 @@ import { validateRegistration as adminRegistrationPreCheck } from '../../middlew
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
 import { invitationSchema } from '../../validations/invitationValidation';
+import { userController } from '../../controllers/userController';
+import { authGuard } from '../../middleware/authGuard';
 
 const router = Router();
 
@@ -60,6 +62,16 @@ registerRoutes(router, [
     method: 'post',
     path: '/auth/reset-password',
     handler: resetPassword,
+  },
+]);
+
+// ----------------- USER ROUTES -----------------
+registerRoutes(router, [
+  {
+    method: 'get',
+    path: '/dashboard',
+    middlewares: [authGuard],
+    handler: userController.getCurrentUser,
   },
 ]);
 

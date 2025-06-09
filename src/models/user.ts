@@ -92,6 +92,10 @@ const userSchema: Schema<User> = new Schema(
       enum: LOCALES,
       default: DEFAULT_LOCALE,
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
     refreshToken: {
       type: String,
       required: false,
@@ -157,7 +161,7 @@ userSchema.statics.refreshAuthToken = async function (
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const payload = jwtUtils.verifyRefreshToken(refreshToken);
 
-  const user = await this.findOne({ _id: payload.userId, refreshToken });
+  const user = await this.findOne({ _id: payload.user, refreshToken });
   if (!user) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid refresh token');
   }
