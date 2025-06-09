@@ -125,10 +125,10 @@ export const DEFAULT_TIMEZONE = TIMEZONES[0];
 export const ROLE = {
   ADMIN: 'admin',
   INSTRUCTOR: 'instructor',
-  STUDENT: 'student',
+  LEARNER: 'learner',
 } as const;
 export type RoleType = (typeof ROLE)[keyof typeof ROLE];
-export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'student']
+export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'learner']
 // membership status
 export const MEMBERSHIP_STATUS = {
   ACTIVE: 'active',
