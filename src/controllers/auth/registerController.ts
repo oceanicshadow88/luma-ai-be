@@ -55,10 +55,10 @@ export const learnerRegister = async (req: Request, res: Response) => {
       accessToken,
     });
   } catch (error) {
-    res.status(error instanceof AppException ? error.statusCode : 500).json({
-      message:
-        error instanceof AppException ? error.message : 'An error occurred during registration',
-    });
+    if (error instanceof AppException) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    res.status(500).json({ message: 'An error occurred during registration' });
   }
 };
 
@@ -73,9 +73,9 @@ export const adminRegister = async (req: Request, res: Response) => {
       accessToken,
     });
   } catch (error) {
-    res.status(error instanceof AppException ? error.statusCode : 500).json({
-      message:
-        error instanceof AppException ? error.message : 'An error occurred during registration',
-    });
+    if (error instanceof AppException) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    res.status(500).json({ message: 'An error occurred during registration' });
   }
 };
