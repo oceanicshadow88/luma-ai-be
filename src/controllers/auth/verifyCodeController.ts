@@ -100,6 +100,7 @@ export const verifyCode = async (req: Request, res: Response) => {
   }
   // Find the code for this email
   const resetCode = await ResetCodeModel.findOne({ email }).exec();
+
   // Check if code exists
   if (!resetCode) {
     throw new AppException(
