@@ -8,7 +8,7 @@ import { getSafePendingUserData, setPendingUserData } from '../../utils/storageP
 import { RegisterUserInput } from '../../controllers/auth/registerController';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
-  const { email } = req.body;
+  const { email, username } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
@@ -32,7 +32,9 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
   }
 
   // check user with company exist
-  const user = await UserModel.findOne({ email });
+  const user = await UserModel.findOne({
+    $or: [{ email }, { username }],
+  });
   if (user) {
     // user and company all exist
     res.status(302).json({
