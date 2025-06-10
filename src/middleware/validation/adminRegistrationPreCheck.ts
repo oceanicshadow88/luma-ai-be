@@ -32,19 +32,20 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
   }
 
   // check user with company exist
+  const userExistWithEmail = await UserModel.findOne({ email });
+  if (userExistWithEmail) {
+    // user and company all exist
+    res.status(400).json({
+      message: 'User already exist with email, please login',
+    });
+  }
   const userExistWithUsername = await UserModel.findOne({ username });
   if (userExistWithUsername) {
     res.status(400).json({
       message: 'User already exist with username',
     });
   }
-  const userExistWithEmail = await UserModel.findOne({ email });
-  if (userExistWithEmail) {
-    // user and company all exist
-    res.status(302).json({
-      message: 'User already exist with email, please login',
-    });
-  }
+
   // company exist, user not exist
   next();
 };
