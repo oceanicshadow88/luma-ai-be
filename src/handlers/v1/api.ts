@@ -17,6 +17,7 @@ import { validateRegistration } from '../../middleware/validation/adminRegistrat
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
+import { verifyAuthToken } from '../../controllers/auth/authController';
 
 const router = Router();
 
@@ -59,6 +60,11 @@ registerRoutes(router, [
     method: 'post',
     path: '/auth/reset-password',
     handler: resetPassword,
+  },
+  {
+    method: 'post',
+    path: '/auth/token',
+    handler: verifyAuthToken,
   },
 ]);
 
