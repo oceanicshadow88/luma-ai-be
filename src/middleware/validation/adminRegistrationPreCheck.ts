@@ -38,12 +38,14 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     res.status(400).json({
       message: 'User already exist with email, please login',
     });
+    return;
   }
   const userExistWithUsername = await UserModel.findOne({ username });
   if (userExistWithUsername) {
     res.status(400).json({
       message: 'User already exist with username',
     });
+    return;
   }
 
   // company exist, user not exist
