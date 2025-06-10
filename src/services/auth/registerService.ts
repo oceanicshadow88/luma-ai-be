@@ -63,7 +63,4 @@ export const checkVerificationCode = async (verifyCode: string, email: string) =
   if (!isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, message);
   }
-
-  // Remove used verification code
-  await resetCode.deleteOne();
 };
