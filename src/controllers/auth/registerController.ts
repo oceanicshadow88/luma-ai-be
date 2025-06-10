@@ -6,6 +6,7 @@ import { checkVerificationCode } from '../../services/auth/registerService';
 import AppException from '../../exceptions/appException';
 import { extractSubdomain } from '../../lib/extractSubdomain';
 import CompanyModel from '../../models/company';
+import { HttpStatusCode } from 'axios';
 
 export interface RegisterUserInput {
   firstname: string;
@@ -26,14 +27,6 @@ export const learnerRegister = async (req: Request, res: Response) => {
     // Get company slug from subdomain
     const companySlug = await extractSubdomain(req);
 
-    // Find company by slug
-    const company = await CompanyModel.findOne({ slug: companySlug });
-    if (!company || !company._id) {
-      return res.status(400).json({
-        message: 'Organization not found',
-      });
-    }
-
     // Verify code existence
     if (!userInput.verifyCode) {
       return res.status(400).json({
@@ -43,6 +36,12 @@ export const learnerRegister = async (req: Request, res: Response) => {
 
     // Verify the code
     await checkVerificationCode(userInput.verifyCode, userInput.email);
+
+    // Find company by slug
+    const company = await CompanyModel.findOne({ slug: companySlug });
+    if (!company || !company._id) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');
+    }
 
     // Create user and membership
     const { refreshToken, accessToken } = await registerService.learnerRegister(
