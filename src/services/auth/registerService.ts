@@ -19,8 +19,16 @@ const registerUser = async (userInput: RegisterUserInput, role: RoleType) => {
 
 export const registerService = {
   // get adminUserInput
+
   teacherRegister: async (userInput: RegisterUserInput) => {
     //this need to be change to email
+    if (userInput.verifyValue) {
+      await checkVerificationCode(userInput.verifyValue, userInput.email);
+    }
+    return registerUser(userInput, ROLE.INSTRUCTOR);
+  },
+  userRegister: async (userInput: RegisterUserInput) => {
+    // verify code to register
     if (userInput.verifyValue) {
       await checkVerificationCode(userInput.verifyValue, userInput.email);
     } // create user

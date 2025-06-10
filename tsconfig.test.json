@@ -11,8 +11,10 @@
     ]
   },
   "include": [
-    "tests/**/*",
-    "src/**/*"
+    "src",
+    "tests",
+    "loaders",
+    "eslint.config.js"
   ],
   "exclude": [
     "node_modules"

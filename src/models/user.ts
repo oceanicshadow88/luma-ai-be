@@ -1,4 +1,3 @@
-// filepath: i:\00_SoftwareDevopment\luma-ai-be\src\models\user.ts
 import mongoose, { Document, Schema, Model, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import MembershipModel from './membership';
@@ -18,6 +17,10 @@ export interface User extends Document {
   createdAt: Date;
   active: boolean;
   refreshToken?: string;
+  loginAttempts: number;
+  lockUntil?: Date;
+  isLocked(): boolean;
+  incrementLoginAttempts(): Promise<void>;
   hashPassword(): Promise<void>;
   validatePassword(inputPassword: string): Promise<boolean>;
   generateTokens(): Promise<{ accessToken: string; refreshToken: string }>;
@@ -93,11 +96,19 @@ const userSchema: Schema<User> = new Schema(
       type: String,
       required: false,
     },
+    loginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockUntil: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );
 
-// use this: no arrow function
+// password: use 'this:' no arrow function
 userSchema.methods.hashPassword = async function (this: User): Promise<void> {
   this.password = await bcrypt.hash(this.password, 12);
 };
@@ -109,6 +120,28 @@ userSchema.methods.validatePassword = async function (
   return bcrypt.compare(password, this.password);
 };
 
+// locked when too many attempts
+userSchema.methods.isLocked = function () {
+  return !!this.lockUntil && this.lockUntil > new Date();
+};
+
+userSchema.methods.incrementLoginAttempts = async function () {
+  const MAX_LOGIN_ATTEMPTS = 5;
+  const LOCK_TIME = 5 * 60 * 1000; // 10 min
+
+  if (this.lockUntil && this.lockUntil < new Date()) {
+    this.loginAttempts = 1;
+    this.lockUntil = undefined;
+  } else {
+    this.loginAttempts += 1;
+    if (this.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+      this.lockUntil = new Date(Date.now() + LOCK_TIME);
+    }
+  }
+  await this.save();
+};
+
+// token method
 userSchema.methods.generateTokens = async function (
   this: User,
 ): Promise<{ accessToken: string; refreshToken: string }> {

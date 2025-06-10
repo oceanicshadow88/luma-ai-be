@@ -9,7 +9,7 @@ class AppException extends Error {
     this.statusCode = statusCode;
     this.payload = payload;
 
-    // make sure instandof work in old environment
+    // make sure instanceof work in old environment
     Object.setPrototypeOf(this, AppException.prototype);
   }
 }
