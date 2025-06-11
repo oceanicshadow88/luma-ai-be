@@ -10,7 +10,7 @@ export interface RegisterUserInput {
   email: string;
   avatarUrl?: string;
   locale?: LocaleType;
-  verifyCode?: string;
+  verifyCode: string;
 }
 
 export const adminRegister = async (req: Request, res: Response) => {
