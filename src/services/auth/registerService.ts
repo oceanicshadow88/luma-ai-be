@@ -10,8 +10,8 @@ import { Types } from 'mongoose';
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
   // Validate verification code if provided
-  if (userInput.verifyCode) {
-    await checkVerificationCode(userInput.verifyCode, userInput.email);
+  if (userInput.verifyValue) {
+    await checkVerificationCode(userInput.verifyValue, userInput.email);
   }
   // Create new user
   const newUser = await userService.createUser(userInput);

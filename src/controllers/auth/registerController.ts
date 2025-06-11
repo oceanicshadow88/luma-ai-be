@@ -16,7 +16,7 @@ export interface RegisterUserInput {
   email: string;
   avatarUrl?: string;
   locale?: LocaleType;
-  verifyCode: string;
+  verifyValue: string;
 }
 
 export const learnerRegister = async (req: Request, res: Response) => {
