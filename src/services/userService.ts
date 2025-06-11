@@ -74,12 +74,7 @@ export const userService = {
       name: `${user.firstname} ${user.lastname}`,
       email: user.email,
       role: membership.role,
-      enterprise: {
-        id: (membership.company._id as Types.ObjectId).toString(),
-        name: membership.company.companyName,
-        slug: membership.company.slug,
-        plan: membership.company.plan,
-      },
+      enterprise: membership.company,
       avatarUrl: user.avatarUrl,
       locale: user.locale,
     };
