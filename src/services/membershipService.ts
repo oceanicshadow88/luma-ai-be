@@ -5,7 +5,7 @@ import { HttpStatusCode } from 'axios';
 import { User } from '../models/user';
 import CompanyModel from '../models/company';
 import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
-import { MembershipStatusType, ROLE, RoleType } from '../config';
+import { MembershipStatusType, RoleType } from '../config';
 
 export interface MembershipInput {
   company: Types.ObjectId;
@@ -58,10 +58,10 @@ export const membershipService = {
     });
   },
 
-  countStudentsInCompany: async (companyId: string) => {
+  countRolesInCompany: async (companyId: string, role: RoleType) => {
     return MembershipModel.countDocuments({
       company: companyId,
-      role: ROLE.LEARNER,
+      role,
     });
   },
 };
