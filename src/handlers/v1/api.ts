@@ -13,6 +13,11 @@ import { generateInvitation } from '../../controllers/invitationController';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import {
+  createFileUploader,
+  ALLOWED_IMAGE_TYPES,
+  wrapMulterMiddleware,
+} from '../../middleware/fileUploader';
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
@@ -64,11 +69,20 @@ registerRoutes(router, [
 ]);
 
 // ----------------- COMPANY ROUTES -----------------
+const logoUploader = createFileUploader({
+  folderName: 'company-logos',
+  allowedMimeTypes: ALLOWED_IMAGE_TYPES.companyLogo,
+  maxSizeMB: 5,
+});
+
 registerRoutes(router, [
   {
     method: 'post',
     path: '/company/register',
-    middlewares: [validateBody(companyValidationSchema)],
+    middlewares: [
+      wrapMulterMiddleware(logoUploader.single('logo')),
+      validateBody(companyValidationSchema),
+    ],
     handler: companyController.createCompany,
   },
 ]);
