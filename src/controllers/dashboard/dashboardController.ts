@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { userService } from '../../services/userService';
 import { membershipService } from '../../services/membershipService';
 import config from '../../config';
+import { mockAdminDashboardData } from '../../mockData/adminDashboardDataMock';
 
 export const adminDashboardController = {
   getAdminDashboardData: async (req: Request, res: Response) => {
@@ -21,6 +22,7 @@ export const adminDashboardController = {
       totalStudents,
       roadmapsCreated: config.DEFAULT_MOCK_COUNT,
       quizzesCreated: config.DEFAULT_MOCK_COUNT,
+      mockAdminDashboardData,
     };
 
     res.status(200).json({ success: true, data: dashboardData });
