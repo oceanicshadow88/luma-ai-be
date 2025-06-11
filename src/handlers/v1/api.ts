@@ -25,7 +25,7 @@ const router = Router();
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/auth/register/admin',
+    path: '/auth/signup/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
   },
@@ -53,7 +53,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/request-reset-code',
+    path: '/auth/send-code',
     handler: requestVerificationCode,
   },
   {
