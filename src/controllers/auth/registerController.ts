@@ -12,6 +12,7 @@ export interface RegisterUserInput {
   lastname: string;
   username: string;
   password: string;
+  confirmPassword: string;
   email: string;
   avatarUrl?: string;
   locale?: LocaleType;
