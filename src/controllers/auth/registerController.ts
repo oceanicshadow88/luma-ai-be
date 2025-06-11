@@ -17,13 +17,15 @@ export interface RegisterUserInput {
   avatarUrl?: string;
   locale?: LocaleType;
   verifyCode: string;
+<<<<<<< HEAD
   termsAccepted: boolean;
+=======
+>>>>>>> f7c9212 (Update registerController.ts)
 }
 
 export const learnerRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
 
-  try {
     // Get company slug from subdomain
     const companySlug = await extractSubdomain(req);
 
@@ -44,12 +46,6 @@ export const learnerRegister = async (req: Request, res: Response) => {
       refreshToken,
       accessToken,
     });
-  } catch (error) {
-    if (error instanceof AppException) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-    res.status(500).json({ message: 'An error occurred during registration' });
-  }
 };
 
 export const adminRegister = async (req: Request, res: Response) => {
