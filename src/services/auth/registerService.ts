@@ -29,7 +29,6 @@ export const registerService = {
 
     // Create admin membership
     await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
-
     return { refreshToken, accessToken };
   },
 
