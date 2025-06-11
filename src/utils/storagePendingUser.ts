@@ -9,7 +9,7 @@ export const setPendingUserData = (userData: RegisterUserInput) => {
 export const getPendingUserData = () => pendingUserData;
 export const getSafePendingUserData = (): Omit<
   RegisterUserInput,
-  'password' | 'verifyCode'
+  'password' | 'confirmPassword' | 'verifyCode'
 > | null => {
   if (!pendingUserData) return null;
 
