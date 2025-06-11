@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 // Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
+import { learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -21,7 +22,7 @@ import {
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
-import { companyValidationSchema } from '../../validations/companyValidaton';
+import { companyValidationSchema } from '../../validations/companyValidation';
 import { invitationSchema } from '../../validations/invitationValidation';
 
 const router = Router();
@@ -33,6 +34,12 @@ registerRoutes(router, [
     path: '/auth/register/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
+  },
+  {
+    method: 'post',
+    path: '/auth/register/learner',
+    middlewares: [validateBody(authValidationSchema.learnerRegister)],
+    handler: learnerRegister,
   },
   {
     method: 'post',
