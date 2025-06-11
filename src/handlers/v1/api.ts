@@ -18,10 +18,10 @@ import { validateRegistration as adminRegistrationPreCheck } from '../../middlew
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
 import { invitationSchema } from '../../validations/invitationValidation';
-import { userController } from '../../controllers/userController';
 import { authGuard } from '../../middleware/authGuard';
 import { quizzesController } from '../../controllers/dashboard/quizzesController';
 import { roadmapsController } from '../../controllers/dashboard/roadmapsController';
+import { adminDashboardController } from '../../controllers/dashboard/dashboardController';
 
 const router = Router();
 
@@ -57,7 +57,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/send-code',
+    path: '/auth/request-verification-code',
     handler: requestVerificationCode,
   },
   {
@@ -71,7 +71,7 @@ registerRoutes(router, [
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/company/register',
+    path: '/auth/signup/institution',
     middlewares: [validateBody(companyValidationSchema)],
     handler: companyController.createCompany,
   },
@@ -91,9 +91,9 @@ registerRoutes(router, [
 registerRoutes(router, [
   {
     method: 'get',
-    path: '/dashboard/me',
+    path: '/dashboard',
     middlewares: [authGuard],
-    handler: userController.getCurrentUser,
+    handler: adminDashboardController.getAdminDashboardData,
   },
   {
     method: 'get',
