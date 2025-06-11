@@ -5,6 +5,22 @@ import { ROLE, RoleType } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
+import { Types } from 'mongoose';
+
+// Create user and generate authentication tokens
+const createUserAndTokens = async (userInput: RegisterUserInput) => {
+  // Validate verification code if provided
+  if (userInput.verifyCode) {
+    await checkVerificationCode(userInput.verifyCode, userInput.email);
+  }
+  // Create new user
+  const newUser = await userService.createUser(userInput);
+  // Generate authentication tokens
+  const { refreshToken, accessToken } = await newUser.generateTokens();
+  await userService.updateUserById(newUser.id, { refreshToken });
+
+  return { newUser, refreshToken, accessToken };
+};
 
 const registerUser = async (userInput: RegisterUserInput, role: RoleType) => {
   const newUser = await userService.createUser(userInput);
@@ -18,28 +34,34 @@ const registerUser = async (userInput: RegisterUserInput, role: RoleType) => {
 };
 
 export const registerService = {
-  // get adminUserInput
-
   teacherRegister: async (userInput: RegisterUserInput) => {
     //this need to be change to email
     if (userInput.verifyValue) {
       await checkVerificationCode(userInput.verifyValue, userInput.email);
     }
-    return registerUser(userInput, ROLE.INSTRUCTOR);
+    return membershipService.createMembershipByUser(userInput, ROLE.INSTRUCTOR);
   },
-  userRegister: async (userInput: RegisterUserInput) => {
-    // verify code to register
-    if (userInput.verifyValue) {
-      await checkVerificationCode(userInput.verifyValue, userInput.email);
-    } // create user
-    return registerUser(userInput, ROLE.INSTRUCTOR);
-  },
+  // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    // verify code to register
-    if (userInput.verifyValue) {
-      await checkVerificationCode(userInput.verifyValue, userInput.email);
-    } // create user
-    return registerUser(userInput, ROLE.ADMIN);
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+
+    // Create admin membership
+    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+    return { refreshToken, accessToken };
+  },
+
+  // Register learner user and create learner membership for specific organization
+  learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+
+    // Create learner membership with organization association
+    await membershipService.createMembership({
+      user: newUser._id as Types.ObjectId,
+      company: new Types.ObjectId(organizationId),
+      role: ROLE.LEARNER,
+    });
+
+    return { refreshToken, accessToken };
   },
 };
 

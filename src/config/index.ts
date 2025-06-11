@@ -46,6 +46,7 @@ interface Config {
   resetCodeRateLimitExpiry: number;
   emailFrom: string;
   smtpConfig: SmtpConfig;
+  DEFAULT_MOCK_COUNT: number;
 }
 
 export const config: Config = {
@@ -84,6 +85,7 @@ export const config: Config = {
       pass: process.env.SMTP_PASS ?? '',
     },
   },
+  DEFAULT_MOCK_COUNT: 666,
 };
 
 // Route api
@@ -125,10 +127,10 @@ export const DEFAULT_TIMEZONE = TIMEZONES[0];
 export const ROLE = {
   ADMIN: 'admin',
   INSTRUCTOR: 'instructor',
-  STUDENT: 'student',
+  LEARNER: 'learner',
 } as const;
 export type RoleType = (typeof ROLE)[keyof typeof ROLE];
-export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'student']
+export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'learner']
 // membership status
 export const MEMBERSHIP_STATUS = {
   ACTIVE: 'active',

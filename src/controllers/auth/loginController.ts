@@ -20,4 +20,4 @@ async function handleLogin(req: Request, res: Response, allowedRoles: RoleType[]
 export const loginEnterprise = (req: Request, res: Response) =>
   handleLogin(req, res, [ROLE.ADMIN, ROLE.INSTRUCTOR]);
 
-export const loginLearner = (req: Request, res: Response) => handleLogin(req, res, [ROLE.STUDENT]);
+export const loginLearner = (req: Request, res: Response) => handleLogin(req, res, [ROLE.LEARNER]);
