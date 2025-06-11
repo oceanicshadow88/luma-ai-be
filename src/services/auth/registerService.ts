@@ -18,7 +18,7 @@ export const registerService = {
     const { refreshToken, accessToken } = await newUser.generateTokens();
     await userService.updateUserById(newUser.id, { refreshToken });
     // create membership
-    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
 
     return { refreshToken, accessToken };
   },
