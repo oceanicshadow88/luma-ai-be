@@ -26,6 +26,10 @@ export interface RegisterUserInput {
 export const learnerRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
 
+  if (userInput.password !== userInput.confirmPassword) {
+  throw new AppException(HttpStatusCode.BadRequest, 'Passwords do not match');
+}
+
     // Get company slug from subdomain
     const companySlug = await extractSubdomain(req);
 
