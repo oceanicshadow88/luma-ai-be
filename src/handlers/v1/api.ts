@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 // Controllers
 import { adminRegister } from '../../controllers/auth/registerController';
+import { learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -13,6 +14,11 @@ import { generateInvitation } from '../../controllers/invitationController';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import {
+  createFileUploader,
+  ALLOWED_IMAGE_TYPES,
+  wrapMulterMiddleware,
+} from '../../middleware/fileUploader';
 
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
@@ -32,6 +38,12 @@ registerRoutes(router, [
     path: '/auth/signup/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
+  },
+  {
+    method: 'post',
+    path: '/auth/register/learner',
+    middlewares: [validateBody(authValidationSchema.learnerRegister)],
+    handler: learnerRegister,
   },
   {
     method: 'post',
@@ -68,11 +80,20 @@ registerRoutes(router, [
 ]);
 
 // ----------------- COMPANY ROUTES -----------------
+const logoUploader = createFileUploader({
+  folderName: 'company-logos',
+  allowedMimeTypes: ALLOWED_IMAGE_TYPES.companyLogo,
+  maxSizeMB: 5,
+});
+
 registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/institution',
-    middlewares: [validateBody(companyValidationSchema)],
+    middlewares: [
+      wrapMulterMiddleware(logoUploader.single('logo')),
+      validateBody(companyValidationSchema),
+    ],
     handler: companyController.createCompany,
   },
 ]);
