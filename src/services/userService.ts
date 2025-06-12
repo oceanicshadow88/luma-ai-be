@@ -17,13 +17,18 @@ export interface UserCreateInput {
 }
 
 export const userService = {
-  createUser: async (userInput: UserCreateInput): Promise<User> => {
-    const existingUser = await UserModel.findOne({
-      $or: [{ email: userInput.email }, { username: userInput.username }],
-    });
-    if (existingUser) {
-      throw new AppException(HttpStatusCode.Conflict, 'User email or username already exist');
+  checkUserExist: async (email: string, username: string) => {
+    const userExistWithEmail = await UserModel.findOne({ email });
+    if (userExistWithEmail) {
+      throw new AppException(HttpStatusCode.Conflict, 'Email already exist');
     }
+    const userExistWithUsername = await UserModel.findOne({ username });
+    if (userExistWithUsername) {
+      throw new AppException(HttpStatusCode.Conflict, 'Username already exist');
+    }
+  },
+  createUser: async (userInput: UserCreateInput): Promise<User> => {
+    await userService.checkUserExist(userInput.email, userInput.username);
 
     const user = new UserModel(userInput);
     await user.hashPassword();
