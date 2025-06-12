@@ -4,6 +4,7 @@ import { ObjectSchema } from 'joi';
 declare module 'express-serve-static-core' {
   interface Request {
     validatedQuery?: unknown;
+    companySlug?: string;
   }
 }
 

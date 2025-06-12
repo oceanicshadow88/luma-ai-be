@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 // Controllers
-import { adminRegister } from '../../controllers/auth/registerController';
-import { learnerRegister } from '../../controllers/auth/registerController';
+import { adminRegister, learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -13,7 +12,7 @@ import { generateInvitation } from '../../controllers/invitationController';
 // Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
 import {
   createFileUploader,
   ALLOWED_IMAGE_TYPES,
@@ -28,6 +27,7 @@ import { authGuard } from '../../middleware/authGuard';
 import { quizzesController } from '../../controllers/dashboard/quizzesController';
 import { roadmapsController } from '../../controllers/dashboard/roadmapsController';
 import { adminDashboardController } from '../../controllers/dashboard/dashboardController';
+import { resolveCompanySlug } from '../../middleware/resolveCompanySlug';
 
 const router = Router();
 
@@ -42,7 +42,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/learner',
-    middlewares: [validateBody(authValidationSchema.learnerRegister)],
+    middlewares: [validateBody(authValidationSchema.learnerRegister), resolveCompanySlug],
     handler: learnerRegister,
   },
   {
