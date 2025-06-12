@@ -1,41 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-import AppException from '../../exceptions/appException';
-import { HttpStatusCode } from 'axios';
-import CompanyModel from '../../models/company';
-import UserModel from '../../models/user';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
+import { userService } from '../../services/userService';
+import { companyService } from '../../services/companyService';
+import { checkVerificationCode } from '../../services/auth/registerService';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, username } = req.body;
-  if (!email) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
+  const { email, username, verifyCode } = req.body;
+  if (verifyCode) {
+    await checkVerificationCode(verifyCode, email);
   }
 
   // check user with company exist
-  const userExistWithEmail = await UserModel.findOne({ email });
-  if (userExistWithEmail) {
-    // user and company all exist
-    res.status(400).json({
-      message: 'User already exist with email, please login',
-    });
-    return;
-  }
-  const userExistWithUsername = await UserModel.findOne({ username });
-  if (userExistWithUsername) {
-    res.status(400).json({
-      message: 'User already exist with username',
-    });
-    return;
-  }
+  await userService.checkUserExist(email, username);
 
   // check company
-  const companySlug = await extractCompanySlug(email);
-  if (!companySlug) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
-  }
-  const existCompany = await CompanyModel.findOne({ slug: companySlug });
+  const existCompany = await companyService.getCompanybyWorkEmail(email);
   if (!existCompany) {
     // company not exist, jump to company register and pass user data
     const user = req.body as RegisterUserInput;

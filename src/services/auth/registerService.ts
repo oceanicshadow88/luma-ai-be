@@ -9,13 +9,8 @@ import { Types } from 'mongoose';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
-  // Validate verification code if provided
-  if (userInput.verifyCode) {
-    await checkVerificationCode(userInput.verifyCode, userInput.email);
-  }
-  // Create new user
   const newUser = await userService.createUser(userInput);
-  // Generate authentication tokens
+
   const { refreshToken, accessToken } = await newUser.generateTokens();
   await userService.updateUserById(newUser.id, { refreshToken });
 
@@ -28,12 +23,17 @@ export const registerService = {
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create admin membership
-    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
     return { refreshToken, accessToken };
   },
 
   // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
+    // Validate verification code if provided
+    if (userInput.verifyCode) {
+      await checkVerificationCode(userInput.verifyCode, userInput.email);
+    }
+
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create learner membership with organization association

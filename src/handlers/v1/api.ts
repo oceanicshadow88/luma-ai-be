@@ -41,15 +41,9 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/register/learner',
+    path: '/auth/signup/learner',
     middlewares: [validateBody(authValidationSchema.learnerRegister)],
     handler: learnerRegister,
-  },
-  {
-    method: 'post',
-    path: '/auth/login/enterprise',
-    middlewares: [validateBody(authValidationSchema.login)],
-    handler: loginEnterprise,
   },
   {
     method: 'post',
@@ -95,6 +89,12 @@ registerRoutes(router, [
       validateBody(companyValidationSchema),
     ],
     handler: companyController.createCompany,
+  },
+  {
+    method: 'post',
+    path: '/auth/login/enterprise',
+    middlewares: [validateBody(authValidationSchema.login)],
+    handler: loginEnterprise,
   },
 ]);
 
