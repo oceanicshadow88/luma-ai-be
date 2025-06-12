@@ -3,6 +3,7 @@ import { jwtUtils } from '../lib/jwtUtils';
 import UserModel from '../models/user';
 import { Types } from 'mongoose';
 
+// 扩展Request接口，添加user属性
 declare global {
   namespace Express {
     interface Request {
@@ -40,7 +41,7 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
     const payload = jwtUtils.verifyAccessToken(token);
 
     // Check if user still exists and is active
-    const user = await UserModel.findById(payload.user).select('-password -refreshToken');
+    const user = await UserModel.findById(payload.userId).select('-password -refreshToken');
 
     if (!user) {
       res.status(401).json({
@@ -92,7 +93,7 @@ export const authGuardLite = (req: Request, res: Response, next: NextFunction): 
     const payload = jwtUtils.verifyAccessToken(token);
 
     req.user = {
-      id: payload.user,
+      id: payload.userId,
       email: payload.email || '',
       username: payload.name || '',
       active: true,
