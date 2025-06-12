@@ -4,6 +4,7 @@ import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { CompanyPlanType, LocaleType } from '../config';
 import UserModel from '../models/user';
+import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
 
 export interface CompanyCreateInput {
   companyName: string;
@@ -43,5 +44,14 @@ export const companyService = {
     if (!company) throw new AppException(HttpStatusCode.BadRequest, 'Company not found');
     await company.deleteOne(); //Trigger pre deleteOne hook, also delete membership
     return true;
+  },
+
+  getCompanybyWorkEmail: async (email: string) => {
+    const companySlug = await extractCompanySlug(email);
+    if (!companySlug) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
+    }
+    const existCompany = await CompanyModel.findOne({ slug: companySlug });
+    return existCompany;
   },
 };

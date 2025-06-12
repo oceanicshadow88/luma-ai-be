@@ -44,6 +44,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
+<<<<<<< HEAD
     path: '/auth/signup/teacher',
     middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
     handler: teacherRegister,
@@ -51,14 +52,11 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/register/learner',
+=======
+    path: '/auth/signup/learner',
+>>>>>>> ddf10ce (fix: verify code check before email check)
     middlewares: [validateBody(authValidationSchema.learnerRegister)],
     handler: learnerRegister,
-  },
-  {
-    method: 'post',
-    path: '/auth/login/enterprise',
-    middlewares: [validateBody(authValidationSchema.login)],
-    handler: loginEnterprise,
   },
   {
     method: 'post',
@@ -109,6 +107,12 @@ registerRoutes(router, [
       validateBody(companyValidationSchema),
     ],
     handler: companyController.createCompany,
+  },
+  {
+    method: 'post',
+    path: '/auth/login/enterprise',
+    middlewares: [validateBody(authValidationSchema.login)],
+    handler: loginEnterprise,
   },
 ]);
 
