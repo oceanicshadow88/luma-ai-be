@@ -5,8 +5,8 @@ import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
-import CompanyModel from '../../models/company';
 import { Types } from 'mongoose';
+import UserModel from '../../models/user';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
@@ -24,26 +24,31 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
 };
 
 export const registerService = {
+  teacherRegister: async (userInput: RegisterUserInput) => {
+    const user = await UserModel.findOne({ email: userInput.email });
+    //this need to be change to email
+    if (!user) {
+      throw new Error('Cannot find user');
+    }
+    const updateUser = await UserModel.findOneAndUpdate({ email: userInput.email }, userInput, {
+      new: true,
+    });
+    await updateUser;
+  },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create admin membership
-    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
     return { refreshToken, accessToken };
   },
 
   // Register learner user and create learner membership for specific organization
-  learnerRegister: async (userInput: RegisterUserInput, companySlug: string) => {
+  learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
     // Validate verification code if provided
     if (userInput.verifyCode) {
       await checkVerificationCode(userInput.verifyCode, userInput.email);
-    }
-
-    // Get company slug from subdomain
-    const company = await CompanyModel.findOne({ slug: companySlug });
-    if (!company || !company._id) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');
     }
 
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
@@ -51,7 +56,7 @@ export const registerService = {
     // Create learner membership with organization association
     await membershipService.createMembership({
       user: newUser._id as Types.ObjectId,
-      company: company._id as Types.ObjectId,
+      company: new Types.ObjectId(organizationId),
       role: ROLE.LEARNER,
     });
 
@@ -59,9 +64,8 @@ export const registerService = {
   },
 };
 
-// Verify the provided verification code
-export const checkVerificationCode = async (verifyCode: string, email: string) => {
-  if (!verifyCode) {
+export const checkVerificationCode = async (verifyValue: string, email: string) => {
+  if (!verifyValue) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
   }
 
@@ -70,7 +74,7 @@ export const checkVerificationCode = async (verifyCode: string, email: string) =
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
   }
 
-  const { isValid, message } = await resetCode.validateResetCode(verifyCode);
+  const { isValid, message } = await resetCode.validateResetCode(verifyValue);
   if (!isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, message);
   }

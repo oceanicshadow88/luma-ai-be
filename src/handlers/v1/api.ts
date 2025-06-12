@@ -1,28 +1,18 @@
 import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
-// Controllers
-import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
-import { learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { companyController } from '../../controllers/companyController';
 import { generateInvitation } from '../../controllers/invitationController';
-
-// Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
-
 import {
   createFileUploader,
   ALLOWED_IMAGE_TYPES,
   wrapMulterMiddleware,
 } from '../../middleware/fileUploader';
-
-// Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
 import { verifyAuthToken } from '../../controllers/auth/authController';
@@ -31,6 +21,9 @@ import { authGuard } from '../../middleware/authGuard';
 import { quizzesController } from '../../controllers/dashboard/quizzesController';
 import { roadmapsController } from '../../controllers/dashboard/roadmapsController';
 import { adminDashboardController } from '../../controllers/dashboard/dashboardController';
+import { adminRegister, learnerRegister } from '../../controllers/auth/registerController';
+import { adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { resolveCompanySlug } from '../../middleware/resolveCompanySlug';
 
 const router = Router();
 
@@ -44,18 +37,14 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-<<<<<<< HEAD
     path: '/auth/signup/teacher',
-    middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
+    middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreC],
     handler: teacherRegister,
   },
   {
     method: 'post',
-    path: '/auth/register/learner',
-=======
     path: '/auth/signup/learner',
->>>>>>> ddf10ce (fix: verify code check before email check)
-    middlewares: [validateBody(authValidationSchema.learnerRegister)],
+    middlewares: [validateBody(authValidationSchema.learnerRegister), resolveCompanySlug],
     handler: learnerRegister,
   },
   {

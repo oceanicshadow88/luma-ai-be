@@ -2,8 +2,9 @@ import { Request } from 'express';
 import CompanyModel from '../models/company';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import logger from './logger';
 
-export async function extractSubdomain(req: Request): Promise<string> {
+export async function extractCompanySlugbySubdomain(req: Request): Promise<string> {
   const hostname = req.hostname?.toLowerCase();
   if (!hostname) {
     throw new AppException(HttpStatusCode.BadRequest, 'Invalid hostname');
@@ -12,6 +13,7 @@ export async function extractSubdomain(req: Request): Promise<string> {
   const firstDotIndex = hostname.indexOf('.');
   if (firstDotIndex === -1) {
     // e.g., "localhost", no subdomain
+    logger.info('No subdomain in hostname, use first company in Database.');
     const firstCompany = await CompanyModel.findOne().sort({ createdAt: 1 }).lean();
     if (!firstCompany || !firstCompany.slug) {
       throw new AppException(HttpStatusCode.NotFound, 'No default company slug found in database');

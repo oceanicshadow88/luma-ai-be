@@ -4,7 +4,10 @@ import { parse } from 'psl';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-export const extractCompanySlug = async (email: string): Promise<string | null> => {
+export const extractCompanySlugbyAdminEmail = async (email: string): Promise<string | null> => {
+  if (!email) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Email missing');
+  }
   const domain = email.split('@')[1]?.toLowerCase();
   // email required
   if (!domain) {
@@ -24,6 +27,9 @@ export const extractCompanySlug = async (email: string): Promise<string | null> 
     'domain' in parsed &&
     typeof parsed.domain === 'string'
   ) {
+    if (!parsed.domain) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Email is invalid');
+    }
     const slug = parsed.domain.split('.')[0];
     if (slug) {
       return slug;

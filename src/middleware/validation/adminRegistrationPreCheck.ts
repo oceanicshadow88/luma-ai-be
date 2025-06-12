@@ -5,7 +5,11 @@ import { userService } from '../../services/userService';
 import { companyService } from '../../services/companyService';
 import { checkVerificationCode } from '../../services/auth/registerService';
 
-export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
+export const adminRegistrationPreCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { email, username, verifyCode } = req.body;
   if (verifyCode) {
     await checkVerificationCode(verifyCode, email);

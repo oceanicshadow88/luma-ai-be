@@ -4,7 +4,7 @@ import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { CompanyPlanType, LocaleType } from '../config';
 import UserModel from '../models/user';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
+import { extractCompanySlugbyAdminEmail } from '../utils/extractCompanySlugFromAdminEmail';
 
 export interface CompanyCreateInput {
   companyName: string;
@@ -47,7 +47,7 @@ export const companyService = {
   },
 
   getCompanybyWorkEmail: async (email: string) => {
-    const companySlug = await extractCompanySlug(email);
+    const companySlug = await extractCompanySlugbyAdminEmail(email);
     if (!companySlug) {
       throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
     }

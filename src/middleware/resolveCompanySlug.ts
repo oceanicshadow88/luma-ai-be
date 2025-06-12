@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import { extractCompanySlugbyAdminEmail } from '../utils/extractCompanySlugFromAdminEmail';
+import { extractCompanySlugbySubdomain } from '../utils/extractCompanySlugbySubdomain';
 import { HttpStatusCode } from 'axios';
-import AppException from '../../../exceptions/appException';
-import { extractCompanySlugbyAdminEmail } from '../../../utils/extractCompanySlugFromAdminEmail';
-import { extractCompanySlugbySubdomain } from '../../../utils/extractCompanySlugbySubdomain';
+import AppException from '../exceptions/appException';
 
 export const resolveCompanySlug = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
