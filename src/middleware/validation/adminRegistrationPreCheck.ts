@@ -37,15 +37,7 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
   }
   const existCompany = await CompanyModel.findOne({ slug: companySlug });
   if (!existCompany) {
-    // company not exist, jump to company register and pass user data
-    const user = req.body as RegisterUserInput;
-    setPendingUserData(user);
-
-    res.status(302).json({
-      message: 'The company does not exist',
-      user: getSafePendingUserData(),
-    });
-    return;
+    throw new Error('Company does not exits');
   }
 
   // company exist, user not exist

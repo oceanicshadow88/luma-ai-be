@@ -19,8 +19,8 @@ export const companyController = {
     if (!companyName) {
       throw new AppException(HttpStatusCode.BadRequest, 'Missing required fields');
     }
-    const logoUrl = req.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
-
+    //const logoUrl = req?.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
+    const logoUrl = 'http://';
     // get user from user register
     const pendingUser = getPendingUserData() as RegisterUserInput;
     if (!pendingUser) {

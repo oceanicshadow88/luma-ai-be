@@ -8,8 +8,8 @@ export const setPendingUserData = (userData: RegisterUserInput) => {
 
 export const getPendingUserData = () => pendingUserData;
 export const getSafePendingUserData = (): {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
 } | null => {

@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 // Controllers
 import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
-import { adminRegister } from '../../controllers/auth/registerController';
 import { learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';

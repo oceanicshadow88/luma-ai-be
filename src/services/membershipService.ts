@@ -42,11 +42,12 @@ export const membershipService = {
     return await MembershipModel.create(membershipInput);
   },
 
-  createAdminMembershipByUser: async (user: User, role: RoleType): Promise<Membership> => {
+  createMembershipByUser: async (user: User, role: RoleType): Promise<Membership> => {
     const slug = await extractCompanySlug(user.email);
     if (!slug) {
       throw new AppException(HttpStatusCode.BadRequest, 'Cannot extract company from email');
     }
+    //this is a bug
     const existCompany = await CompanyModel.findOne({ slug });
     if (!existCompany) {
       throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');

@@ -71,7 +71,7 @@ export const userService = {
     return {
       userId: (user._id as Types.ObjectId).toString(),
       username: user.username,
-      name: `${user.firstname} ${user.lastname}`,
+      name: `${user.firstName} ${user.lastName}`,
       email: user.email,
       role: membership.role,
       enterprise: membership.company,

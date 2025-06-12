@@ -6,6 +6,7 @@ import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
+import UserModel from '../../models/user';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
@@ -35,11 +36,15 @@ const registerUser = async (userInput: RegisterUserInput, role: RoleType) => {
 
 export const registerService = {
   teacherRegister: async (userInput: RegisterUserInput) => {
+    const user = await UserModel.findOne({ email: userInput.email });
     //this need to be change to email
+    if (!user) {
+      throw new Error('Cannot find user');
+    }
     if (userInput.verifyValue) {
       await checkVerificationCode(userInput.verifyValue, userInput.email);
     }
-    return membershipService.createMembershipByUser(userInput, ROLE.INSTRUCTOR);
+    await membershipService.createMembershipByUser(user, ROLE.INSTRUCTOR);
   },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {

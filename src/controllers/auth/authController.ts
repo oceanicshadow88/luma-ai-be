@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 
 export const verifyAuthToken = async (req: Request, res: Response) => {
   const { token } = req.body;
-  authService.verifyToken(token);
+  await authService.verifyToken(token);
+
   return res.sendStatus(HttpStatusCode.Ok);
 };
