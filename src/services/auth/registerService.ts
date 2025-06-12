@@ -28,7 +28,7 @@ export const registerService = {
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create admin membership
-    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
     return { refreshToken, accessToken };
   },
 
