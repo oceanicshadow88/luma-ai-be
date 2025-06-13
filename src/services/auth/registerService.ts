@@ -23,17 +23,6 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
   return { newUser, refreshToken, accessToken };
 };
 
-const registerUser = async (userInput: RegisterUserInput, role: RoleType) => {
-  const newUser = await userService.createUser(userInput);
-  // generate Token
-  const { refreshToken, accessToken } = await newUser.generateTokens();
-  await userService.updateUserById(newUser.id, { refreshToken });
-  // create membership
-  await membershipService.createMembershipByUser(newUser, role);
-
-  return { refreshToken, accessToken };
-};
-
 export const registerService = {
   teacherRegister: async (userInput: RegisterUserInput) => {
     const user = await UserModel.findOne({ email: userInput.email });
