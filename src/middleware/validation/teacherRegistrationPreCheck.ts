@@ -11,15 +11,6 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
 
-  // check user with company exist
-  const userExistWithEmail = await UserModel.findOne({ email });
-  if (userExistWithEmail) {
-    // user and company all exist
-    res.status(400).json({
-      message: 'User already exist with email, please login',
-    });
-    return;
-  }
   const userExistWithUsername = await UserModel.findOne({ username });
   if (userExistWithUsername) {
     res.status(400).json({

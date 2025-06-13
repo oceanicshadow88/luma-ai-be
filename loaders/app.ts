@@ -5,6 +5,8 @@ import morgan from '../src/middleware/morgan';
 import rateLimiter from '../src/middleware/rateLimit';
 import v1Router from '../src/handlers/v1/api';
 import errorHandler from '../src/middleware/error/errorHandler';
+import { companySeeder } from '../src/database/seeder/companySeeder';
+import { userSeeder } from '../src/database/seeder/userSeeder';
 
 export const catchAllErrors = (
   fn: (req: Request, res: Response, next: NextFunction) => any,
@@ -36,21 +38,34 @@ function wrapRoutes(router: Router): Router {
 
   return router;
 }
-// Create Express app
-const app: Express = express();
 
-// Middleware
-app.use(helmet());
-app.use(cors());
-app.use(morgan);
-app.use(rateLimiter);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+async function initData() {
+  if (process.env.NODE_ENV === 'local') {
+    const user = await userSeeder.seedDefault();
+    await companySeeder.seedDefault(user);
+  }
+}
+function init() {
+  // Create Express app
+  const app: Express = express();
 
-// Routes
-app.use('/api/v1', wrapRoutes(v1Router));
+  // Middleware
+  app.use(helmet());
+  app.use(cors());
+  app.use(morgan);
+  app.use(rateLimiter);
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-// Error Handling
-app.use(errorHandler);
+  // Routes
+  app.use('/api/v1', wrapRoutes(v1Router));
 
+  // Error Handling
+  app.use(errorHandler);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  initData();
+  return app;
+}
+
+const app = init();
 export default app;

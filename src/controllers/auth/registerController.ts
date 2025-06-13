@@ -49,8 +49,6 @@ export const learnerRegister = async (req: Request, res: Response) => {
 };
 
 export const adminRegister = async (req: Request, res: Response) => {
-  res.sendStatus(201);
-  return;
   const userInput = req.body as RegisterUserInput;
 
   const { refreshToken, accessToken } = await registerService.adminRegister(userInput);

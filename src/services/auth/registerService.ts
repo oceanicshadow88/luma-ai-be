@@ -41,10 +41,10 @@ export const registerService = {
     if (!user) {
       throw new Error('Cannot find user');
     }
-    if (userInput.verifyValue) {
-      await checkVerificationCode(userInput.verifyValue, userInput.email);
-    }
-    await membershipService.createMembershipByUser(user, ROLE.INSTRUCTOR);
+    const updateUser = await UserModel.findOneAndUpdate({ email: userInput.email }, userInput, {
+      new: true,
+    });
+    await updateUser;
   },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {

@@ -14,6 +14,8 @@ import { generateInvitation } from '../../controllers/invitationController';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
+
 import {
   createFileUploader,
   ALLOWED_IMAGE_TYPES,
@@ -39,6 +41,12 @@ registerRoutes(router, [
     path: '/auth/signup/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
+  },
+  {
+    method: 'post',
+    path: '/auth/signup/teacher',
+    middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
+    handler: teacherRegister,
   },
   {
     method: 'post',
