@@ -1,7 +1,8 @@
-// @ts-ignore
+
 import AppException from '@src/exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import freemail from 'freemail';
+
+const freemail = require('freemail');
 import { parse } from 'psl';
 
 export const extractCompanySlug = async (email: string): Promise<string | null> => {

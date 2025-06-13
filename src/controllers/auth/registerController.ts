@@ -17,10 +17,7 @@ export interface RegisterUserInput {
   avatarUrl?: string;
   locale?: LocaleType;
   verifyCode: string;
-<<<<<<< HEAD
   termsAccepted: boolean;
-=======
->>>>>>> f7c9212 (Update registerController.ts)
 }
 
 export const learnerRegister = async (req: Request, res: Response) => {

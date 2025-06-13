@@ -36,7 +36,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/register/learner',
+    path: '/auth/signup/learner',
     middlewares: [validateBody(authValidationSchema.learnerRegister)],
     handler: learnerRegister,
   },
