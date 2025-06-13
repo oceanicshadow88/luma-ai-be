@@ -1,16 +1,16 @@
-import { Request, Response } from 'express';
-import AppException from '../exceptions/appException';
+import { ROLE } from '@src/config';
+import { RegisterUserInput } from '@src/controllers/auth/registerController';
+import AppException from '@src/exceptions/appException';
+import UserModel, { User } from '@src/models/user';
+import { checkVerificationCode } from '@src/services/auth/registerService';
+import { companyService } from '@src/services/companyService';
+import { membershipService } from '@src/services/membershipService';
+import { userService } from '@src/services/userService';
+import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
+import { clearPendingUserData, getPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
-import { userService } from '../services/userService';
-import { companyService } from '../services/companyService';
+import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { membershipService } from '../services/membershipService';
-import { ROLE } from '../config';
-import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
-import { checkVerificationCode } from '../services/auth/registerService';
-import { RegisterUserInput } from './auth/registerController';
-import UserModel, { User } from '../models/user';
 
 export const companyController = {
   createCompany: async (req: Request, res: Response) => {

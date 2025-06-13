@@ -1,8 +1,9 @@
-// @ts-ignore
-import freemail from 'freemail';
-import { parse } from 'psl';
-import AppException from '../exceptions/appException';
+
+import AppException from '@src/exceptions/appException';
 import { HttpStatusCode } from 'axios';
+
+const freemail = require('freemail');
+import { parse } from 'psl';
 
 export const extractCompanySlug = async (email: string): Promise<string | null> => {
   const domain = email.split('@')[1]?.toLowerCase();

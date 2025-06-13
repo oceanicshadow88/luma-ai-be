@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-
+import logger from '@src/utils/logger';
+import { NextFunction, Request, Response } from 'express';
+import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
-import logger from '../utils/logger';
 
 interface FileUploadOptions {
   folderName: string;

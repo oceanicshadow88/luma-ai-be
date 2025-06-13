@@ -1,6 +1,6 @@
-import winston from 'winston';
+import config from '@src/config';
 import path from 'path';
-import config from '../config';
+import winston from 'winston';
 
 export const createLogger = (filename?: string): winston.Logger => {
   const logger = winston.createLogger({

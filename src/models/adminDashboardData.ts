@@ -12,7 +12,7 @@ export interface Quiz {
   status: 'Published' | 'Draft';
 }
 
-export interface adminDashboardData {
+export interface AdminDashboardData {
   roadmaps: Roadmap[];
   quizzes: Quiz[];
 }

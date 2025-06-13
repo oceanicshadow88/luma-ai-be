@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { jwtUtils } from '../lib/jwtUtils';
-import UserModel from '../models/user';
+import { jwtUtils } from '@src/lib/jwtUtils';
+import UserModel from '@src/models/user';
+import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 
 declare global {

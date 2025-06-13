@@ -14,7 +14,8 @@
     },
     "typescript.updateImportsOnFileMove.enabled": "always",
     // Use relative imports in TS
-    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "typescript.tsdk": "node_modules/typescript/lib",
     "workbench.editor.enablePreview": false,
     "editor.foldingImportsByDefault": true,
     "less.format.enable": false,

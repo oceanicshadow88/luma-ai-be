@@ -1,10 +1,10 @@
-import UserModel from '../../models/user';
-import AppException from '../../exceptions/appException';
+import { RoleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { Company } from '@src/models/company';
+import MembershipModel from '@src/models/membership';
+import UserModel from '@src/models/user';
 import { HttpStatusCode } from 'axios';
-import MembershipModel from '../../models/membership';
-import { RoleType } from '../../config';
 import { Types } from 'mongoose';
-import { Company } from '../../models/company';
 
 export interface LoginResult {
   refreshToken?: string;

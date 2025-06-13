@@ -1,6 +1,6 @@
+import config from '@src/config';
+import logger from '@src/utils/logger';
 import mongoose from 'mongoose';
-import config from '../config';
-import logger from '../utils/logger';
 
 export const connectDB = () => {
   // Set a connection timeout

@@ -1,11 +1,11 @@
 // Authentication and authorization
-import { Request, Response } from 'express';
-import { registerService } from '../../services/auth/registerService';
-import { LocaleType } from 'src/config';
-import AppException from '../../exceptions/appException';
-import { extractSubdomain } from '../../lib/extractSubdomain';
-import CompanyModel from '../../models/company';
+import { LocaleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { extractSubdomain } from '@src/lib/extractSubdomain';
+import CompanyModel from '@src/models/company';
+import { registerService } from '@src/services/auth/registerService';
 import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
 
 export interface RegisterUserInput {
   firstname: string;

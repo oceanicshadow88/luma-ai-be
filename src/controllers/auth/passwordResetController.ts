@@ -1,7 +1,7 @@
+import ResetCodeModel from '@src/models/resetCode';
+import UserModel from '@src/models/user';
+import { isValidEmail, isValidPassword } from '@src/utils';
 import { Request, Response } from 'express';
-import { isValidEmail, isValidPassword } from '../../utils';
-import UserModel from '../../models/user';
-import ResetCodeModel from '../../models/resetCode';
 
 /**
  * Combined verify code and reset password

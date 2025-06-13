@@ -1,4 +1,4 @@
-import { RegisterUserInput } from '../controllers/auth/registerController';
+import { RegisterUserInput } from '@src/controllers/auth/registerController';
 
 let pendingUserData: RegisterUserInput | null = null;
 

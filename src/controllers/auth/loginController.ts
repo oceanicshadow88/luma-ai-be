@@ -1,7 +1,7 @@
+import { ROLE, RoleType } from '@src/config';
+import { extractSubdomain } from '@src/lib/extractSubdomain';
+import { LoginResult, loginService } from '@src/services/auth/loginService';
 import { Request, Response } from 'express';
-import { LoginResult, loginService } from '../../services/auth/loginService';
-import { extractSubdomain } from '../../lib/extractSubdomain';
-import { ROLE, RoleType } from '../../config';
 
 async function handleLogin(req: Request, res: Response, allowedRoles: RoleType[]) {
   const { email, password } = req.body;

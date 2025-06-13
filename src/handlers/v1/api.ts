@@ -1,33 +1,28 @@
-import { Router } from 'express';
-import { registerRoutes } from '../../utils/registerRoutes';
-// Controllers
-import { adminRegister } from '../../controllers/auth/registerController';
-import { learnerRegister } from '../../controllers/auth/registerController';
-import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
-import { userLogout } from '../../controllers/auth/logoutController';
-import { resetPassword } from '../../controllers/auth/passwordResetController';
-import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
-import { companyController } from '../../controllers/companyController';
-import { generateInvitation } from '../../controllers/invitationController';
-
-// Middlewares
-import { refreshToken } from '../../middleware/tokenHandler';
-import { validateBody } from '../../middleware/validation/validationMiddleware';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { loginEnterprise, loginLearner } from '@src/controllers/auth/loginController';
+import { userLogout } from '@src/controllers/auth/logoutController';
+import { resetPassword } from '@src/controllers/auth/passwordResetController';
+import { adminRegister } from '@src/controllers/auth/registerController';
+import { learnerRegister } from '@src/controllers/auth/registerController';
+import { requestVerificationCode } from '@src/controllers/auth/verifyCodeController';
+import { companyController } from '@src/controllers/companyController';
+import { adminDashboardController } from '@src/controllers/dashboard/dashboardController';
+import { quizzesController } from '@src/controllers/dashboard/quizzesController';
+import { roadmapsController } from '@src/controllers/dashboard/roadmapsController';
+import { generateInvitation } from '@src/controllers/invitationController';
+import { authGuard } from '@src/middleware/authGuard';
 import {
-  createFileUploader,
   ALLOWED_IMAGE_TYPES,
+  createFileUploader,
   wrapMulterMiddleware,
-} from '../../middleware/fileUploader';
-
-// Validation Schemas
-import authValidationSchema from '../../validations/userAuthValidation';
-import { companyValidationSchema } from '../../validations/companyValidation';
-import { invitationSchema } from '../../validations/invitationValidation';
-import { authGuard } from '../../middleware/authGuard';
-import { quizzesController } from '../../controllers/dashboard/quizzesController';
-import { roadmapsController } from '../../controllers/dashboard/roadmapsController';
-import { adminDashboardController } from '../../controllers/dashboard/dashboardController';
+} from '@src/middleware/fileUploader';
+import { refreshToken } from '@src/middleware/tokenHandler';
+import { validateRegistration as adminRegistrationPreCheck } from '@src/middleware/validation/adminRegistrationPreCheck';
+import { validateBody } from '@src/middleware/validation/validationMiddleware';
+import { registerRoutes } from '@src/utils/registerRoutes';
+import { companyValidationSchema } from '@src/validations/companyValidation';
+import { invitationSchema } from '@src/validations/invitationValidation';
+import authValidationSchema from '@src/validations/userAuthValidation';
+import { Router } from 'express';
 
 const router = Router();
 
@@ -41,7 +36,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/register/learner',
+    path: '/auth/signup/learner',
     middlewares: [validateBody(authValidationSchema.learnerRegister)],
     handler: learnerRegister,
   },

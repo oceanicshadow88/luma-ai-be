@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ObjectSchema } from 'joi';
 
 declare module 'express-serve-static-core' {

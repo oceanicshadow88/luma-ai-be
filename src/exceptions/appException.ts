@@ -1,4 +1,4 @@
-import type { SafePayload } from '../config';
+import type { SafePayload } from '@src/config';
 
 class AppException extends Error {
   statusCode: number;

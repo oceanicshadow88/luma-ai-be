@@ -1,9 +1,9 @@
-import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
-import { config } from '../config';
-import { RoleType, EXPIRES_TIME_CONFIG } from '../config';
-import AppException from '../exceptions/appException';
+import { config } from '@src/config';
+import { EXPIRES_TIME_CONFIG, RoleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import ResetCodeModel from '@src/models/resetCode';
 import { HttpStatusCode } from 'axios';
-import ResetCodeModel from '../models/resetCode';
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
 interface InvitationTokenPayload extends JwtPayload {
   email: string;

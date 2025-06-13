@@ -1,6 +1,6 @@
+import { paginationValidationSchema } from '@src/validations/paginationValidation';
+import authValidationSchema from '@src/validations/userAuthValidation';
 import Joi from 'joi';
-import { paginationValidationSchema } from './paginationValidation';
-import authValidationSchema from './userAuthValidation';
 
 export const userValidateSchema = {
   search: Joi.object({

@@ -1,7 +1,7 @@
-import { Request } from 'express';
-import CompanyModel from '../models/company';
-import AppException from '../exceptions/appException';
+import AppException from '@src/exceptions/appException';
+import CompanyModel from '@src/models/company';
 import { HttpStatusCode } from 'axios';
+import { Request } from 'express';
 
 export async function extractSubdomain(req: Request): Promise<string> {
   const hostname = req.hostname?.toLowerCase();

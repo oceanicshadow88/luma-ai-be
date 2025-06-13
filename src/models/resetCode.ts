@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
-import config from '../config';
+import config from '@src/config';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface ResetCode extends Document {
   email: string;

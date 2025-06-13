@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import { InvitationService } from '@src/services/invitationService';
+import { GenerateInvitationRequest } from '@src/types/invitation';
 import { HttpStatusCode } from 'axios';
-import { InvitationService } from '../services/invitationService';
-import { GenerateInvitationRequest } from '../types/invitation';
+import { Request, Response } from 'express';
 
 /**
  * Generate an invitation link
