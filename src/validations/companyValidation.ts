@@ -8,6 +8,7 @@ import {
 } from '@src/config';
 import Joi from 'joi';
 
+
 // hex color
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
 

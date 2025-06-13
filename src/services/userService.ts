@@ -5,6 +5,8 @@ import UserModel, { User } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 import { LocaleType } from 'src/config';
+import { Company } from '../models/company';
+import MembershipModel from '../models/membership';
 
 export interface UserCreateInput {
   firstname: string;

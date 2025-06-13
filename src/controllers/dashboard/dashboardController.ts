@@ -4,6 +4,7 @@ import { companyUsageService } from '@src/services/companyUsageService';
 import { userService } from '@src/services/userService';
 import { Request, Response } from 'express';
 
+
 export const adminDashboardController = {
   getAdminDashboardData: async (req: Request, res: Response) => {
     if (!req.user?.id) {
