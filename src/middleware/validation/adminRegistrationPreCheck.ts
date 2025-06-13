@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-import AppException from '../../exceptions/appException';
+import { RegisterUserInput } from '@src/controllers/auth/registerController';
+import AppException from '@src/exceptions/appException';
+import CompanyModel from '@src/models/company';
+import UserModel from '@src/models/user';
+import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
+import { getSafePendingUserData, setPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
-import CompanyModel from '../../models/company';
-import UserModel from '../../models/user';
-import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
-import { RegisterUserInput } from '../../controllers/auth/registerController';
+import { NextFunction, Request, Response } from 'express';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email, username } = req.body;

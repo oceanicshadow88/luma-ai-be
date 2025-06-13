@@ -1,10 +1,10 @@
+import AppException from '@src/exceptions/appException';
+import { Company } from '@src/models/company';
+import MembershipModel from '@src/models/membership';
+import UserModel, { User } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
-import UserModel, { User } from '../models/user';
-import AppException from '../exceptions/appException';
 import { Types } from 'mongoose';
 import { LocaleType } from 'src/config';
-import { Company } from '../models/company';
-import MembershipModel from '../models/membership';
 
 export interface UserCreateInput {
   firstname: string;

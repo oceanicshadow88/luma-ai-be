@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { isValidEmail } from '../../utils';
-import ResetCodeModel from '../../models/resetCode';
-import config from '../../config';
-import AppException from '../../exceptions/appException';
+import config from '@src/config';
+import AppException from '@src/exceptions/appException';
+import ResetCodeModel from '@src/models/resetCode';
+import { isValidEmail } from '@src/utils';
 import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
 
 /**
  * Request verification code

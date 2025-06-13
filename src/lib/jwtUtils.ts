@@ -1,7 +1,7 @@
-import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
-import { config } from '../config';
-import AppException from '../exceptions/appException';
+import { config } from '@src/config';
+import AppException from '@src/exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
 export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 

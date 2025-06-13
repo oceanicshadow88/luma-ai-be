@@ -1,10 +1,10 @@
-import ResetCodeModel from '../../models/resetCode';
-import { userService } from '../userService';
-import { membershipService } from '../membershipService';
-import { ROLE } from '../../config';
-import AppException from '../../exceptions/appException';
+import { ROLE } from '@src/config';
+import { RegisterUserInput } from '@src/controllers/auth/registerController';
+import AppException from '@src/exceptions/appException';
+import ResetCodeModel from '@src/models/resetCode';
+import { membershipService } from '@src/services/membershipService';
+import { userService } from '@src/services/userService';
 import { HttpStatusCode } from 'axios';
-import { RegisterUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
 
 // Create user and generate authentication tokens

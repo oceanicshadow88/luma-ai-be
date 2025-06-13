@@ -1,8 +1,8 @@
-import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
-import AppException from '../../exceptions/appException';
-import logger from '../../utils/logger';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import AppException from '@src/exceptions/appException';
+import logger from '@src/utils/logger';
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import multer from 'multer';
 
 const errorHandler: ErrorRequestHandler = (

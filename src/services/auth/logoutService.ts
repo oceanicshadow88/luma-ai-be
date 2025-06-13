@@ -1,4 +1,4 @@
-import UserModel from '../../models/user';
+import UserModel from '@src/models/user';
 
 export const logoutService = {
   logoutUser: async (refreshToken: string) => {

@@ -1,6 +1,6 @@
-import { generateInvitationLink } from '../utils/invitationLink';
-import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
-import { EXPIRES_TIME_CONFIG } from '../config';
+import { EXPIRES_TIME_CONFIG } from '@src/config';
+import { GenerateInvitationRequest, GenerateInvitationResponse } from '@src/types/invitation';
+import { generateInvitationLink } from '@src/utils/invitationLink';
 
 export class InvitationService {
   static async generateInvitation({

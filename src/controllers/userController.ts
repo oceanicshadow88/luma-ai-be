@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import { userService } from '../services/userService';
-import AppException from '../exceptions/appException';
+import AppException from '@src/exceptions/appException';
+import { userService } from '@src/services/userService';
 import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
 
 export const userController = {
   deleteUser: async (req: Request, res: Response) => {

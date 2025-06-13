@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import logger from '@src/utils/logger';
 import dotenv from 'dotenv';
-import logger from '../src/utils/logger';
+import mongoose from 'mongoose';
 
 // Load environment variables
 dotenv.config({ path: '.env.test' });

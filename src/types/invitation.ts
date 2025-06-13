@@ -1,4 +1,4 @@
-import { RoleType } from '../config';
+import { RoleType } from '@src/config';
 
 export interface GenerateInvitationRequest {
   email: string;

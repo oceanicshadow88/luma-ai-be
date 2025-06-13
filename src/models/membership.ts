@@ -1,11 +1,11 @@
-import mongoose, { Document, Schema } from 'mongoose';
 import {
   DEFAULT_MEMBERSHIP_STATUS,
   MEMBERSHIP_STATUS,
   MembershipStatusType,
-  RoleType,
   roleList,
-} from '../config';
+  RoleType,
+} from '@src/config';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface Membership extends Document {
   company: mongoose.Types.ObjectId;

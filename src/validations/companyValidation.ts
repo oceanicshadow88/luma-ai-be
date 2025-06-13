@@ -1,4 +1,3 @@
-import Joi from 'joi';
 import {
   COMPANY_PLAN_LIST,
   DEFAULT_COMPANY_PLAN,
@@ -6,7 +5,8 @@ import {
   DEFAULT_TIMEZONE,
   LOCALE_LIST,
   TIMEZONES,
-} from '../config';
+} from '@src/config';
+import Joi from 'joi';
 
 // hex color
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;

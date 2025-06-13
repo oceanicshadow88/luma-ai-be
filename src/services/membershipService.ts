@@ -1,11 +1,11 @@
-import { Types } from 'mongoose';
-import MembershipModel, { Membership } from '../models/membership';
-import AppException from '../exceptions/appException';
+import { MembershipStatusType, RoleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import CompanyModel from '@src/models/company';
+import MembershipModel, { Membership } from '@src/models/membership';
+import { User } from '@src/models/user';
+import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
 import { HttpStatusCode } from 'axios';
-import { User } from '../models/user';
-import CompanyModel from '../models/company';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
-import { MembershipStatusType, RoleType } from '../config';
+import { Types } from 'mongoose';
 
 export interface MembershipInput {
   company: Types.ObjectId;

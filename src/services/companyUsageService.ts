@@ -1,6 +1,6 @@
-import { ROLE } from '../config';
-import CompanyUsageModel from '../models/companyUsage';
-import { membershipService } from './membershipService';
+import { ROLE } from '@src/config';
+import CompanyUsageModel from '@src/models/companyUsage';
+import { membershipService } from '@src/services/membershipService';
 
 export const companyUsageService = {
   upsertCompanyUsage: async (companyId: string) => {

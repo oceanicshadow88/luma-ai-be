@@ -1,6 +1,6 @@
-import { adminDashboardData } from '../models/adminDashboardData';
+import { AdminDashboardData } from '@src/models/adminDashboardData';
 
-export const mockAdminDashboardData: adminDashboardData = {
+export const mockAdminDashboardData: AdminDashboardData = {
   roadmaps: [
     {
       name: 'IELTS Band 7+ Pathway',

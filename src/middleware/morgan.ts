@@ -1,6 +1,6 @@
+import config from '@src/config';
+import logger from '@src/utils/logger';
 import morgan from 'morgan';
-import config from '../config';
-import logger from '../utils/logger';
 
 export default morgan(config.env === 'development' ? 'dev' : 'combined', {
   stream: {

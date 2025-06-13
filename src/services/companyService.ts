@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
-import CompanyModel, { Company } from '../models/company';
-import AppException from '../exceptions/appException';
+import { CompanyPlanType, LocaleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import CompanyModel, { Company } from '@src/models/company';
+import UserModel from '@src/models/user';
 import { HttpStatusCode } from 'axios';
-import { CompanyPlanType, LocaleType } from '../config';
-import UserModel from '../models/user';
+import mongoose from 'mongoose';
 
 export interface CompanyCreateInput {
   companyName: string;

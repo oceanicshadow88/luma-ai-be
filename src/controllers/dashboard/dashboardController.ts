@@ -1,8 +1,8 @@
+import config from '@src/config';
+import { mockAdminDashboardData } from '@src/mockData/adminDashboardDataMock';
+import { companyUsageService } from '@src/services/companyUsageService';
+import { userService } from '@src/services/userService';
 import { Request, Response } from 'express';
-import { userService } from '../../services/userService';
-import config from '../../config';
-import { mockAdminDashboardData } from '../../mockData/adminDashboardDataMock';
-import { companyUsageService } from '../../services/companyUsageService';
 
 export const adminDashboardController = {
   getAdminDashboardData: async (req: Request, res: Response) => {

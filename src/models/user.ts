@@ -1,10 +1,10 @@
-import mongoose, { Document, Schema, Model, Types } from 'mongoose';
-import bcrypt from 'bcryptjs';
-import MembershipModel from './membership';
-import { jwtUtils } from '../lib/jwtUtils';
-import AppException from '../exceptions/appException';
+import { DEFAULT_LOCALE, LOCALES, LocaleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { jwtUtils } from '@src/lib/jwtUtils';
+import MembershipModel from '@src/models/membership';
 import { HttpStatusCode } from 'axios';
-import { DEFAULT_LOCALE, LOCALES, LocaleType } from '../config';
+import bcrypt from 'bcryptjs';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 export interface User extends Document {
   firstname: string;
