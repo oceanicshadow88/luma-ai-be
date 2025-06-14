@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import Company from '../../models/company';
+import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
+import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
+import { RegisterUserInput } from '../../controllers/auth/registerController';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email, username } = req.body;
@@ -27,24 +29,25 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     });
     return;
   }
-  if (process.env.NODE_ENV === 'local') {
-    const existCompany = await Company.findOne({ slug: 'default-company' });
-    if (!existCompany) {
-      throw new Error('Cannot not find default company');
-    }
-    req.company = existCompany as any;
-    req.companyId = existCompany._id as string;
-  } else {
-    // check company
-    const companySlug = await extractCompanySlug(email);
-    if (!companySlug) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
-    }
-    const existCompany = await Company.findOne({ slug: companySlug });
-    if (!existCompany) {
-      throw new Error('Company does not exits');
-    }
+
+  // check company
+  const companySlug = await extractCompanySlug(email);
+  if (!companySlug) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
   }
+  const existCompany = await CompanyModel.findOne({ slug: companySlug });
+  if (!existCompany) {
+    // company not exist, jump to company register and pass user data
+    const user = req.body as RegisterUserInput;
+    setPendingUserData(user);
+
+    res.status(302).json({
+      message: 'The company does not exist',
+      user: getSafePendingUserData(),
+    });
+    return;
+  }
+
   // company exist, user not exist
   next();
 };
