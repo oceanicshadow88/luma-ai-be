@@ -27,12 +27,12 @@ const baseAuthSchema = Joi.object({
 });
 
 const registerSchema = baseAuthSchema.keys({
-  firstname: Joi.string().required().messages({
-    'string.empty': 'First Name is required',
+  firstName: Joi.string().required().messages({
+    'string.empty': 'First name is required',
   }),
 
-  lastname: Joi.string().required().messages({
-    'string.empty': 'Last Name is required',
+  lastName: Joi.string().required().messages({
+    'string.empty': 'Last name is required',
   }),
   username: Joi.string()
     .required()
@@ -69,7 +69,7 @@ const registerSchema = baseAuthSchema.keys({
       'any.only': `Locale must be either: ${LOCALE_LIST.join(', ')}`,
     }),
 
-  verifyCode: Joi.string().required().messages({
+  verifyValue: Joi.string().required().messages({
     'string.empty': 'Verification code is required',
   }),
 
