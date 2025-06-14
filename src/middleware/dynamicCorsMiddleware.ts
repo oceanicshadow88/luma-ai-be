@@ -17,7 +17,7 @@ export const dynamicCorsMiddleware: RequestHandler = cors({
       (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local') &&
       hostname.endsWith('.lumaai.localhost')
     ) {
-      return callback(null, true);
+      return callback(null, origin);
     }
 
     // In production, only allow tenant subdomains on lumaai.com
@@ -32,7 +32,7 @@ export const dynamicCorsMiddleware: RequestHandler = cors({
         })
         .then(isActive => {
           if (!isActive) throw new AppException(HttpStatusCode.Forbidden, 'Company is inactive');
-          callback(null, true);
+          callback(null, origin);
         })
         .catch(callback);
 
