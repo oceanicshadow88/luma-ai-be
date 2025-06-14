@@ -11,7 +11,7 @@ import UserModel from '../../models/user';
 export const authService = {
   verifyToken: async (token: string) => {
     const payload = jwtUtils.verifyAccessToken(token);
-    const user = await UserModel.findById(payload?.userId);
+    const user = await UserModel.find({ email: payload?.email });
     if (!user) {
       throw new AppException(HttpStatusCode.Forbidden);
     }
