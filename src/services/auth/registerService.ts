@@ -59,7 +59,6 @@ export const registerService = {
   },
 };
 
-// verify code
 export const checkVerificationCode = async (verifyValue: string, email: string) => {
   if (!verifyValue) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
