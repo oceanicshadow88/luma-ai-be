@@ -12,14 +12,17 @@ export const dynamicCorsMiddleware: RequestHandler = cors({
     const url = new URL(origin);
     const hostname = url.hostname;
     // Allow *.lumaai.localhost in development/local environment
-    if (
-      (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local') &&
-      hostname.endsWith('.lumaai.localhost')
-    ) {
-      return callback(null, origin);
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local') {
+      if (hostname === 'lumaai.localhost' || hostname.endsWith('.lumaai.localhost')) {
+        return callback(null, origin);
+      }
     }
 
     // In production, only allow tenant subdomains on lumaai.com
+    if (hostname === 'lumaai.com') {
+      return callback(null, origin);
+    }
+
     if (hostname.endsWith('.lumaai.com')) {
       const slug = hostname.replace(/\.lumaai\.com$/, '');
 
