@@ -25,7 +25,7 @@ export function createFileUploader({ folderName, allowedMimeTypes, maxSizeMB }: 
 
   const storage = multer.diskStorage({
     destination: uploadDir,
-    filename: (req: any, file: any, cb: any) => {
+    filename: (req, file, cb) => {
       const extName = path.extname(file.originalname);
       const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}${extName}`;
       cb(null, uniqueName);
@@ -35,7 +35,7 @@ export function createFileUploader({ folderName, allowedMimeTypes, maxSizeMB }: 
   return multer({
     storage,
     limits: { fileSize: maxSizeMB * 1024 * 1024 },
-    fileFilter: (req: any, file: any, cb: any) => {
+    fileFilter: (req, file, cb) => {
       if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
       } else {

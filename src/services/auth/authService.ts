@@ -1,8 +1,3 @@
-// import { HttpStatusCode } from 'axios';
-// import AppException from '../../exceptions/appException';
-// import { jwtUtils } from '../../lib/jwtUtils';
-// import UserModel from '../../models/user';
-
 import { HttpStatusCode } from 'axios';
 import AppException from '../../exceptions/appException';
 import { jwtUtils } from '../../lib/jwtUtils';

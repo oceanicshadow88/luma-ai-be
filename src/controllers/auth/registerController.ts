@@ -61,11 +61,7 @@ export const adminRegister = async (req: Request, res: Response) => {
 };
 
 export const teacherRegister = async (req: Request, res: Response) => {
-  // Validate Data - Joi validate schema: deal in route with authvalidation middleware
-  // Get params from request body
   const userInput = req.body as RegisterUserInput;
-
-  // create user
   await registerService.teacherRegister(userInput);
 
   res.sendStatus(201);
