@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 import moment from 'moment-timezone';
 
-const env: string = process.env.NODE_ENV ?? 'development';
+process.env.NODE_ENV = process.env.NODE_ENV ?? 'development'; // make sure must have NODE_ENV
+const env = process.env.NODE_ENV;
 dotenv.config({ path: `.env.${env}` });
 
 interface JwtConfig {

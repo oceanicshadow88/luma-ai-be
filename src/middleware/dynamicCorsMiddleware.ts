@@ -11,7 +11,6 @@ export const dynamicCorsMiddleware: RequestHandler = cors({
 
     const url = new URL(origin);
     const hostname = url.hostname;
-
     // Allow *.lumaai.localhost in development/local environment
     if (
       (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local') &&
