@@ -7,6 +7,7 @@ import v1Router from '../src/handlers/v1/api';
 import errorHandler from '../src/middleware/error/errorHandler';
 import { companySeeder } from '../src/database/seeder/companySeeder';
 import { userSeeder } from '../src/database/seeder/userSeeder';
+import { dynamicCorsMiddleware } from '../src/middleware/dynamicCorsMiddleware';
 
 export const catchAllErrors = (
   fn: (req: Request, res: Response, next: NextFunction) => any,
@@ -35,7 +36,6 @@ function wrapRoutes(router: Router): Router {
       }
     }
   }
-
   return router;
 }
 
@@ -56,6 +56,7 @@ function init() {
   app.use(rateLimiter);
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(dynamicCorsMiddleware);
 
   // Routes
   app.use('/api/v1', wrapRoutes(v1Router));
