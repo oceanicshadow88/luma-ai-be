@@ -62,9 +62,10 @@ const errorHandler: ErrorRequestHandler = (
 
   // Custom error handler
   if (err instanceof AppException) {
+    logger.error('Error:', err.message);
     const responseBody: Record<string, unknown> = {
       success: false,
-      message: err.message,
+      message: 'Internal Server Error',
     };
 
     if (err.payload != null) {
