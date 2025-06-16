@@ -74,7 +74,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/request-reset-code',
+    path: '/auth/request-verification-code',
     handler: requestVerificationCode,
   },
   {
@@ -99,7 +99,7 @@ const logoUploader = createFileUploader({
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/company/register',
+    path: '/auth/signup/institution',
     middlewares: [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
