@@ -5,8 +5,8 @@ import { Types } from 'mongoose';
 import { LocaleType } from 'src/config';
 
 export interface UserCreateInput {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   username: string;
   password: string;
   email: string;
@@ -56,5 +56,29 @@ export const userService = {
   deleteUserById: async (userId: string) => {
     const user = await userService.getUserById(userId);
     return await user.deleteOne(); //Trigger pre deleteOne hook, also delete membership
+  },
+
+  getCurrentUserInfo: async (userId: string) => {
+    const user = await userService.getUserById(userId);
+
+    const membership = await MembershipModel.findOne({
+      user: user._id,
+    })
+      .populate<{ company: Company }>('company')
+      .lean();
+    if (!membership?.company) {
+      throw new AppException(HttpStatusCode.NotFound, 'Membership or organisation not found');
+    }
+
+    return {
+      userId: (user._id as Types.ObjectId).toString(),
+      username: user.username,
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      role: membership.role,
+      enterprise: membership.company,
+      avatarUrl: user.avatarUrl,
+      locale: user.locale,
+    };
   },
 };
