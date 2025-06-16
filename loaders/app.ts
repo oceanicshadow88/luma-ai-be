@@ -9,7 +9,7 @@ import { userSeeder } from '../src/database/seeder/userSeeder';
 import { dynamicCorsMiddleware } from '../src/middleware/dynamicCorsMiddleware';
 
 export const catchAllErrors = (
-  fn: (req: Request, res: Response, next: NextFunction) => any,
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown> | void,
 ): RequestHandler => {
   return (req, res, next) => {
     try {

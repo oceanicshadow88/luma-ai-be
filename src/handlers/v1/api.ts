@@ -37,12 +37,6 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/signup/teacher',
-    middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
-    handler: teacherRegister,
-  },
-  {
-    method: 'post',
     path: '/auth/signup/learner',
     middlewares: [validateBody(authValidationSchema.learnerRegister), resolveCompanySlug],
     handler: learnerRegister,
