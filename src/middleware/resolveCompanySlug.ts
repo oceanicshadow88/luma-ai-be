@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlugbyAdminEmail } from '../utils/extractCompanySlugFromAdminEmail';
+import { extractCompanySlug } from '../utils/extractCompanySlugFromAdminEmail';
 import { extractCompanySlugbySubdomain } from '../utils/extractCompanySlugbySubdomain';
 import { HttpStatusCode } from 'axios';
 import AppException from '../exceptions/appException';
@@ -11,7 +11,7 @@ export const resolveCompanySlug = async (req: Request, res: Response, next: Next
   const adminPaths = ['/auth/signup/admin'];
   const isAdminRoute = adminPaths.some(path => req.path.startsWith(path));
   if (isAdminRoute) {
-    slug = await extractCompanySlugbyAdminEmail(email);
+    slug = await extractCompanySlug(email);
   } else {
     slug = await extractCompanySlugbySubdomain(req);
   }

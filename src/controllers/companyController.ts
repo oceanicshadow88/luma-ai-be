@@ -10,7 +10,7 @@ import { clearPendingUserData, getPendingUserData } from '../utils/storagePendin
 import { checkVerificationCode } from '../services/auth/registerService';
 import { RegisterUserInput } from './auth/registerController';
 import UserModel, { User } from '../models/user';
-import { extractCompanySlugbyAdminEmail } from '../utils/extractCompanySlugFromAdminEmail';
+import { extractCompanySlug } from '../utils/extractCompanySlugFromAdminEmail';
 
 export const companyController = {
   createCompany: async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ export const companyController = {
       await checkVerificationCode(pendingUser.verifyValue, pendingUser.email);
     }
     // check company slug
-    const slug = await extractCompanySlugbyAdminEmail(pendingUser.email);
+    const slug = await extractCompanySlug(pendingUser.email);
     if (!slug) {
       throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
     }

@@ -4,7 +4,7 @@ import AppException from '../exceptions/appException';
 import { Types } from 'mongoose';
 import { LocaleType } from 'src/config';
 import { Company } from '../models/company';
-import MembershipModel from '../models/membership';
+import Membership from '../models/membership';
 
 export interface UserCreateInput {
   firstName: string;
@@ -17,18 +17,14 @@ export interface UserCreateInput {
 }
 
 export const userService = {
-  checkUserExist: async (email: string, username: string) => {
-    const userExistWithEmail = await UserModel.findOne({ email });
-    if (userExistWithEmail) {
-      throw new AppException(HttpStatusCode.Conflict, 'Email already exist');
-    }
-    const userExistWithUsername = await UserModel.findOne({ username });
-    if (userExistWithUsername) {
-      throw new AppException(HttpStatusCode.Conflict, 'Username already exist');
-    }
-  },
+  // create users
   createUser: async (userInput: UserCreateInput): Promise<User> => {
-    await userService.checkUserExist(userInput.email, userInput.username);
+    const existingUser = await UserModel.findOne({
+      $or: [{ email: userInput.email }, { username: userInput.username }],
+    });
+    if (existingUser) {
+      throw new AppException(HttpStatusCode.Conflict, 'User email or username already exist');
+    }
 
     const user = new UserModel(userInput);
     await user.hashPassword();
@@ -37,6 +33,7 @@ export const userService = {
     return user;
   },
 
+  // Get user by ID
   getUserById: async (userId: string): Promise<User> => {
     if (!Types.ObjectId.isValid(userId)) {
       throw new AppException(HttpStatusCode.BadRequest, 'Invalid user ID');
@@ -49,6 +46,7 @@ export const userService = {
     return user;
   },
 
+  // Update user
   updateUserById: async (userId: string, updates: Partial<User>): Promise<User> => {
     const user = await userService.getUserById(userId);
     user.set(updates);
@@ -56,6 +54,7 @@ export const userService = {
     return user;
   },
 
+  // Delete user
   deleteUserById: async (userId: string) => {
     const user = await userService.getUserById(userId);
     return await user.deleteOne(); //Trigger pre deleteOne hook, also delete membership
@@ -64,7 +63,7 @@ export const userService = {
   getCurrentUserInfo: async (userId: string) => {
     const user = await userService.getUserById(userId);
 
-    const membership = await MembershipModel.findOne({
+    const membership = await Membership.findOne({
       user: user._id,
     })
       .populate<{ company: Company }>('company')

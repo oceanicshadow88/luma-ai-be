@@ -4,7 +4,7 @@ import { parse } from 'psl';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-export const extractCompanySlugbyAdminEmail = async (email: string): Promise<string | null> => {
+export const extractCompanySlug = async (email: string): Promise<string | null> => {
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email missing');
   }

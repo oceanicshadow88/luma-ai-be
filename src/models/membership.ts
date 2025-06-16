@@ -44,5 +44,5 @@ const membershipSchema = new Schema(
 );
 
 membershipSchema.index({ user: 1, company: 1, role: 1 }, { unique: true });
-
-export default mongoose.model<Membership>('Membership', membershipSchema);
+const Membership = mongoose.model<Membership>('Membership', membershipSchema);
+export default Membership;

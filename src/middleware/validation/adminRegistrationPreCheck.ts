@@ -1,25 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
+import { extractCompanySlug } from '../../utils/extractCompanySlugFromAdminEmail';
+import AppException from '../../exceptions/appException';
+import { HttpStatusCode } from 'axios';
+import CompanyModel from '../../models/company';
+import UserModel from '../../models/user';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
-import { userService } from '../../services/userService';
-import { companyService } from '../../services/companyService';
-import { checkVerificationCode } from '../../services/auth/registerService';
 
-export const adminRegistrationPreCheck = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { email, username, verifyCode } = req.body;
-  if (verifyCode) {
-    await checkVerificationCode(verifyCode, email);
+export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
 
-  // check user with company exist
-  await userService.checkUserExist(email, username);
-
   // check company
-  const existCompany = await companyService.getCompanybyWorkEmail(email);
+  const companySlug = await extractCompanySlug(email);
+  if (!companySlug) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
+  }
+  const existCompany = await CompanyModel.findOne({ slug: companySlug });
   if (!existCompany) {
     // company not exist, jump to company register and pass user data
     const user = req.body as RegisterUserInput;
@@ -32,6 +31,15 @@ export const adminRegistrationPreCheck = async (
     return;
   }
 
+  // check user with company exist
+  const user = await UserModel.findOne({ email });
+  if (user) {
+    // user and company all exist
+    res.status(302).json({
+      message: 'User already exist, please login',
+    });
+    return;
+  }
   // company exist, user not exist
   next();
 };
