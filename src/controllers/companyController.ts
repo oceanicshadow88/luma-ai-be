@@ -19,8 +19,7 @@ export const companyController = {
     if (!companyName) {
       throw new AppException(HttpStatusCode.BadRequest, 'Missing required fields');
     }
-    const logoUrl = req.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
-
+    const logoUrl = req?.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
     // get user from user register
     const pendingUser = getPendingUserData() as RegisterUserInput;
     if (!pendingUser) {
@@ -28,8 +27,8 @@ export const companyController = {
     }
 
     // verify code
-    if (pendingUser.verifyCode) {
-      await checkVerificationCode(pendingUser.verifyCode, pendingUser.email);
+    if (pendingUser.verifyValue) {
+      await checkVerificationCode(pendingUser.verifyValue, pendingUser.email);
     }
     // check company slug
     const slug = await extractCompanySlugbyAdminEmail(pendingUser.email);

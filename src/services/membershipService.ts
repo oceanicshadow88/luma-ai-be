@@ -47,6 +47,8 @@ export const membershipService = {
     if (!slug) {
       throw new AppException(HttpStatusCode.BadRequest, 'Cannot extract company from email');
     }
+    // eslint-disable-next-line local/no-dev-notes
+    //TODO: this is a bug
     const existCompany = await CompanyModel.findOne({ slug });
     if (!existCompany) {
       throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');

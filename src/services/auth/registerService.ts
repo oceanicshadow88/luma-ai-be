@@ -7,6 +7,7 @@ import { HttpStatusCode } from 'axios';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
 import CompanyModel from '../../models/company';
 import { Types } from 'mongoose';
+import UserModel from '../../models/user';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
@@ -19,11 +20,23 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
 };
 
 export const registerService = {
+  teacherRegister: async (userInput: RegisterUserInput) => {
+    const user = await UserModel.findOne({ email: userInput.email });
+    //this need to be change to email
+    if (!user) {
+      throw new Error('Cannot find user');
+    }
+    const updateUser = await UserModel.findOneAndUpdate({ email: userInput.email }, userInput, {
+      new: true,
+    });
+    await updateUser;
+  },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create admin membership
+    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
     await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
     return { refreshToken, accessToken };
   },
@@ -54,9 +67,8 @@ export const registerService = {
   },
 };
 
-// Verify the provided verification code
-export const checkVerificationCode = async (verifyCode: string, email: string) => {
-  if (!verifyCode) {
+export const checkVerificationCode = async (verifyValue: string, email: string) => {
+  if (!verifyValue) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
   }
 
@@ -65,7 +77,7 @@ export const checkVerificationCode = async (verifyCode: string, email: string) =
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
   }
 
-  const { isValid, message } = await resetCode.validateResetCode(verifyCode);
+  const { isValid, message } = await resetCode.validateResetCode(verifyValue);
   if (!isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, message);
   }

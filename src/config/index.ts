@@ -51,7 +51,7 @@ interface Config {
 }
 
 export const config: Config = {
-  env,
+  env: process.env.NODE_ENV ?? 'production',
   port: parseInt(process.env.PORT ?? '8000', 10),
   mongoURI: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/luma-ai',
   jwt: {

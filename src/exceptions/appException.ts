@@ -4,8 +4,8 @@ class AppException extends Error {
   statusCode: number;
   payload?: SafePayload;
 
-  constructor(statusCode: number, message: string, payload?: SafePayload) {
-    super(message);
+  constructor(statusCode: number, message?: string, payload?: SafePayload) {
+    super(message ?? '');
     this.statusCode = statusCode;
     this.payload = payload;
 

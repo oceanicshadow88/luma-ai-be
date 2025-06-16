@@ -1,8 +1,8 @@
 import CompanyModel from '../models/company';
 
 class TenantCorsService {
-  private cache = new Map<string, { result: boolean; timestamp: number }>();
-  private cacheTimeout = 5 * 60 * 1000; // 5 minutes cache expiration
+  private readonly cache = new Map<string, { result: boolean; timestamp: number }>();
+  private readonly cacheTimeout = 5 * 60 * 1000; // 5 minutes cache expiration
 
   private async checkCache(
     slug: string,
