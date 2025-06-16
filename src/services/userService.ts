@@ -3,6 +3,8 @@ import UserModel, { User } from '../models/user';
 import AppException from '../exceptions/appException';
 import { Types } from 'mongoose';
 import { LocaleType } from 'src/config';
+import { Company } from '../models/company';
+import Membership from '../models/membership';
 
 export interface UserCreateInput {
   firstName: string;
@@ -61,7 +63,7 @@ export const userService = {
   getCurrentUserInfo: async (userId: string) => {
     const user = await userService.getUserById(userId);
 
-    const membership = await MembershipModel.findOne({
+    const membership = await Membership.findOne({
       user: user._id,
     })
       .populate<{ company: Company }>('company')
