@@ -45,7 +45,6 @@ interface Config {
   resetCodeRateLimitExpiry: number;
   emailFrom: string;
   smtpConfig: SmtpConfig;
-  DEFAULT_MOCK_COUNT: number;
 }
 
 export const config: Config = {
@@ -84,7 +83,6 @@ export const config: Config = {
       pass: process.env.SMTP_PASS ?? '',
     },
   },
-  DEFAULT_MOCK_COUNT: 666,
 };
 
 // Route api

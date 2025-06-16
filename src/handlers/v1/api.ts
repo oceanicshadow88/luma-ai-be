@@ -27,10 +27,6 @@ import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
 import { verifyAuthToken } from '../../controllers/auth/authController';
 import { invitationSchema } from '../../validations/invitationValidation';
-import { authGuard } from '../../middleware/authGuard';
-import { quizzesController } from '../../controllers/dashboard/quizzesController';
-import { roadmapsController } from '../../controllers/dashboard/roadmapsController';
-import { adminDashboardController } from '../../controllers/dashboard/dashboardController';
 
 const router = Router();
 
@@ -38,7 +34,7 @@ const router = Router();
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/auth/signup/admin',
+    path: '/auth/register/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
   },
@@ -78,7 +74,7 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/request-verification-code',
+    path: '/auth/request-reset-code',
     handler: requestVerificationCode,
   },
   {
@@ -103,7 +99,7 @@ const logoUploader = createFileUploader({
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/auth/signup/institution',
+    path: '/company/register',
     middlewares: [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
@@ -119,28 +115,6 @@ registerRoutes(router, [
     path: '/invitation/generate',
     middlewares: [validateBody(invitationSchema)],
     handler: generateInvitation,
-  },
-]);
-
-// ----------------- DASHBOARD ROUTES -----------------
-registerRoutes(router, [
-  {
-    method: 'get',
-    path: '/dashboard',
-    middlewares: [authGuard],
-    handler: adminDashboardController.getAdminDashboardData,
-  },
-  {
-    method: 'get',
-    path: '/dashboard/quizzes',
-    middlewares: [authGuard],
-    handler: quizzesController,
-  },
-  {
-    method: 'get',
-    path: '/dashboard/roadmaps',
-    middlewares: [authGuard],
-    handler: roadmapsController,
   },
 ]);
 
