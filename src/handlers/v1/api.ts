@@ -15,7 +15,7 @@ import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
 import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
-
+import { saas } from '../../middleware/saasMiddleware';
 import {
   createFileUploader,
   ALLOWED_IMAGE_TYPES,
@@ -40,14 +40,14 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/signup/teacher',
-    middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
+    path: '/auth/signup/instructor',
+    middlewares: [saas, validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
     handler: teacherRegister,
   },
   {
     method: 'post',
-    path: '/auth/register/learner',
-    middlewares: [validateBody(authValidationSchema.learnerRegister)],
+    path: '/auth/signup/learner',
+    middlewares: [saas, validateBody(authValidationSchema.learnerRegister)],
     handler: learnerRegister,
   },
   {
@@ -113,7 +113,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/invitation/generate',
-    middlewares: [validateBody(invitationSchema)],
+    middlewares: [saas, validateBody(invitationSchema)],
     handler: generateInvitation,
   },
 ]);
