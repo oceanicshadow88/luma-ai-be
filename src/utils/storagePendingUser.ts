@@ -8,15 +8,15 @@ export const setPendingUserData = (userData: RegisterUserInput) => {
 
 export const getPendingUserData = () => pendingUserData;
 export const getSafePendingUserData = (): {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   username: string;
   email: string;
 } | null => {
   if (!pendingUserData) return null;
 
-  const { firstName, lastName, username, email } = pendingUserData;
-  return { firstName, lastName, username, email };
+  const { firstname, lastname, username, email } = pendingUserData;
+  return { firstname, lastname, username, email };
 };
 
 export const clearPendingUserData = () => {

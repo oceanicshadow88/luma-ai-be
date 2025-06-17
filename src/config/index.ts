@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 import moment from 'moment-timezone';
 
-dotenv.config();
+const env: string = process.env.NODE_ENV ?? 'development';
+dotenv.config({ path: `.env.${env}` });
 
 interface JwtConfig {
   secret: string;
@@ -49,7 +50,7 @@ interface Config {
 }
 
 export const config: Config = {
-  env: process.env.NODE_ENV ?? 'production',
+  env,
   port: parseInt(process.env.PORT ?? '8000', 10),
   mongoURI: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/luma-ai',
   jwt: {

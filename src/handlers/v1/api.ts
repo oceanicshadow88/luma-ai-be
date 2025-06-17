@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { registerRoutes } from '../../utils/registerRoutes';
 // Controllers
-import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
+import { adminRegister } from '../../controllers/auth/registerController';
 import { learnerRegister } from '../../controllers/auth/registerController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
@@ -14,8 +14,6 @@ import { generateInvitation } from '../../controllers/invitationController';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
-
 import {
   createFileUploader,
   ALLOWED_IMAGE_TYPES,
@@ -25,7 +23,6 @@ import {
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
 import { companyValidationSchema } from '../../validations/companyValidation';
-import { verifyAuthToken } from '../../controllers/auth/authController';
 import { invitationSchema } from '../../validations/invitationValidation';
 import { authGuard } from '../../middleware/authGuard';
 import { quizzesController } from '../../controllers/dashboard/quizzesController';
@@ -41,12 +38,6 @@ registerRoutes(router, [
     path: '/auth/signup/admin',
     middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
     handler: adminRegister,
-  },
-  {
-    method: 'post',
-    path: '/auth/signup/teacher',
-    middlewares: [validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
-    handler: teacherRegister,
   },
   {
     method: 'post',
@@ -85,11 +76,6 @@ registerRoutes(router, [
     method: 'post',
     path: '/auth/reset-password',
     handler: resetPassword,
-  },
-  {
-    method: 'post',
-    path: '/auth/token',
-    handler: verifyAuthToken,
   },
 ]);
 

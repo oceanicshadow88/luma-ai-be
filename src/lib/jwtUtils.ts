@@ -74,7 +74,7 @@ export const jwtUtils = {
   /**
    * Verify access token
    */
-  verifyAccessToken(token: string): TokenPayload | undefined {
+  verifyAccessToken(token: string): TokenPayload {
     const secret: Secret = config.jwt?.secret;
     return jwt.verify(token, secret) as TokenPayload;
   },

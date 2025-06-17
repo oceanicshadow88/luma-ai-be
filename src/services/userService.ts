@@ -7,8 +7,8 @@ import { Company } from '../models/company';
 import MembershipModel from '../models/membership';
 
 export interface UserCreateInput {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   username: string;
   password: string;
   email: string;
@@ -71,7 +71,7 @@ export const userService = {
     return {
       userId: (user._id as Types.ObjectId).toString(),
       username: user.username,
-      name: `${user.firstName} ${user.lastName}`,
+      name: `${user.firstname} ${user.lastname}`,
       email: user.email,
       role: membership.role,
       enterprise: membership.company,
