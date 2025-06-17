@@ -27,7 +27,7 @@ export const loginService = {
   }): Promise<LoginResult> => {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'Invalid credentials.');
+      throw new AppException(HttpStatusCode.NotFound, 'User not exist.');
     }
     if (user.isLocked()) {
       throw new AppException(
@@ -39,21 +39,24 @@ export const loginService = {
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
       await user.incrementLoginAttempts();
-      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid credentials');
+      throw new AppException(HttpStatusCode.Unauthorized, 'Password not match');
     }
     const memberships = await MembershipModel.find({ user: user._id }).populate<{
       company: Pick<Company, 'slug'> & { _id: Types.ObjectId };
     }>('company', 'slug');
     if (!memberships.length) {
-      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid credentials.');
+      throw new AppException(
+        HttpStatusCode.InternalServerError,
+        'Membership or Company not exist.',
+      );
     }
     const matchedMembershipWithSlug = memberships.find(m => m.company.slug === slug);
     if (!matchedMembershipWithSlug) {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid credentials.');
+      throw new AppException(HttpStatusCode.Unauthorized, 'Company slug not match.');
     }
     const role = matchedMembershipWithSlug.role;
     if (!allowedRoles.includes(role)) {
-      throw new AppException(HttpStatusCode.Forbidden, 'Invalid credentials.');
+      throw new AppException(HttpStatusCode.Forbidden, 'User role not match.');
     }
 
     const { refreshToken, accessToken } = await user.generateTokens();

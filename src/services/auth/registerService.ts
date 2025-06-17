@@ -6,6 +6,7 @@ import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
+import CompanyModel from '../../models/company';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
@@ -13,6 +14,11 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
   if (userInput.verifyCode) {
     await checkVerificationCode(userInput.verifyCode, userInput.email);
   }
+
+  if (userInput.password !== userInput.confirmPassword) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Passwords do not match');
+  }
+
   // Create new user
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
@@ -23,23 +29,26 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
 };
 
 export const registerService = {
-  // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
-
-    // Create admin membership
-    await membershipService.createMembershipByUser(newUser, ROLE.ADMIN);
+    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
     return { refreshToken, accessToken };
   },
 
   // Register learner user and create learner membership for specific organization
-  learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
+  learnerRegister: async (userInput: RegisterUserInput, companySlug: string) => {
+    // Get company slug from subdomain
+    const company = await CompanyModel.findOne({ slug: companySlug });
+    if (!company || !company._id) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');
+    }
+
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create learner membership with organization association
     await membershipService.createMembership({
       user: newUser._id as Types.ObjectId,
-      company: new Types.ObjectId(organizationId),
+      company: company._id as Types.ObjectId,
       role: ROLE.LEARNER,
     });
 

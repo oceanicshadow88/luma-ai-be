@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
+import { extractCompanySlugFromEmail } from '../../utils/extractCompanySlugFromEmail';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import CompanyModel from '../../models/company';
@@ -9,8 +9,8 @@ import { RegisterUserInput } from '../../controllers/auth/registerController';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email, username } = req.body;
-  if (!email) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
+  if (!email || !username) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Email or Username is required');
   }
 
   // check user with company exist
@@ -31,7 +31,7 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
   }
 
   // check company
-  const companySlug = await extractCompanySlug(email);
+  const companySlug = await extractCompanySlugFromEmail(email);
   if (!companySlug) {
     throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
   }

@@ -4,7 +4,7 @@ import { parse } from 'psl';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-export const extractCompanySlug = async (email: string): Promise<string | null> => {
+export const extractCompanySlugFromEmail = async (email: string): Promise<string | null> => {
   const domain = email.split('@')[1]?.toLowerCase();
   // email required
   if (!domain) {

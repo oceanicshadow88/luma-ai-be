@@ -4,7 +4,7 @@ import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { User } from '../models/user';
 import CompanyModel from '../models/company';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
+import { extractCompanySlugFromEmail } from '../utils/extractCompanySlugFromEmail';
 import { MembershipStatusType, RoleType } from '../config';
 
 export interface MembershipInput {
@@ -43,7 +43,7 @@ export const membershipService = {
   },
 
   createAdminMembershipByUser: async (user: User, role: RoleType): Promise<Membership> => {
-    const slug = await extractCompanySlug(user.email);
+    const slug = await extractCompanySlugFromEmail(user.email);
     if (!slug) {
       throw new AppException(HttpStatusCode.BadRequest, 'Cannot extract company from email');
     }

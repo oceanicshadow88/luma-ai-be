@@ -3,7 +3,7 @@ import CompanyModel from '../models/company';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 
-export async function extractSubdomain(req: Request): Promise<string> {
+export async function getCompanySlugFromSubdomain(req: Request): Promise<string> {
   const hostname = req.hostname?.toLowerCase();
   if (!hostname) {
     throw new AppException(HttpStatusCode.BadRequest, 'Invalid hostname');

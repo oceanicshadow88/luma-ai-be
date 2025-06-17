@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
+import { extractCompanySlugFromEmail } from '../utils/extractCompanySlugFromEmail';
 import { userService } from '../services/userService';
 import { companyService } from '../services/companyService';
 import { Types } from 'mongoose';
@@ -32,7 +32,7 @@ export const companyController = {
       await checkVerificationCode(pendingUser.verifyCode, pendingUser.email);
     }
     // check company slug
-    const slug = await extractCompanySlug(pendingUser.email);
+    const slug = await extractCompanySlugFromEmail(pendingUser.email);
     if (!slug) {
       throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
     }
