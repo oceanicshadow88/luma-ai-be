@@ -1,7 +1,7 @@
 import ResetCodeModel from '../../models/resetCode';
 import { userService } from '../userService';
 import { membershipService } from '../membershipService';
-import { ROLE, RoleType } from '../../config';
+import { ROLE } from '../../config';
 import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
@@ -11,9 +11,9 @@ import UserModel from '../../models/user';
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
   // Validate verification code if provided
-  if (userInput.verifyValue) {
-    await checkVerificationCode(userInput.verifyValue, userInput.email);
-  }
+  // if (userInput.verifyValue) {
+  //   await checkVerificationCode(userInput.verifyValue, userInput.email);
+  // }
   // Create new user
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
@@ -55,7 +55,6 @@ export const registerService = {
       company: new Types.ObjectId(organizationId),
       role: ROLE.LEARNER,
     });
-
     return { refreshToken, accessToken };
   },
 };
