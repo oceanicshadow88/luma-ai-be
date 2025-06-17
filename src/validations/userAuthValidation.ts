@@ -73,10 +73,6 @@ const registerSchema = baseAuthSchema.keys({
     'string.empty': 'Verification code is required',
   }),
 
-  confirmPassword: Joi.string().required().valid(Joi.ref('password')).messages({
-    'any.only': 'Passwords do not match',
-  }),
-
   termsAccepted: Joi.boolean().valid(true).required().messages({
     'any.only': 'You must agree to the terms to continue',
   }),

@@ -12,10 +12,13 @@ export const generateInvitation = async (
 ): Promise<void> => {
   const { email, role } = req.body;
 
-  const result = await InvitationService.generateInvitation({
-    email,
-    role,
-  });
+  const result = await InvitationService.generateInvitation(
+    {
+      email,
+      role,
+    },
+    req.companyId,
+  );
   res.status(HttpStatusCode.Ok).json({
     success: true,
     message: 'Invitation link generated successfully',
