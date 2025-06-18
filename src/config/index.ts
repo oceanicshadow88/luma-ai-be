@@ -1,8 +1,7 @@
 import dotenv from 'dotenv';
 import moment from 'moment-timezone';
 
-const env: string = process.env.NODE_ENV ?? 'development';
-dotenv.config({ path: `.env.${env}` });
+dotenv.config();
 
 interface JwtConfig {
   secret: string;
@@ -49,7 +48,7 @@ interface Config {
 }
 
 export const config: Config = {
-  env,
+  env: process.env.NODE_ENV ?? 'production',
   port: parseInt(process.env.PORT ?? '8000', 10),
   mongoURI: process.env.MONGODB_URI ?? 'mongodb://localhost:27017/luma-ai',
   jwt: {
@@ -93,6 +92,13 @@ export const ROUTES = {
   REGISTER_USER_ADMIN: ' /v1/auth/register/admin',
 };
 
+// Invitation configuration
+export const EXPIRES_TIME_CONFIG = {
+  EXPIRES_IN_JWT: '24h', // JWT token expiration (for jwt.sign)
+  EXPIRES_IN_HOURS: 24, // Hours for database expiration calculation
+  EXPIRES_IN_DISPLAY: '24 hours', // Display text for API responses
+} as const;
+
 // Mongoose DB type and default value
 // companyPlan
 export const COMPANY_PLANS = {
@@ -118,10 +124,10 @@ export const DEFAULT_TIMEZONE = TIMEZONES[0];
 export const ROLE = {
   ADMIN: 'admin',
   INSTRUCTOR: 'instructor',
-  STUDENT: 'student',
+  LEARNER: 'learner',
 } as const;
 export type RoleType = (typeof ROLE)[keyof typeof ROLE];
-export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'student']
+export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'learner']
 // membership status
 export const MEMBERSHIP_STATUS = {
   ACTIVE: 'active',

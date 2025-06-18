@@ -39,7 +39,9 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
 
     // Verify token signature and expiration
     const payload = jwtUtils.verifyAccessToken(token);
-
+    if (!payload) {
+      throw new Error('Cannot find payload');
+    }
     // Check if user still exists and is active
     const user = await UserModel.findById(payload.userId).select('-password -refreshToken');
 
@@ -91,6 +93,9 @@ export const authGuardLite = (req: Request, res: Response, next: NextFunction): 
 
     const token = authHeader.substring(7);
     const payload = jwtUtils.verifyAccessToken(token);
+    if (!payload) {
+      throw new Error('Cannot find payload');
+    }
 
     req.user = {
       id: payload.userId,

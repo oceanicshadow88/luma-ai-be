@@ -8,8 +8,8 @@ const baseAuthSchema = Joi.object({
     .lowercase()
     .pattern(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
     .messages({
-      'string.pattern.base': 'It is not a valid email address',
-      'string.empty': 'Email is required',
+      'string.pattern.base': 'Sorry, please type a valid email',
+      'string.empty': 'Please enter your email',
     }),
 
   password: Joi.string()
@@ -19,20 +19,20 @@ const baseAuthSchema = Joi.object({
     .trim()
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/)
     .messages({
-      'string.empty': 'Password is required',
-      'string.min': 'Password must be at least 8 characters long',
+      'string.empty': 'Please enter your password',
+      'string.min': 'Please lengthen this text to 8 characters or more',
       'string.pattern.base':
         'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
     }),
 });
 
 const registerSchema = baseAuthSchema.keys({
-  firstname: Joi.string().required().messages({
-    'string.empty': 'First Name is required',
+  firstName: Joi.string().required().messages({
+    'string.empty': 'First name is required',
   }),
 
-  lastname: Joi.string().required().messages({
-    'string.empty': 'Last Name is required',
+  lastName: Joi.string().required().messages({
+    'string.empty': 'Last name is required',
   }),
   username: Joi.string()
     .required()
@@ -69,8 +69,12 @@ const registerSchema = baseAuthSchema.keys({
       'any.only': `Locale must be either: ${LOCALE_LIST.join(', ')}`,
     }),
 
-  verifyCode: Joi.string().required().messages({
+  verifyValue: Joi.string().required().messages({
     'string.empty': 'Verification code is required',
+  }),
+
+  termsAccepted: Joi.boolean().valid(true).required().messages({
+    'any.only': 'You must agree to the terms to continue',
   }),
 
   active: Joi.boolean().default(true).messages({
@@ -86,6 +90,7 @@ const freshTokenSchema = Joi.object({
 
 const authValidationSchema = {
   register: registerSchema,
+  learnerRegister: registerSchema,
   login: baseAuthSchema,
   freshToken: freshTokenSchema,
 };

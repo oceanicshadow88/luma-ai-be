@@ -1,17 +1,23 @@
 import { Request, Response } from 'express';
-import { loginService } from '../../services/auth/loginService';
+import { LoginResult, loginService } from '../../services/auth/loginService';
+import { extractSubdomain } from '../../lib/extractSubdomain';
+import { ROLE, RoleType } from '../../config';
 
-export const login = async (req: Request, res: Response) => {
-  // get data from request body
-  const { email, password }: { email: string; password: string } = req.body;
-  // call user service to do DB operation
-  const { refreshToken, accessToken, membership } = await loginService.login({
+async function handleLogin(req: Request, res: Response, allowedRoles: RoleType[]) {
+  const { email, password } = req.body;
+  const slug = await extractSubdomain(req);
+
+  const loginResult: LoginResult = await loginService.login({
     email,
     password,
+    slug,
+    allowedRoles,
   });
 
-  res.json({
-    success: true,
-    data: { refreshToken, accessToken, membership },
-  });
-};
+  res.json({ success: true, data: loginResult });
+}
+
+export const loginEnterprise = (req: Request, res: Response) =>
+  handleLogin(req, res, [ROLE.ADMIN, ROLE.INSTRUCTOR]);
+
+export const loginLearner = (req: Request, res: Response) => handleLogin(req, res, [ROLE.LEARNER]);

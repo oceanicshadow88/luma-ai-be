@@ -1,25 +1,50 @@
-// authentication, authorization
+// Authentication and authorization
 import { Request, Response } from 'express';
 import { registerService } from '../../services/auth/registerService';
 import { LocaleType } from 'src/config';
+import { ObjectId } from 'mongoose';
+
 export interface RegisterUserInput {
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   username: string;
   password: string;
   email: string;
   avatarUrl?: string;
   locale?: LocaleType;
-  verifyCode?: string;
+  verifyValue: string;
+  _id?: ObjectId;
 }
 
+export const learnerRegister = async (req: Request, res: Response) => {
+  const userInput = req.body as RegisterUserInput;
+  // Create user and membership
+  const { refreshToken, accessToken } = await registerService.learnerRegister(
+    userInput,
+    req.companyId.toString(),
+  );
+  res.status(201).json({
+    message: 'Successfully signed up!',
+    refreshToken,
+    accessToken,
+  });
+};
+
 export const adminRegister = async (req: Request, res: Response) => {
-  // Validate Data - Joi validate schema: deal in route with authValidation middleware
-  // Get params from request body
   const userInput = req.body as RegisterUserInput;
 
-  // create user
-  const { refreshToken, accessToken } = await registerService.userRegister(userInput);
+  const { refreshToken, accessToken } = await registerService.adminRegister(userInput);
 
-  res.status(201).json({ refreshToken, accessToken });
+  res.status(201).json({
+    message: 'Successfully signed up!',
+    refreshToken,
+    accessToken,
+  });
+};
+
+export const teacherRegister = async (req: Request, res: Response) => {
+  const userInput = req.body as RegisterUserInput;
+  await registerService.teacherRegister(userInput);
+
+  res.sendStatus(201);
 };
