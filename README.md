@@ -58,12 +58,12 @@ npm install --global yarn
 yarn install
 ```
 
-3. copy your a `.env.example` file in the root directory with the following variables:
+cp .env.example .env
 
 ```
 PORT=5000
 LOG_LEVEL=info
-NODE_ENV=development
+NODE_ENV=local
 
 RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT=100
@@ -131,21 +131,21 @@ For the best development experience in VS Code, install the ESLint and Prettier 
 ```
 
 ### SonarQube 
-1. Build sonarqube by docker (.env.development edit by own)
+1. Build sonarqube by docker (.env edit by own)
 
   ```bash
   docker-compose up -d 
   ```
 
 2. then visit http://localhost:9000 to configure project,username:admin, password:admin
-3. Configure environment variables in .env.development
-##### .env.development
+3. Configure environment variables in .env
+##### .env
 SONAR_HOST_URL=http://localhost:9000                       # website 
 SONAR_TOKEN=your_token                                     # own generate token
 4. load environment variables
 
 ```bash
-export $(cat .env.development | xargs)
+export $(cat .env | xargs)
 ```
 5. run sonarqube scanner (after login in Sonar web)
 
@@ -184,8 +184,8 @@ sonar.login=admin                                         # login with admin, pa
 ports:                                                     # edit port
       - "9000:9000"
     env_file:                                              # load environment variable
-      - .env.development
-##### .env.development
+      - .env
+##### .env
 SONAR_HOST_URL=http://localhost:9000                       # website 
 SONAR_TOKEN=your_token                                     # own generate token
 
