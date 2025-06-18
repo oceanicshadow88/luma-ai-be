@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/loaders/server.js",
-    "dev": "nodemon --watch src --ext ts --exec ts-node ./loaders/server.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register ./loaders/server.ts",
     "debug": "node --inspect dist/loaders/server.js",
     "lint": "eslint \"{src,loaders,tests}/**/*.ts\" --fix",
     "format": "prettier --write \"{src,tests,loaders}/**/*.ts\"",
