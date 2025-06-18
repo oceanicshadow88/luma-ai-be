@@ -92,6 +92,10 @@ const userSchema: Schema<User> = new Schema(
       enum: LOCALES,
       default: DEFAULT_LOCALE,
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
     refreshToken: {
       type: String,
       required: false,
