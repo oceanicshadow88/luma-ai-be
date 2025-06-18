@@ -95,6 +95,27 @@ module.exports = [
       'no-console': 'error',
       'no-debugger': 'error',
       'local/no-dev-notes': 'error',
+      '@typescript-eslint/naming-convention': [
+        'error',
+        //（type/interface/class）use PascalCase
+        {
+          selector: 'typeLike',
+          format: ['PascalCase'],
+        },
+        {
+          selector: 'interface',
+          format: ['PascalCase'],
+          custom: {
+            regex: '^I[A-Z]',
+            match: false,
+          },
+        },
+        // use camelCase for variable
+        {
+          selector: 'variable',
+          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+        },
+      ],
     },
   },
 ];
