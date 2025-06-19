@@ -1,6 +1,7 @@
 {
     // Format on save
     "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     // Files to validate with ESLint
     "eslint.validate": [
         "javascript",
@@ -10,6 +11,7 @@
     ],
     // Auto fix ESLint errors on save
     "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
         "source.fixAll.eslint": "always"
     },
     "typescript.updateImportsOnFileMove.enabled": "always",
