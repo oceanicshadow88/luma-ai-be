@@ -1,9 +1,10 @@
 import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
-import { RoleType, EXPIRES_TIME_CONFIG } from '../config';
+import { RoleType, ROLE, EXPIRES_TIME_CONFIG } from '../config';
 import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import ResetCodeModel from '../models/resetCode';
+import { extractCompanySlug } from './extractCompanySlugFromEmail';
 
 interface InvitationTokenPayload extends JwtPayload {
   email: string;
@@ -45,7 +46,14 @@ export async function generateInvitationLink(email: string, role: RoleType): Pro
     attempts: 0,
   });
 
-  const signupBaseUrl = 'http://localhost:5173/auth/signup';
+  // currently we fixed the signup URL to localhost for development
+  // In production, this should be replaced with the actual base URL of application
+  let signupBaseUrl = 'http://localhost:5173/auth/signup';
+
+  if (role === ROLE.INSTRUCTOR) {
+    // If the role is INSTRUCTOR, append the teacher path to the signup URL
+    signupBaseUrl = `${signupBaseUrl}/teacher`;
+  }
   return `${signupBaseUrl}?token=${token}`;
 }
 
