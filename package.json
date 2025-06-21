@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "Express.js and TypeScript backend for LUMA AI",
   "main": "dist/server.js",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/loaders/server.js",
-    "dev": "nodemon --watch src --ext ts --exec ts-node ./loaders/server.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register ./loaders/server.ts",
     "debug": "node --inspect dist/loaders/server.js",
     "lint": "eslint \"{src,loaders,tests}/**/*.ts\" --fix",
     "format": "prettier --write \"{src,tests,loaders}/**/*.ts\"",
@@ -91,6 +94,7 @@
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "lint-staged": "^16.1.0",
@@ -98,6 +102,7 @@
     "prettier": "^3.5.3",
     "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
   }
 }

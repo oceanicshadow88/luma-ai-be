@@ -65,6 +65,7 @@ module.exports = [
       '@typescript-eslint': typescriptPlugin,
       prettier: prettierPlugin,
       local: localRulesPlugin,
+      'simple-import-sort': require('eslint-plugin-simple-import-sort'),
     },
     rules: {
       // TypeScript recommended rules
@@ -95,6 +96,29 @@ module.exports = [
       'no-console': 'error',
       'no-debugger': 'error',
       'local/no-dev-notes': 'error',
+      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/exports': 'warn',
+      '@typescript-eslint/naming-convention': [
+        'error',
+        //（type/interface/class）use PascalCase
+        {
+          selector: 'typeLike',
+          format: ['PascalCase'],
+        },
+        {
+          selector: 'interface',
+          format: ['PascalCase'],
+          custom: {
+            regex: '^I[A-Z]',
+            match: false,
+          },
+        },
+        // use camelCase for variable
+        {
+          selector: 'variable',
+          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+        },
+      ],
     },
   },
 ];
