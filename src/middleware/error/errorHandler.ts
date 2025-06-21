@@ -1,9 +1,10 @@
-import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import Joi from 'joi';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import multer from 'multer';
+
 import AppException from '../../exceptions/appException';
 import logger from '../../utils/logger';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import Joi from 'joi';
-import multer from 'multer';
 
 const errorHandler: ErrorRequestHandler = (
   err: Error,
@@ -62,21 +63,20 @@ const errorHandler: ErrorRequestHandler = (
 
   // Custom error handler
   if (err instanceof AppException) {
-    logger.error('Error:', err.message);
-    const responseBody: Record<string, unknown> = {
+    logger.error(`[AppException]: ${err.message}`, {
+      statusCode: err.statusCode,
+      stack: err.stack,
+      ...(err.payload ? { payload: err.payload } : {}),
+    });
+
+    res.status(err.statusCode).json({
       success: false,
       message: 'Internal Server Error',
-    };
-
-    if (err.payload != null) {
-      responseBody.payload = err.payload;
-    }
-
-    res.status(err.statusCode).json(responseBody);
+    });
     return;
   }
 
-  logger.error('[Unhandled Error]', err);
+  logger.error('[Unhandled Error]: ', err);
   res.status(500).json({
     success: false,
     message: 'Unhandled Error',
