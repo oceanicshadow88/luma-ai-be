@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import config from '../../config';
 import AppException from '../../exceptions/appException';
 import ResetCodeModel from '../../models/resetCode';
+import { VerifyCodeType } from '../../types/invitation';
 import { isValidEmail } from '../../utils';
 
 /**
@@ -26,7 +27,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   // Check for existing code
   const existingCode = await ResetCodeModel.findOne({
     email,
-    type: 'verification',
+    verifyType: VerifyCodeType.VERIFICATION,
   }).exec();
   const now = new Date();
 
@@ -68,7 +69,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   await ResetCodeModel.create({
     email,
     code: verificationCode,
-    type: 'verification',
+    verifyType: VerifyCodeType.VERIFICATION,
     expiresAt: expiryTime,
     attempts: 0,
   });
@@ -106,7 +107,7 @@ export const verifyCode = async (req: Request, res: Response) => {
   // Find the code for this email
   const resetCode = await ResetCodeModel.findOne({
     email,
-    type: 'verification',
+    verifyType: VerifyCodeType.VERIFICATION,
   }).exec();
 
   // Check if code exists

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import ResetCodeModel from '../../models/resetCode';
 import UserModel from '../../models/user';
+import { VerifyCodeType } from '../../types/invitation';
 import { isValidEmail, isValidPassword } from '../../utils';
 
 /**
@@ -61,7 +62,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   // Find the reset code for this email
   const resetCode = await ResetCodeModel.findOne({
     email,
-    type: 'password_reset',
+    verifyType: VerifyCodeType.VERIFICATION,
   }).exec();
   // Check if reset code exists
   if (!resetCode) {

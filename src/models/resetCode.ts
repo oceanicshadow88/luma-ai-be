@@ -1,11 +1,12 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 import config from '../config';
+import { VerifyCodeType } from '../types/invitation';
 
 export interface ResetCode extends Document {
   email: string;
   code: string;
-  type: 'verification' | 'invitation' | 'password_reset'; // Add type field to distinguish different code types
+  verifyType: VerifyCodeType; // Use enum instead of union type
   expiresAt: Date;
   attempts: number;
   validateResetCode(code: string): Promise<{
@@ -27,11 +28,11 @@ const resetCodeSchema: Schema<ResetCode> = new Schema(
       type: String,
       required: true,
     },
-    type: {
+    verifyType: {
       type: String,
       required: true,
-      enum: ['verification', 'invitation', 'password_reset'],
-      default: 'verification',
+      enum: Object.values(VerifyCodeType),
+      default: VerifyCodeType.VERIFICATION,
     },
     expiresAt: {
       type: Date,
