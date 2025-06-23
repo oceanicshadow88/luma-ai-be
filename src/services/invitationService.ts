@@ -21,6 +21,7 @@ export class InvitationService {
   static async generateInvitation(
     { email, role }: GenerateInvitationRequest,
     companyId: string,
+    frontendBaseUrl?: string | null,
   ): Promise<GenerateInvitationResponse> {
     const newUsername = await generateRandomUsername();
     const { newUser } = await createUserAndTokens({
@@ -37,7 +38,7 @@ export class InvitationService {
       role: ROLE.INSTRUCTOR,
       status: MEMBERSHIP_STATUS.INVITED,
     });
-    const invitationLink = await generateInvitationLink(email, role);
+    const invitationLink = await generateInvitationLink(email, role, frontendBaseUrl || undefined);
 
     return {
       invitationLink,

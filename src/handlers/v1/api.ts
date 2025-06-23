@@ -114,7 +114,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/invitation/generate',
-    middlewares: [saas, validateBody(invitationSchema)],
+    middlewares: [validateBody(invitationSchema)],
     handler: generateInvitation,
   },
 ]);
