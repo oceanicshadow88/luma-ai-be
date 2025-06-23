@@ -1,12 +1,13 @@
-import ResetCodeModel from '../../models/resetCode';
-import { userService } from '../userService';
-import { membershipService } from '../membershipService';
-import { ROLE } from '../../config';
-import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { RegisterUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
+
+import { ROLE } from '../../config';
+import { RegisterUserInput } from '../../controllers/auth/registerController';
+import AppException from '../../exceptions/appException';
+import ResetCodeModel from '../../models/resetCode';
 import UserModel from '../../models/user';
+import { membershipService } from '../membershipService';
+import { userService } from '../userService';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput) => {
@@ -63,8 +64,10 @@ export const checkVerificationCode = async (verifyValue: string, email: string) 
   if (!verifyValue) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
   }
-
-  const resetCode = await ResetCodeModel.findOne({ email });
+  const resetCode = await ResetCodeModel.findOne({
+    email,
+    type: 'verification',
+  });
   if (!resetCode) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
   }

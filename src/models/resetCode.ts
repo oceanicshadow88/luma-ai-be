@@ -1,9 +1,11 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
+
 import config from '../config';
 
 export interface ResetCode extends Document {
   email: string;
   code: string;
+  type: 'verification' | 'invitation' | 'password_reset'; // Add type field to distinguish different code types
   expiresAt: Date;
   attempts: number;
   validateResetCode(code: string): Promise<{
@@ -24,6 +26,12 @@ const resetCodeSchema: Schema<ResetCode> = new Schema(
     code: {
       type: String,
       required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ['verification', 'invitation', 'password_reset'],
+      default: 'verification',
     },
     expiresAt: {
       type: Date,

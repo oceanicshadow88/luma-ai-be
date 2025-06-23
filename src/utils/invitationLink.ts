@@ -38,16 +38,21 @@ export async function generateInvitationLink(
 
   const token = jwt.sign(payload, secret, options);
 
-  // Store the token in the database (similar to reset code)  // Remove any existing invitation tokens for this email
-  await ResetCodeModel.deleteMany({ email, code: { $regex: '^invitation_' } });
+  // Store the token in the database (similar to reset code)
+  // Remove any existing invitation tokens for this email
+  await ResetCodeModel.deleteMany({
+    email,
+    type: 'invitation',
+  });
 
-  // Store the new invitation token with prefix to distinguish from reset codes
+  // Store the new invitation token with type to distinguish from other code types
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + EXPIRES_TIME_CONFIG.EXPIRES_IN_HOURS); // 24 hours from now
 
   await ResetCodeModel.create({
     email,
-    code: `invitation_${token}`, // Prefix to distinguish from reset codes
+    code: token, // Store the raw token instead of prefixed version
+    type: 'invitation',
     expiresAt,
     attempts: 0,
   });
@@ -84,11 +89,11 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
       'Invalid token purpose. This is not an invitation token.',
     );
   }
-
   // Check if token exists in database
   const invitationRecord = await ResetCodeModel.findOne({
     email: decoded.email,
-    code: `invitation_${token}`,
+    code: token,
+    type: 'invitation',
   });
 
   if (!invitationRecord) {
@@ -97,9 +102,8 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
       'Invitation token not found or has been used.',
     );
   }
-
   // Use the existing validateResetCode method to check expiration and attempts
-  const validation = await invitationRecord.validateResetCode(`invitation_${token}`);
+  const validation = await invitationRecord.validateResetCode(token);
 
   if (!validation.isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, validation.message);
