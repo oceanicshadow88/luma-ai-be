@@ -1,32 +1,33 @@
 import { Router } from 'express';
-import { registerRoutes } from '../../utils/registerRoutes';
-// Controllers
-import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
-import { learnerRegister } from '../../controllers/auth/registerController';
+
+import { verifyAuthToken } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
+// Controllers
+import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
+import { learnerRegister } from '../../controllers/auth/registerController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { companyController } from '../../controllers/companyController';
+import { dashboardController } from '../../controllers/dashboardController';
 import { generateInvitation } from '../../controllers/invitationController';
-
-// Middlewares
-import { refreshToken } from '../../middleware/tokenHandler';
-import { validateBody } from '../../middleware/validation/validationMiddleware';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
-import { saas } from '../../middleware/saasMiddleware';
+import { authGuard } from '../../middleware/authGuard';
 import {
-  createFileUploader,
   ALLOWED_IMAGE_TYPES,
+  createFileUploader,
   wrapMulterMiddleware,
 } from '../../middleware/fileUploader';
-
+import { saas } from '../../middleware/saasMiddleware';
+// Middlewares
+import { refreshToken } from '../../middleware/tokenHandler';
+import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
+import { validateBody } from '../../middleware/validation/validationMiddleware';
+import { registerRoutes } from '../../utils/registerRoutes';
+import { companyValidationSchema } from '../../validations/companyValidation';
+import { invitationSchema } from '../../validations/invitationValidation';
 // Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
-import { companyValidationSchema } from '../../validations/companyValidation';
-import { verifyAuthToken } from '../../controllers/auth/authController';
-import { invitationSchema } from '../../validations/invitationValidation';
 
 const router = Router();
 
@@ -115,6 +116,16 @@ registerRoutes(router, [
     path: '/invitation/generate',
     middlewares: [saas, validateBody(invitationSchema)],
     handler: generateInvitation,
+  },
+]);
+
+// ----------------- DASHBOARD ROUTES -----------------
+registerRoutes(router, [
+  {
+    method: 'get',
+    path: '/dashboard',
+    middlewares: [saas, authGuard],
+    handler: dashboardController.getAdminDashboard,
   },
 ]);
 
