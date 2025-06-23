@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-
-import { adminDashboardDataMock, DEFAULT_MOCK_COUNT } from '../mockData/adminDashboardDataMock';
 import { companyUsageService } from '../services/companyUsageService';
 
+const DEFAULT_MOCK_COUNT = 666;
 export const dashboardController = {
   getAdminDashboardData: async (req: Request, res: Response) => {
     if (!req.user?.id) {
@@ -18,7 +17,6 @@ export const dashboardController = {
       currentUserInfo: '',
       totalLearners: companyUsage?.currentLearners ?? DEFAULT_MOCK_COUNT,
       totalInstructors: companyUsage?.currentInstructors ?? DEFAULT_MOCK_COUNT,
-      adminDashboardDataMock,
     };
 
     res.status(200).json({ success: true, data: dashboardData });
