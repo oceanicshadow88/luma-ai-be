@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 
 import { InvitationService } from '../services/invitationService';
 import { GenerateInvitationRequest } from '../types/invitation';
+import { extractFrontendBaseUrl } from '../utils/invitationLink';
 
 /**
  * Generate an invitation link
@@ -12,6 +13,9 @@ export const generateInvitation = async (
   res: Response,
 ): Promise<void> => {
   const { email, role } = req.body;
+
+  // Extract frontend base URL from request headers
+  const frontendBaseUrl = extractFrontendBaseUrl(req);
 
   const result = await InvitationService.generateInvitation(
     {
