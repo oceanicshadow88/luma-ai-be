@@ -10,7 +10,7 @@ export const companyUsageService = {
     ]);
 
     const updatedUsage = await CompanyUsageModel.findOneAndUpdate(
-      { companyId },
+      { company: companyId },
       {
         $set: {
           currentLearners: learnerCount,
