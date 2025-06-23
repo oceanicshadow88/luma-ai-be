@@ -12,7 +12,6 @@ export const adminDashboardController = {
       return res.status(401).json({ success: false, message: 'Missing company' });
     }
 
-    // const companyId = currentUserInfo?.enterprise.id;
     const companyUsage = await companyUsageService.upsertCompanyUsage(req.companyId);
 
     const dashboardData = {
