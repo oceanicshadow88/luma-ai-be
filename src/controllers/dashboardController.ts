@@ -1,14 +1,24 @@
 import { Request, Response } from 'express';
+import { companyUsageService } from '../services/companyUsageService';
 
+const DEFAULT_MOCK_COUNT = 666;
 export const dashboardController = {
-  getAdminDashboard: async (req: Request, res: Response) => {
+  getAdminDashboardData: async (req: Request, res: Response) => {
     if (!req.user?.id) {
-      return res.status(401).json({ success: false, message: 'Unauthorized User' });
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     if (!req.companyId) {
       return res.status(401).json({ success: false, message: 'Missing company' });
     }
 
-    res.status(200).json({ success: true, data: ' Dashboard' });
+    const companyUsage = await companyUsageService.upsertCompanyUsage(req.companyId);
+
+    const dashboardData = {
+      currentUserInfo: '',
+      totalLearners: companyUsage?.currentLearners ?? DEFAULT_MOCK_COUNT,
+      totalInstructors: companyUsage?.currentInstructors ?? DEFAULT_MOCK_COUNT,
+    };
+
+    res.status(200).json({ success: true, data: dashboardData });
   },
 };
