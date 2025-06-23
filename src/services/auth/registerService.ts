@@ -6,6 +6,7 @@ import { RegisterUserInput } from '../../controllers/auth/registerController';
 import AppException from '../../exceptions/appException';
 import ResetCodeModel from '../../models/resetCode';
 import UserModel from '../../models/user';
+import { VerifyCodeType } from '../../types/invitation';
 import { membershipService } from '../membershipService';
 import { userService } from '../userService';
 
@@ -66,7 +67,7 @@ export const checkVerificationCode = async (verifyValue: string, email: string) 
   }
   const resetCode = await ResetCodeModel.findOne({
     email,
-    type: 'verification',
+    verifyType: VerifyCodeType.VERIFICATION,
   });
   if (!resetCode) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
