@@ -6,6 +6,7 @@ import { EXPIRES_TIME_CONFIG, ROLE, RoleType } from '../config';
 import { config } from '../config';
 import AppException from '../exceptions/appException';
 import ResetCodeModel from '../models/resetCode';
+import { VerifyCodeType } from '../types/invitation';
 
 interface InvitationTokenPayload extends JwtPayload {
   email: string;
@@ -37,12 +38,11 @@ export async function generateInvitationLink(
   };
 
   const token = jwt.sign(payload, secret, options);
-
   // Store the token in the database (similar to reset code)
   // Remove any existing invitation tokens for this email
   await ResetCodeModel.deleteMany({
     email,
-    type: 'invitation',
+    verifyType: VerifyCodeType.INVITATION,
   });
 
   // Store the new invitation token with type to distinguish from other code types
@@ -52,7 +52,7 @@ export async function generateInvitationLink(
   await ResetCodeModel.create({
     email,
     code: token, // Store the raw token instead of prefixed version
-    type: 'invitation',
+    verifyType: VerifyCodeType.INVITATION,
     expiresAt,
     attempts: 0,
   });
@@ -93,7 +93,7 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
   const invitationRecord = await ResetCodeModel.findOne({
     email: decoded.email,
     code: token,
-    type: 'invitation',
+    verifyType: VerifyCodeType.INVITATION,
   });
 
   if (!invitationRecord) {
