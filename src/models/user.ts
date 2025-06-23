@@ -1,10 +1,11 @@
-import mongoose, { Document, Schema, Model, Types } from 'mongoose';
-import bcrypt from 'bcryptjs';
-import MembershipModel from './membership';
-import { jwtUtils } from '../lib/jwtUtils';
-import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import bcrypt from 'bcryptjs';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
+
 import { DEFAULT_LOCALE, LOCALES, LocaleType } from '../config';
+import AppException from '../exceptions/appException';
+import { jwtUtils } from '../lib/jwtUtils';
+import MembershipModel from './membership';
 
 export interface User extends Document {
   firstName: string;
@@ -150,8 +151,8 @@ userSchema.methods.generateTokens = async function (
   this: User,
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const userId = (this._id as Types.ObjectId).toString();
-  const accessToken = jwtUtils.generateAccessToken({ user: userId });
-  const refreshToken = jwtUtils.generateRefreshToken({ user: userId });
+  const accessToken = jwtUtils.generateAccessToken({ userId });
+  const refreshToken = jwtUtils.generateRefreshToken({ userId });
 
   return { accessToken, refreshToken };
 };
@@ -167,10 +168,10 @@ userSchema.statics.refreshAuthToken = async function (
   }
 
   const newAccessToken = jwtUtils.generateAccessToken({
-    user: (user._id as Types.ObjectId).toString(),
+    userId: (user._id as Types.ObjectId).toString(),
   });
   const newRefreshToken = jwtUtils.generateRefreshToken({
-    user: (user._id as Types.ObjectId).toString(),
+    userId: (user._id as Types.ObjectId).toString(),
   });
 
   user.refreshToken = newRefreshToken;

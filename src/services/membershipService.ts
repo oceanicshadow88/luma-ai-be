@@ -1,11 +1,12 @@
-import { Types } from 'mongoose';
-import MembershipModel, { Membership } from '../models/membership';
-import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { User } from '../models/user';
-import CompanyModel from '../models/company';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
+import { Types } from 'mongoose';
 import { MembershipStatusType, RoleType } from 'src/config';
+
+import AppException from '../exceptions/appException';
+import CompanyModel from '../models/company';
+import MembershipModel, { Membership } from '../models/membership';
+import { User } from '../models/user';
+import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
 
 export interface MembershipInput {
   company: Types.ObjectId;
@@ -55,6 +56,13 @@ export const membershipService = {
     return membershipService.createMembership({
       user: user._id as Types.ObjectId,
       company: existCompany._id as Types.ObjectId,
+      role,
+    });
+  },
+
+  countRolesInCompany: async (companyId: string, role: RoleType) => {
+    return MembershipModel.countDocuments({
+      company: companyId,
       role,
     });
   },
