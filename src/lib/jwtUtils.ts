@@ -1,12 +1,13 @@
-import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
+import { HttpStatusCode } from 'axios';
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
+
 import { config } from '../config';
 import AppException from '../exceptions/appException';
-import { HttpStatusCode } from 'axios';
 
 export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 
 interface TokenPayload extends JwtPayload {
-  user: string;
+  userId: string;
   name?: string;
   email?: string;
   role?: string;
