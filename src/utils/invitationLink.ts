@@ -18,13 +18,13 @@ interface InvitationTokenPayload extends JwtPayload {
  * Generate an invitation link with JWT token and store in database
  * @param email - The email address of the invitee
  * @param role - The role to be assigned (INSTRUCTOR or LEARNER)
- * @param frontendBaseUrl - Optional frontend base URL, defaults to extracting from request headers
+ * @param frontendBaseUrl - Frontend base URL for generating the invitation link
  * @returns A complete signup URL with the invitation token
  */
 export async function generateInvitationLink(
   email: string,
   role: RoleType,
-  frontendBaseUrl?: string,
+  frontendBaseUrl: string,
 ): Promise<string> {
   const secret: Secret = config.jwt?.secret;
   const payload: InvitationTokenPayload = {
@@ -48,7 +48,6 @@ export async function generateInvitationLink(
   // Store the new invitation token with type to distinguish from other code types
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + EXPIRES_TIME_CONFIG.EXPIRES_IN_HOURS); // 24 hours from now
-
   await ResetCodeModel.create({
     email,
     code: token, // Store the raw token instead of prefixed version
@@ -56,9 +55,9 @@ export async function generateInvitationLink(
     expiresAt,
     attempts: 0,
   });
-  // Use provided frontend base URL or default to localhost for development
-  // In production, frontendBaseUrl should be passed from the request headers or config
-  let signupBaseUrl = frontendBaseUrl || 'http://localhost:5173';
+
+  // Use provided frontend base URL
+  let signupBaseUrl = frontendBaseUrl;
 
   // Ensure the URL ends with /auth/signup
   if (!signupBaseUrl.includes('/auth/signup')) {

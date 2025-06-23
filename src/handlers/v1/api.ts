@@ -12,6 +12,7 @@ import { companyController } from '../../controllers/companyController';
 import { dashboardController } from '../../controllers/dashboardController';
 import { generateInvitation } from '../../controllers/invitationController';
 import { authGuard } from '../../middleware/authGuard';
+import { extractFrontendUrl } from '../../middleware/extractFrontendUrl';
 import {
   ALLOWED_IMAGE_TYPES,
   createFileUploader,
@@ -114,7 +115,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/invitation/generate',
-    middlewares: [validateBody(invitationSchema)],
+    middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
     handler: generateInvitation,
   },
 ]);
