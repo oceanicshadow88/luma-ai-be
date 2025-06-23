@@ -6,7 +6,10 @@ import { RegisterUserInput } from '../../controllers/auth/registerController';
 import AppException from '../../exceptions/appException';
 import ResetCodeModel from '../../models/resetCode';
 import UserModel from '../../models/user';
+<<<<<<< HEAD
 import { VerifyCodeType } from '../../types/invitation';
+=======
+>>>>>>> 2fde4d7 (fix: luma7 solve conflict save for vertify code and invatation link)
 import { membershipService } from '../membershipService';
 import { userService } from '../userService';
 
