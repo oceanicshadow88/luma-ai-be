@@ -79,7 +79,7 @@ export const userService = {
       name: `${membership.user.firstName} ${membership.user.lastName}`,
       email: membership.user.email,
       role: membership.role,
-      enterprise: membership.company,
+      company: membership.company,
       avatarUrl: membership.user.avatarUrl,
       locale: membership.user.locale,
     };

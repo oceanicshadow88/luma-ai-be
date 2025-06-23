@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { userService } from '../services/userService';
 
-export const adminDashboardController = {
+export const dashboardController = {
   getAdminDashboardData: async (req: Request, res: Response) => {
     if (!req.user?.id) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
