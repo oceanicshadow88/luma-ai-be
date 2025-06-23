@@ -11,7 +11,10 @@ import { requestVerificationCode } from '../../controllers/auth/verifyCodeContro
 import { companyController } from '../../controllers/companyController';
 import { dashboardController } from '../../controllers/dashboardController';
 import { generateInvitation } from '../../controllers/invitationController';
+<<<<<<< HEAD
 import { authGuard } from '../../middleware/authGuard';
+=======
+>>>>>>> 12a2cfe (fix： LUM- solve review problems)
 import { extractFrontendUrl } from '../../middleware/extractFrontendUrl';
 import {
   ALLOWED_IMAGE_TYPES,
