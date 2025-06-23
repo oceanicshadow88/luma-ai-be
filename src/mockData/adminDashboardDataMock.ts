@@ -1,75 +1,47 @@
+import { faker } from '@faker-js/faker';
+
+type Roadmap = {
+  name: string;
+  createdDate: string;
+  createdBy: string;
+  status: 'Published' | 'Draft';
+};
+
+type Quiz = {
+  title: string;
+  createdDate: string;
+  assignedTo: string;
+  status: 'Published' | 'Draft';
+};
+
+const getRandomStatus = (): 'Published' | 'Draft' =>
+  faker.helpers.arrayElement(['Published', 'Draft']);
+
+const generateFakeRoadmaps = (count = 5): Roadmap[] => {
+  return Array.from({ length: count }, () => ({
+    name: faker.company.catchPhrase() ?? 'Untitled Roadmap',
+    createdDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0]!,
+    createdBy: `${faker.number.int({ min: 10, max: 50 })} learners`,
+    status: getRandomStatus(),
+  }));
+};
+
+const generateFakeQuizzes = (count = 5): Quiz[] => {
+  return Array.from({ length: count }, () => ({
+    title: `${faker.commerce.department()} ${faker.word.adjective()} Quiz`,
+    createdDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0]!,
+    assignedTo: `${faker.number.int({ min: 15, max: 60 })} learners`,
+    status: getRandomStatus(),
+  }));
+};
+
 export const DEFAULT_MOCK_COUNT = 666;
+const fakeRoadmaps = generateFakeRoadmaps(12);
+const fakeQuizzes = generateFakeQuizzes(16);
+
 export const adminDashboardDataMock = {
   roadmapsCreated: DEFAULT_MOCK_COUNT,
   quizzesCreated: DEFAULT_MOCK_COUNT,
-  roadmaps: [
-    {
-      name: 'IELTS Band 7+ Pathway',
-      createdDate: '2025-04-24',
-      createdBy: '24 learners',
-      status: 'Published',
-    },
-    {
-      name: 'Advanced JavaScript Concepts',
-      createdDate: '2025-04-22',
-      createdBy: '45 learners',
-      status: 'Draft',
-    },
-    {
-      name: 'Data Science Fundamentals',
-      createdDate: '2025-04-20',
-      createdBy: '15 learners',
-      status: 'Published',
-    },
-    {
-      name: 'UI/UX Design Principles',
-      createdDate: '2025-04-18',
-      createdBy: '50 learners',
-      status: 'Published',
-    },
-    {
-      name: 'Introduction to Cloud Computing',
-      createdDate: '2025-04-15',
-      createdBy: '22 learners',
-      status: 'Draft',
-    },
-  ],
-  quizzes: [
-    {
-      title: 'Reading Diagnostic Test',
-      createdDate: '2026-04-26',
-      assignedTo: '45 learners',
-      status: 'Published',
-    },
-    {
-      title: 'JavaScript Basics Assessment',
-      createdDate: '2025-04-25',
-      assignedTo: '30 learners',
-      status: 'Draft',
-    },
-    {
-      title: 'History Midterm Exam',
-      createdDate: '2025-04-24',
-      assignedTo: '60 learners',
-      status: 'Published',
-    },
-    {
-      title: 'Python Syntax Challenge',
-      createdDate: '2025-04-23',
-      assignedTo: '22 learners',
-      status: 'Published',
-    },
-    {
-      title: 'UX Principles Pop Quiz',
-      createdDate: '2025-04-22',
-      assignedTo: '15 learners',
-      status: 'Draft',
-    },
-    {
-      title: 'Calculus I Final',
-      createdDate: '2025-04-17',
-      assignedTo: '60 learners',
-      status: 'Published',
-    },
-  ],
+  roadmaps: fakeRoadmaps,
+  quizzes: fakeQuizzes,
 };
