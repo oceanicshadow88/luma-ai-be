@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-
 import { adminDashboardDataMock, DEFAULT_MOCK_COUNT } from '../mockData/adminDashboardDataMock';
 import { companyUsageService } from '../services/companyUsageService';
+import { userService } from '../services/userService';
 
 export const dashboardController = {
   getAdminDashboard: async (req: Request, res: Response) => {
@@ -13,9 +13,12 @@ export const dashboardController = {
     }
 
     const companyUsage = await companyUsageService.upsertCompanyUsage(req.companyId);
+    
+    const currentUserInfo = await userService.getCurrentUserInfo(req.user.id, req.companyId);
 
+    //TODO: mock data for dashboard display
     const dashboardData = {
-      currentUserInfo: '',
+      currentUserInfo,
       totalLearners: companyUsage?.currentLearners ?? DEFAULT_MOCK_COUNT,
       totalInstructors: companyUsage?.currentInstructors ?? DEFAULT_MOCK_COUNT,
       adminDashboardDataMock,

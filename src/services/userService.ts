@@ -1,10 +1,11 @@
 import { HttpStatusCode } from 'axios';
-import UserModel, { User } from '../models/user';
-import AppException from '../exceptions/appException';
 import { Types } from 'mongoose';
 import { LocaleType } from 'src/config';
+
+import AppException from '../exceptions/appException';
 import { Company } from '../models/company';
 import Membership from '../models/membership';
+import UserModel, { User } from '../models/user';
 
 export interface UserCreateInput {
   firstName: string;
@@ -60,27 +61,27 @@ export const userService = {
     return await user.deleteOne(); //Trigger pre deleteOne hook, also delete membership
   },
 
-  getCurrentUserInfo: async (userId: string) => {
-    const user = await userService.getUserById(userId);
-
+  getCurrentUserInfo: async (userId: string, companyId: string) => {
     const membership = await Membership.findOne({
-      user: user._id,
+      user: userId,
+      company: companyId,
     })
-      .populate<{ company: Company }>('company')
+      .populate<{ company: Company; user: User }>('company user')
       .lean();
-    if (!membership?.company) {
-      throw new AppException(HttpStatusCode.NotFound, 'Membership or organisation not found');
+
+    if (!membership?.company || !membership?.user) {
+      throw new AppException(HttpStatusCode.NotFound, 'Invalid Membership');
     }
 
     return {
-      userId: (user._id as Types.ObjectId).toString(),
-      username: user.username,
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.email,
+      userId: (membership.user._id as Types.ObjectId).toString(),
+      username: membership.user.username,
+      name: `${membership.user.firstName} ${membership.user.lastName}`,
+      email: membership.user.email,
       role: membership.role,
-      enterprise: membership.company,
-      avatarUrl: user.avatarUrl,
-      locale: user.locale,
+      company: membership.company,
+      avatarUrl: membership.user.avatarUrl,
+      locale: membership.user.locale,
     };
   },
 };
