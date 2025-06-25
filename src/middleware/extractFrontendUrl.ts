@@ -1,46 +1,37 @@
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
-// @ts-ignore
-import freemail from 'freemail';
-import { parse } from 'psl';
 
 import AppException from '../exceptions/appException';
-import { extractFrontendBaseUrl } from '../utils/invitationLink';
 
 /**
- * Extract company slug from email domain
- * @param email - The email address to extract company slug from
- * @returns Company slug or null if extraction fails
- * @throws AppException if email is invalid or uses public email provider
+ * Extract frontend base URL from request headers
+ * @param req - Express request object
+ * @returns Frontend base URL or null if not found
  */
-export const extractCompanySlug = async (email: string): Promise<string | null> => {
-  const domain = email.split('@')[1]?.toLowerCase();
-  // email required
-  if (!domain) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
+function extractFrontendBaseUrl(req: Request): string | null {
+  // Try to get from Origin header (for CORS requests)
+  if (req.headers.origin) {
+    return req.headers.origin;
   }
-
-  // block public email
-  if (freemail.isFree(email)) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Public email providers are not allowed');
-  }
-
-  // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc
-  const parsed = parse(domain);
-  if (
-    typeof parsed === 'object' &&
-    parsed !== null &&
-    'domain' in parsed &&
-    typeof parsed.domain === 'string'
-  ) {
-    const slug = parsed.domain.split('.')[0];
-    if (slug) {
-      return slug;
+  // Try to get from Referer header
+  if (req.headers.referer) {
+    // Validate URL format before using
+    if (!req.headers.referer.match(/^https?:\/\/.+/)) {
+      throw new AppException(HttpStatusCode.BadRequest, 'Invalid referer URL format');
     }
+
+    const url = new URL(req.headers.referer);
+    return `${url.protocol}//${url.host}`;
   }
 
-  throw new AppException(HttpStatusCode.BadRequest, 'Please provide a valid email address');
-};
+  // Try to construct from Host header
+  if (req.headers.host) {
+    const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    return `${protocol}://${req.headers.host}`;
+  }
+
+  return null;
+}
 
 /**
  * Middleware to extract frontend base URL from request headers

@@ -4,12 +4,12 @@ import { Types } from 'mongoose';
 
 import { ROLE } from '../config';
 import AppException from '../exceptions/appException';
-import { extractCompanySlug } from '../middleware/extractFrontendUrl';
 import UserModel, { User } from '../models/user';
 import { checkVerificationCode } from '../services/auth/registerService';
 import { companyService } from '../services/companyService';
 import { membershipService } from '../services/membershipService';
 import { userService } from '../services/userService';
+import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
 import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
 import { RegisterUserInput } from './auth/registerController';
 
