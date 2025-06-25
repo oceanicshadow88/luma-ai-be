@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import { isValidEmail, isValidPassword } from '../../utils';
-import UserModel from '../../models/user';
+
 import ResetCodeModel from '../../models/resetCode';
+import UserModel from '../../models/user';
+import { VerifyCodeType } from '../../types/invitation';
+import { isValidEmail, isValidPassword } from '../../utils';
 
 /**
  * Combined verify code and reset password
@@ -9,7 +11,6 @@ import ResetCodeModel from '../../models/resetCode';
  */
 export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, code, newPassword } = req.body;
-
   // Validation
   if (!email) {
     return res.status(422).json({
@@ -59,8 +60,10 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   }
 
   // Find the reset code for this email
-  const resetCode = await ResetCodeModel.findOne({ email }).exec();
-
+  const resetCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  }).exec();
   // Check if reset code exists
   if (!resetCode) {
     return res.status(400).json({
@@ -103,5 +106,6 @@ export const verifyResetCode = async (req: Request, res: Response) => {
  * It redirects to the combined verifyResetCode function
  */
 export const resetPassword = async (req: Request, res: Response) => {
+  // This function now delegates to verifyResetCode for consistency
   return verifyResetCode(req, res);
 };

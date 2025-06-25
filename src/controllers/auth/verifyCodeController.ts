@@ -1,9 +1,11 @@
+import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-import { isValidEmail } from '../../utils';
-import ResetCodeModel from '../../models/resetCode';
+
 import config from '../../config';
 import AppException from '../../exceptions/appException';
-import { HttpStatusCode } from 'axios';
+import ResetCodeModel from '../../models/resetCode';
+import { VerifyCodeType } from '../../types/invitation';
+import { isValidEmail } from '../../utils';
 
 /**
  * Request verification code
@@ -23,7 +25,10 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   }
 
   // Check for existing code
-  const existingCode = await ResetCodeModel.findOne({ email }).exec();
+  const existingCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  }).exec();
   const now = new Date();
 
   // Check for rate limiting
@@ -60,11 +65,11 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   if (existingCode) {
     await existingCode.deleteOne();
   }
-
   // Store code in the database
   await ResetCodeModel.create({
     email,
     code: verificationCode,
+    verifyType: VerifyCodeType.VERIFICATION,
     expiresAt: expiryTime,
     attempts: 0,
   });
@@ -98,8 +103,12 @@ export const verifyCode = async (req: Request, res: Response) => {
   if (!isValidEmail(email)) {
     throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
+
   // Find the code for this email
-  const resetCode = await ResetCodeModel.findOne({ email }).exec();
+  const resetCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  }).exec();
 
   // Check if code exists
   if (!resetCode) {

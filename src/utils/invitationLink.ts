@@ -1,9 +1,12 @@
-import jwt, { Secret, JwtPayload, SignOptions } from 'jsonwebtoken';
-import { config } from '../config';
-import { RoleType, EXPIRES_TIME_CONFIG } from '../config';
-import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import { Request } from 'express';
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
+
+import { EXPIRES_TIME_CONFIG, ROLE, RoleType } from '../config';
+import { config } from '../config';
+import AppException from '../exceptions/appException';
 import ResetCodeModel from '../models/resetCode';
+import { VerifyCodeType } from '../types/invitation';
 
 interface InvitationTokenPayload extends JwtPayload {
   email: string;
@@ -15,9 +18,14 @@ interface InvitationTokenPayload extends JwtPayload {
  * Generate an invitation link with JWT token and store in database
  * @param email - The email address of the invitee
  * @param role - The role to be assigned (INSTRUCTOR or LEARNER)
+ * @param frontendBaseUrl - Frontend base URL for generating the invitation link
  * @returns A complete signup URL with the invitation token
  */
-export async function generateInvitationLink(email: string, role: RoleType): Promise<string> {
+export async function generateInvitationLinkAndStoreToken(
+  email: string,
+  role: RoleType,
+  frontendBaseUrl: string,
+): Promise<string> {
   const secret: Secret = config.jwt?.secret;
   const payload: InvitationTokenPayload = {
     email,
@@ -30,22 +38,36 @@ export async function generateInvitationLink(email: string, role: RoleType): Pro
   };
 
   const token = jwt.sign(payload, secret, options);
+  // Store the token in the database (similar to reset code)
+  // Remove any existing invitation tokens for this email
+  await ResetCodeModel.deleteMany({
+    email,
+    verifyType: VerifyCodeType.INVITATION,
+  });
 
-  // Store the token in the database (similar to reset code)  // Remove any existing invitation tokens for this email
-  await ResetCodeModel.deleteMany({ email, code: { $regex: '^invitation_' } });
-
-  // Store the new invitation token with prefix to distinguish from reset codes
+  // Store the new invitation token with type to distinguish from other code types
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + EXPIRES_TIME_CONFIG.EXPIRES_IN_HOURS); // 24 hours from now
-
   await ResetCodeModel.create({
     email,
-    code: `invitation_${token}`, // Prefix to distinguish from reset codes
+    code: token, // Store the raw token instead of prefixed version
+    verifyType: VerifyCodeType.INVITATION,
     expiresAt,
     attempts: 0,
   });
 
-  const signupBaseUrl = 'http://localhost:5173/auth/signup';
+  // Use provided frontend base URL
+  let signupBaseUrl = frontendBaseUrl;
+
+  // Ensure the URL ends with /auth/signup
+  if (!signupBaseUrl.includes('/auth/signup')) {
+    signupBaseUrl = `${signupBaseUrl.replace(/\/$/, '')}/auth/signup`;
+  }
+
+  if (role === ROLE.INSTRUCTOR) {
+    // If the role is INSTRUCTOR, append the teacher path to the signup URL
+    signupBaseUrl = `${signupBaseUrl}/teacher`;
+  }
   return `${signupBaseUrl}?token=${token}`;
 }
 
@@ -66,11 +88,11 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
       'Invalid token purpose. This is not an invitation token.',
     );
   }
-
   // Check if token exists in database
   const invitationRecord = await ResetCodeModel.findOne({
     email: decoded.email,
-    code: `invitation_${token}`,
+    code: token,
+    verifyType: VerifyCodeType.INVITATION,
   });
 
   if (!invitationRecord) {
@@ -79,9 +101,8 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
       'Invitation token not found or has been used.',
     );
   }
-
   // Use the existing validateResetCode method to check expiration and attempts
-  const validation = await invitationRecord.validateResetCode(`invitation_${token}`);
+  const validation = await invitationRecord.validateResetCode(token);
 
   if (!validation.isValid) {
     throw new AppException(HttpStatusCode.Unauthorized, validation.message);

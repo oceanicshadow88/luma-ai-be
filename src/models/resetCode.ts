@@ -1,9 +1,12 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
+
 import config from '../config';
+import { VerifyCodeType } from '../types/invitation';
 
 export interface ResetCode extends Document {
   email: string;
   code: string;
+  verifyType: VerifyCodeType; // Use enum instead of union type
   expiresAt: Date;
   attempts: number;
   validateResetCode(code: string): Promise<{
@@ -24,6 +27,12 @@ const resetCodeSchema: Schema<ResetCode> = new Schema(
     code: {
       type: String,
       required: true,
+    },
+    verifyType: {
+      type: String,
+      required: true,
+      enum: Object.values(VerifyCodeType),
+      default: VerifyCodeType.VERIFICATION,
     },
     expiresAt: {
       type: Date,

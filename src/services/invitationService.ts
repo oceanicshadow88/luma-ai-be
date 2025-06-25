@@ -1,14 +1,24 @@
 import mongoose, { Types } from 'mongoose';
+import { LocaleType } from 'src/config';
 
 import { EXPIRES_TIME_CONFIG, MEMBERSHIP_STATUS, ROLE } from '../config';
-import { RegisterUserInput } from '../controllers/auth/registerController';
 import { generateRandomUsername } from '../lib/generateRandomUsername';
 import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
-import { generateInvitationLink } from '../utils/invitationLink';
+import { generateInvitationLinkAndStoreToken } from '../utils/invitationLink';
 import { membershipService } from './membershipService';
 import { userService } from './userService';
 
-const createUserAndTokens = async (userInput: RegisterUserInput) => {
+export interface RegisterUserInputByInvitation {
+  firstName: string;
+  lastName: string;
+  username: string;
+  password: string;
+  email: string;
+  avatarUrl?: string;
+  locale?: LocaleType;
+}
+
+const createUserAndTokens = async (userInput: RegisterUserInputByInvitation) => {
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
@@ -21,6 +31,7 @@ export class InvitationService {
   static async generateInvitation(
     { email, role }: GenerateInvitationRequest,
     companyId: string,
+    frontendBaseUrl: string,
   ): Promise<GenerateInvitationResponse> {
     const newUsername = await generateRandomUsername();
     const { newUser } = await createUserAndTokens({
@@ -29,7 +40,6 @@ export class InvitationService {
       username: newUsername,
       firstName: 'Invited',
       lastName: 'Teacher',
-      verifyValue: '888888',
     });
     await membershipService.createMembership({
       company: new mongoose.Types.ObjectId(companyId),
@@ -37,7 +47,7 @@ export class InvitationService {
       role: ROLE.INSTRUCTOR,
       status: MEMBERSHIP_STATUS.INVITED,
     });
-    const invitationLink = await generateInvitationLink(email, role);
+    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
 
     return {
       invitationLink,
