@@ -21,7 +21,7 @@ interface InvitationTokenPayload extends JwtPayload {
  * @param frontendBaseUrl - Frontend base URL for generating the invitation link
  * @returns A complete signup URL with the invitation token
  */
-export async function generateInvitationLink(
+export async function generateInvitationLinkAndStoreToken(
   email: string,
   role: RoleType,
   frontendBaseUrl: string,
