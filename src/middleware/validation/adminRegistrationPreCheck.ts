@@ -5,8 +5,8 @@ import { RegisterUserInput } from '../../controllers/auth/registerController';
 import AppException from '../../exceptions/appException';
 import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
+import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
-import { extractCompanySlug } from '../extractFrontendUrl';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email, username } = req.body;

@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import AppException from '../../exceptions/appException';
 import Company from '../../models/company';
 import UserModel from '../../models/user';
-import { extractCompanySlug } from '../extractFrontendUrl';
+import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email, username } = req.body;
