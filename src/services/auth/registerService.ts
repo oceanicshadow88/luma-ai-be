@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 
-import { ROLE } from '../../config';
+import { ROLE, RoleType } from '../../config';
 import { RegisterUserInput } from '../../controllers/auth/registerController';
 import AppException from '../../exceptions/appException';
 import ResetCodeModel from '../../models/resetCode';
@@ -11,11 +11,11 @@ import { membershipService } from '../membershipService';
 import { userService } from '../userService';
 
 // Create user and generate authentication tokens
-const createUserAndTokens = async (userInput: RegisterUserInput) => {
-  // Validate verification code if provided
-  // if (userInput.verifyValue) {
-  //   await checkVerificationCode(userInput.verifyValue, userInput.email);
-  // }
+const createUserAndTokens = async (userInput: RegisterUserInput, role: RoleType) => {
+  // Validate verification code is checked in pre-check for admin register
+  if (role === ROLE.LEARNER) {
+    await checkVerificationCode(userInput.verifyValue, userInput.email);
+  }
   // Create new user
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
@@ -39,7 +39,7 @@ export const registerService = {
   },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput, ROLE.ADMIN);
 
     // Create admin membership
     await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
@@ -49,7 +49,10 @@ export const registerService = {
 
   // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(
+      userInput,
+      ROLE.LEARNER,
+    );
 
     // Create learner membership with organization association
     await membershipService.createMembership({

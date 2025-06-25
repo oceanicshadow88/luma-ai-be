@@ -5,11 +5,12 @@ import { RegisterUserInput } from '../../controllers/auth/registerController';
 import AppException from '../../exceptions/appException';
 import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
+import { checkVerificationCode } from '../../services/auth/registerService';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, username } = req.body;
+  const { email, username, verifyValue } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
@@ -30,6 +31,9 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     });
     return;
   }
+
+  // check verification code, error will be thrown if verification code is not valid
+  await checkVerificationCode(verifyValue, email);
 
   // check company
   const companySlug = await extractCompanySlug(email);
