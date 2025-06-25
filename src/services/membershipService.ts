@@ -3,10 +3,10 @@ import { Types } from 'mongoose';
 import { MembershipStatusType, RoleType } from 'src/config';
 
 import AppException from '../exceptions/appException';
+import { extractCompanySlug } from '../middleware/extractFrontendUrl';
 import CompanyModel from '../models/company';
 import MembershipModel, { Membership } from '../models/membership';
 import { User } from '../models/user';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
 
 export interface MembershipInput {
   company: Types.ObjectId;
