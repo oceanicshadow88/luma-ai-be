@@ -1,9 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import { NextFunction, Request, Response } from 'express';
+
+import AppException from '../../exceptions/appException';
 import Company from '../../models/company';
 import UserModel from '../../models/user';
+import { extractCompanySlug } from '../extractFrontendUrl';
 
 export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
   const { email, username } = req.body;
