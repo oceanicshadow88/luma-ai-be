@@ -27,10 +27,8 @@ export const companyController = {
       return res.status(400).json({ message: 'Missing user registration data' });
     }
 
-    // verify code
-    if (pendingUser.verifyValue) {
-      await checkVerificationCode(pendingUser.verifyValue, pendingUser.email);
-    }
+    // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
+
     // check company slug
     const slug = await extractCompanySlug(pendingUser.email);
     if (!slug) {
