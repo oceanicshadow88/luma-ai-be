@@ -1,5 +1,4 @@
 import { HttpStatusCode } from 'axios';
-import { Request } from 'express';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
 import { EXPIRES_TIME_CONFIG, ROLE, RoleType } from '../config';
