@@ -4,9 +4,11 @@ import { verifyAuthToken } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
-// Controllers
-import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
-import { learnerRegister } from '../../controllers/auth/registerController';
+import {
+  adminRegister,
+  learnerRegister,
+  teacherRegister,
+} from '../../controllers/auth/registerController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { companyController } from '../../controllers/companyController';
 import { dashboardController } from '../../controllers/dashboardController';
@@ -19,7 +21,6 @@ import {
   wrapMulterMiddleware,
 } from '../../middleware/fileUploader';
 import { saas } from '../../middleware/saasMiddleware';
-// Middlewares
 import { refreshToken } from '../../middleware/tokenHandler';
 import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
 import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
@@ -27,7 +28,6 @@ import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { registerRoutes } from '../../utils/registerRoutes';
 import { companyValidationSchema } from '../../validations/companyValidation';
 import { invitationSchema } from '../../validations/invitationValidation';
-// Validation Schemas
 import authValidationSchema from '../../validations/userAuthValidation';
 
 const router = Router();
@@ -55,13 +55,13 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/login/enterprise',
-    middlewares: [validateBody(authValidationSchema.login)],
+    middlewares: [saas, validateBody(authValidationSchema.login)],
     handler: loginEnterprise,
   },
   {
     method: 'post',
     path: '/auth/login/learner',
-    middlewares: [validateBody(authValidationSchema.login)],
+    middlewares: [saas, validateBody(authValidationSchema.login)],
     handler: loginLearner,
   },
   {
