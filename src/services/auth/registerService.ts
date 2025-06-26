@@ -34,11 +34,11 @@ export const registerService = {
       throw new Error('Cannot find user');
     }
     // Hash the password before updating
-    const hashedPassword = await bcrypt.hash(userInput.password, 12);
+    await user.hashPassword();
 
     const updateUser = await UserModel.findOneAndUpdate(
       { email: userInput.email },
-      { ...userInput, password: hashedPassword },
+      { ...userInput, password: user.password },
       { new: true },
     );
     await updateUser;
