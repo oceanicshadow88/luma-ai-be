@@ -1,13 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
+
 import {
   COMPANY_PLANS,
-  TIMEZONES,
-  LOCALES,
-  DEFAULT_LOCALE,
-  DEFAULT_COMPANY_PLAN,
   CompanyPlanType,
-  LocaleType,
+  DEFAULT_COMPANY_PLAN,
+  DEFAULT_LOCALE,
   DEFAULT_TIMEZONE,
+  LOCALES,
+  LocaleType,
+  TIMEZONES,
 } from '../config';
 import MembershipModel from './membership';
 
@@ -90,4 +91,5 @@ companySchema.pre('deleteOne', { document: true, query: false }, async function 
   next();
 });
 
-export default mongoose.model<Company>('Company', companySchema);
+const CompanyModel = mongoose.model<Company>('Company', companySchema);
+export default CompanyModel;
