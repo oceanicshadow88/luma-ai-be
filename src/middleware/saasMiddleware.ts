@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from 'express';
 
 import config from '../config';
 import AppException from '../exceptions/appException';
-import { extractSubdomain } from '../lib/extractSubdomain';
 import CompanyModel, { Company } from '../models/company';
 
 export const saas = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +18,24 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-  const slug = await extractSubdomain(req);
+  const origin = req.headers.origin ?? `${req.protocol}://${req.hostname}`;
+
+  const hostname = new URL(origin).hostname.toLowerCase();
+  if (!hostname) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Invalid hostname');
+  }
+
+  const firstDotIndex = hostname.indexOf('.');
+  if (firstDotIndex === -1) {
+    // e.g., "localhost", no subdomain
+    throw new AppException(HttpStatusCode.BadRequest, 'Missing subdomain');
+  }
+
+  const slug = hostname.substring(0, firstDotIndex);
+  if (!slug) {
+    throw new AppException(HttpStatusCode.BadRequest, 'Invalid subdomain');
+  }
+
   const existCompany = await CompanyModel.findOne({ slug }).lean();
   if (!existCompany) {
     throw new AppException(HttpStatusCode.NotFound, `Company not found for slug: ${slug}`);
