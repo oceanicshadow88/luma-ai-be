@@ -5,7 +5,6 @@ import { Types } from 'mongoose';
 import { ROLE } from '../config';
 import AppException from '../exceptions/appException';
 import UserModel, { User } from '../models/user';
-import { checkVerificationCode } from '../services/auth/registerService';
 import { companyService } from '../services/companyService';
 import { membershipService } from '../services/membershipService';
 import { userService } from '../services/userService';
