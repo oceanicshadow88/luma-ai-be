@@ -1,5 +1,4 @@
 import { HttpStatusCode } from 'axios';
-import bcrypt from 'bcryptjs';
 import { Types } from 'mongoose';
 
 import { ROLE } from '../../config';
@@ -33,15 +32,10 @@ export const registerService = {
     if (!user) {
       throw new Error('Cannot find user');
     }
-    // Hash the password before updating
-    await user.hashPassword();
 
-    const updateUser = await UserModel.findOneAndUpdate(
-      { email: userInput.email },
-      { ...userInput, password: user.password },
-      { new: true },
-    );
-    await updateUser;
+    // Update user data and save - this will trigger pre-save hook for password hashing
+    Object.assign(user, userInput, { active: true });
+    await user.save();
   },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {

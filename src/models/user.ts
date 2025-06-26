@@ -183,6 +183,16 @@ userSchema.statics.refreshAuthToken = async function (
   };
 };
 
+// Hash password before saving if it's modified
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
 // When deleting a user, delete the relevant membership
 userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
   await MembershipModel.deleteMany({ user: this._id });

@@ -16,6 +16,7 @@ export interface RegisterUserInputByInvitation {
   email: string;
   avatarUrl?: string;
   locale?: LocaleType;
+  active: boolean;
 }
 
 const createUserAndTokens = async (userInput: RegisterUserInputByInvitation) => {
@@ -40,6 +41,7 @@ export class InvitationService {
       username: newUsername,
       firstName: 'Invited',
       lastName: 'Teacher',
+      active: false,
     });
     await membershipService.createMembership({
       company: new mongoose.Types.ObjectId(companyId),
