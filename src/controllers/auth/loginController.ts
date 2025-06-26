@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { LoginResult, loginService } from '../../services/auth/loginService';
-import { extractSubdomain } from '../../lib/extractSubdomain';
+
 import { ROLE, RoleType } from '../../config';
+import { LoginResult, loginService } from '../../services/auth/loginService';
 
 async function handleLogin(req: Request, res: Response, allowedRoles: RoleType[]) {
   const { email, password } = req.body;
-  const slug = await extractSubdomain(req);
+  const slug = req.company.slug;
 
   const loginResult: LoginResult = await loginService.login({
     email,
