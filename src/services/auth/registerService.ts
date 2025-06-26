@@ -1,4 +1,5 @@
 import { HttpStatusCode } from 'axios';
+import bcrypt from 'bcryptjs';
 import { Types } from 'mongoose';
 
 import { ROLE } from '../../config';
@@ -32,9 +33,14 @@ export const registerService = {
     if (!user) {
       throw new Error('Cannot find user');
     }
-    const updateUser = await UserModel.findOneAndUpdate({ email: userInput.email }, userInput, {
-      new: true,
-    });
+    // Hash the password before updating
+    const hashedPassword = await bcrypt.hash(userInput.password, 12);
+
+    const updateUser = await UserModel.findOneAndUpdate(
+      { email: userInput.email },
+      { ...userInput, password: hashedPassword },
+      { new: true },
+    );
     await updateUser;
   },
   // Register admin user and create admin membership
