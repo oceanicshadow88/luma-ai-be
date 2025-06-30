@@ -1,4 +1,4 @@
-import { DEFAULT_COMPANY_PLAN, DEFAULT_TIMEZONE, DEFAULT_LOCALE } from '../../config';
+import { DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE } from '../../config';
 import Company from '../../models/company';
 
 export const companySeeder = {

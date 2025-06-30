@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 import {
   COMPANY_PLAN_LIST,
   DEFAULT_COMPANY_PLAN,

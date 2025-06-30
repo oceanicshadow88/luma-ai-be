@@ -1,12 +1,13 @@
-import express, { Express, NextFunction, RequestHandler, Router, Request, Response } from 'express';
 import cors from 'cors';
+import express, { Express, NextFunction, Request, RequestHandler, Response, Router } from 'express';
 import helmet from 'helmet';
-import morgan from '../src/middleware/morgan';
-import rateLimiter from '../src/middleware/rateLimit';
-import v1Router from '../src/handlers/v1/api';
-import errorHandler from '../src/middleware/error/errorHandler';
+
 import { companySeeder } from '../src/database/seeder/companySeeder';
 import { userSeeder } from '../src/database/seeder/userSeeder';
+import v1Router from '../src/handlers/v1/api';
+import errorHandler from '../src/middleware/error/errorHandler';
+import morgan from '../src/middleware/morgan';
+import rateLimiter from '../src/middleware/rateLimit';
 
 export const catchAllErrors = (
   fn: (req: Request, res: Response, next: NextFunction) => any,

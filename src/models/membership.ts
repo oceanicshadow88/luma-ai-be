@@ -1,10 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
+
 import {
   DEFAULT_MEMBERSHIP_STATUS,
   MEMBERSHIP_STATUS,
   MembershipStatusType,
-  RoleType,
   roleList,
+  RoleType,
 } from '../config';
 
 export interface Membership extends Document {
