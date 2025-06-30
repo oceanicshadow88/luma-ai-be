@@ -1,8 +1,9 @@
 import { DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE } from '../../config';
 import Company from '../../models/company';
+import { User } from '../../models/user';
 
 export const companySeeder = {
-  async seedDefault(owner: any) {
+  async seedDefault(owner: User) {
     const existing = await Company.findOne({ slug: 'default-company' });
     if (existing) {
       return;

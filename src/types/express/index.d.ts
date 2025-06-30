@@ -1,6 +1,6 @@
 declare namespace Express {
   interface Request {
-    company: any;
+    company: Company;
     companyId: string;
     frontendBaseUrl: string;
   }

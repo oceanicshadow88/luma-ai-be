@@ -19,8 +19,11 @@ export const userSeeder = {
         password: hashedPassword,
       });
       return newUser;
-    } catch (err: any) {
-      throw new Error('❌ Error seeding user:' + err?.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error('❌ Error seeding user: ' + err.message);
+      }
+      throw new Error('❌ Unknown error seeding user');
     }
   },
 };
