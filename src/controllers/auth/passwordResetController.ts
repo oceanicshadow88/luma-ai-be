@@ -84,7 +84,6 @@ export const verifyResetCode = async (req: Request, res: Response) => {
 
   // Code is valid - update the password
   user.password = newPassword;
-  await user.hashPassword();
 
   // Delete the reset code record
   await resetCode.deleteOne();

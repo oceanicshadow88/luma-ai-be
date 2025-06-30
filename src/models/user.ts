@@ -113,11 +113,6 @@ const userSchema: Schema<User> = new Schema(
   { timestamps: true },
 );
 
-// password: use 'this:' no arrow function
-userSchema.methods.hashPassword = async function (this: User): Promise<void> {
-  this.password = await bcrypt.hash(this.password, 12);
-};
-
 userSchema.methods.validatePassword = async function (
   this: User,
   password: string,
