@@ -1,7 +1,7 @@
 import config from '../src/config';
 import { connectDB } from '../src/database/connection';
-import app from './app';
 import logger from '../src/utils/logger';
+import app from './app';
 
 const port = config.port || 8000;
 

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import UserModel from '../models/user';
 
 export const refreshToken = async (req: Request, res: Response) => {

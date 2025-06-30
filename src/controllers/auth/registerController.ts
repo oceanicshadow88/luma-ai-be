@@ -1,8 +1,9 @@
 // Authentication and authorization
 import { Request, Response } from 'express';
-import { registerService } from '../../services/auth/registerService';
-import { LocaleType } from 'src/config';
 import { ObjectId } from 'mongoose';
+import { LocaleType } from 'src/config';
+
+import { registerService } from '../../services/auth/registerService';
 
 export interface RegisterUserInput {
   firstName: string;
