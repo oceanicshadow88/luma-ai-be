@@ -10,7 +10,7 @@ import morgan from '../src/middleware/morgan';
 import rateLimiter from '../src/middleware/rateLimit';
 
 export const catchAllErrors = (
-  fn: (req: Request, res: Response, next: NextFunction) => any,
+  fn: (req: Request, res: Response, next: NextFunction) => void | Promise<void>,
 ): RequestHandler => {
   return (req, res, next) => {
     try {
@@ -24,10 +24,22 @@ export const catchAllErrors = (
   };
 };
 
+interface ExpressLayer {
+  route?: {
+    stack: ExpressRouteLayer[];
+  };
+  // Add other properties you might need from the layer
+}
+
+interface ExpressRouteLayer {
+  handle: RequestHandler;
+  // Add other properties you might need from the route layer
+}
+
 function wrapRoutes(router: Router): Router {
-  const stack = (router as any).stack;
+  const stack = router.stack as unknown as ExpressLayer[];
   for (const layer of stack) {
-    if (layer.route && layer.route.stack) {
+    if (layer.route?.stack) {
       for (const routeLayer of layer.route.stack) {
         const handler = routeLayer.handle;
         if (handler.constructor.name === 'AsyncFunction') {
