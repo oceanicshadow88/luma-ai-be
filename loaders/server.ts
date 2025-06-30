@@ -22,4 +22,7 @@ const startServer = async () => {
   }
 };
 
-startServer();
+startServer().catch(error => {
+  logger.error('Failed to start server:', { payload: error });
+  process.exit(1);
+});
