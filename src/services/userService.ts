@@ -28,7 +28,6 @@ export const userService = {
     }
 
     const user = new UserModel(userInput);
-    await user.hashPassword();
     await user.save();
 
     return user;

@@ -37,7 +37,7 @@ export class InvitationService {
     const newUsername = await generateRandomUsername();
     const { newUser } = await createUserAndTokens({
       email,
-      password: 'any',
+      password: '123@Password',
       username: newUsername,
       firstName: 'Invited',
       lastName: 'Teacher',
