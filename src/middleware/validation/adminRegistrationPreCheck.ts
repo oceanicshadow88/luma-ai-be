@@ -9,7 +9,11 @@ import { checkVerificationCode } from '../../services/auth/registerService';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
 
-export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
+export const adminRegistrationPreCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { email, username, verifyValue } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');

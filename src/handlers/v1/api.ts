@@ -22,8 +22,8 @@ import {
 } from '../../middleware/fileUploader';
 import { saas } from '../../middleware/saasMiddleware';
 import { refreshToken } from '../../middleware/tokenHandler';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
+import { adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
+import { teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { registerRoutes } from '../../utils/registerRoutes';
 import { companyValidationSchema } from '../../validations/companyValidation';
