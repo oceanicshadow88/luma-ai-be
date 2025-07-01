@@ -45,7 +45,11 @@ export const adminRegister = async (req: Request, res: Response) => {
 
 export const teacherRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
-  await registerService.teacherRegister(userInput);
+  const { refreshToken, accessToken } = await registerService.teacherRegister(userInput);
 
-  res.sendStatus(201);
+  res.sendStatus(201).json({
+    message: 'Successfully signed up!',
+    refreshToken,
+    accessToken,
+  });
 };
