@@ -6,7 +6,11 @@ import CompanyModel, { Company } from '../../models/company';
 import UserModel from '../../models/user';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 
-export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
+export const teacherRegistrationPreCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { email, username } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
