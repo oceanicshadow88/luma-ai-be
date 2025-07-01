@@ -5,7 +5,6 @@ import AppException from '../../exceptions/appException';
 import CompanyModel, { Company } from '../../models/company';
 import UserModel from '../../models/user';
 import { checkVerificationCode } from '../../services/auth/registerService';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 
 export const teacherRegistrationPreCheck = async (
   req: Request,
@@ -36,11 +35,7 @@ export const teacherRegistrationPreCheck = async (
     req.companyId = existCompany._id as string;
   } else {
     // check company
-    const companySlug = await extractCompanySlug(email);
-    if (!companySlug) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
-    }
-    const existCompany = await CompanyModel.findOne({ slug: companySlug });
+    const existCompany = await CompanyModel.findOne({ slug: req.company.slug });
     if (!existCompany) {
       throw new Error('Company does not exits');
     }
