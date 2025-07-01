@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import AppException from '../../exceptions/appException';
 import CompanyModel, { Company } from '../../models/company';
 import UserModel from '../../models/user';
+import { checkVerificationCode } from '../../services/auth/registerService';
 import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 
 export const teacherRegistrationPreCheck = async (
@@ -11,7 +12,7 @@ export const teacherRegistrationPreCheck = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, username } = req.body;
+  const { email, username, verifyValue } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
@@ -23,6 +24,9 @@ export const teacherRegistrationPreCheck = async (
     });
     return;
   }
+
+  await checkVerificationCode(verifyValue, email);
+
   if (process.env.NODE_ENV === 'local') {
     const existCompany = await CompanyModel.findOne({ slug: 'default-company' });
     if (!existCompany) {
