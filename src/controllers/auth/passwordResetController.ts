@@ -7,7 +7,7 @@ import { isValidEmail, isValidPassword } from '../../utils';
 
 /**
  * Combined verify code and reset password
- * Validates the verification code and resets the password in one step
+ * Validates the verification value and resets the password in one step
  */
 export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, code, newPassword } = req.body;
@@ -22,7 +22,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   if (!code) {
     return res.status(422).json({
       success: false,
-      message: 'Please enter the verification code',
+      message: 'Please enter the verification value',
     });
   }
 

@@ -70,7 +70,7 @@ resetCodeSchema.methods.validateResetCode = async function (
 
     return {
       isValid: false,
-      message: 'Too many incorrect attempts. Please request a new verification code.',
+      message: 'Too many incorrect attempts. Please request a new verification value.',
     };
   }
 
@@ -80,7 +80,7 @@ resetCodeSchema.methods.validateResetCode = async function (
 
     return {
       isValid: false,
-      message: 'Invalid code. Please try again.',
+      message: 'Invalid verifyValue. Please try again.',
     };
   }
 
