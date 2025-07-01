@@ -37,7 +37,7 @@ export const teacherRegistrationPreCheck = async (
     // check company
     const existCompany = await CompanyModel.findOne({ slug: req.company.slug });
     if (!existCompany) {
-      throw new Error('Company does not exits');
+      throw new AppException(HttpStatusCode.NotFound, 'Company does not exits');
     }
   }
   // company exist, user not exist
