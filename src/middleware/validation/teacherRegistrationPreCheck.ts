@@ -4,14 +4,13 @@ import { NextFunction, Request, Response } from 'express';
 import AppException from '../../exceptions/appException';
 import CompanyModel, { Company } from '../../models/company';
 import UserModel from '../../models/user';
-import { checkVerificationCode } from '../../services/auth/registerService';
 
 export const teacherRegistrationPreCheck = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, username, verifyValue } = req.body;
+  const { email, username } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
@@ -23,8 +22,6 @@ export const teacherRegistrationPreCheck = async (
     });
     return;
   }
-
-  await checkVerificationCode(verifyValue, email);
 
   if (process.env.NODE_ENV === 'local') {
     const existCompany = await CompanyModel.findOne({ slug: 'default-company' });
