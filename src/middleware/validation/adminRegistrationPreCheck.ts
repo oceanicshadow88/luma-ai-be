@@ -32,7 +32,7 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     return;
   }
 
-  // check verification code, error will be thrown if verification code is not valid
+  // check verification value, error will be thrown if verification value is not valid
   await checkVerificationCode(verifyValue, email);
 
   // check company

@@ -1,6 +1,6 @@
 import { RoleType } from '../config';
 
-// Verification/Reset code types enum for reuse across the application
+// Verification/Reset value types enum for reuse across the application
 export enum VerifyCodeType {
   VERIFICATION = 'verification',
   INVITATION = 'invitation',

@@ -12,7 +12,7 @@ import { userService } from '../userService';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput, role: RoleType) => {
-  // Validate verification code is checked in pre-check for admin register
+  // Validate verification value is checked in pre-check for admin register
   if (role === ROLE.LEARNER) {
     await checkVerificationCode(userInput.verifyValue, userInput.email);
   }
@@ -66,14 +66,14 @@ export const registerService = {
 
 export const checkVerificationCode = async (verifyValue: string, email: string) => {
   if (!verifyValue) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
+    throw new AppException(HttpStatusCode.Unauthorized, 'VerifyValue is required');
   }
   const resetCode = await ResetCodeModel.findOne({
     email,
     verifyType: VerifyCodeType.VERIFICATION,
   });
   if (!resetCode) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification value');
   }
 
   const { isValid, message } = await resetCode.validateResetCode(verifyValue);
