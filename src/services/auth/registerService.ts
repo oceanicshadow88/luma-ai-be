@@ -30,12 +30,17 @@ export const registerService = {
     const user = await UserModel.findOne({ email: userInput.email });
     //this need to be change to email
     if (!user) {
-      throw new Error('Cannot find user');
+      throw new AppException(HttpStatusCode.NotFound, 'Non invited users');
     }
 
     // Update user data and save - this will trigger pre-save hook for password hashing
     Object.assign(user, userInput, { active: true });
     await user.save();
+
+    const { refreshToken, accessToken } = await user.generateTokens();
+    await userService.updateUserById(user.id, { refreshToken });
+
+    return { refreshToken, accessToken };
   },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
