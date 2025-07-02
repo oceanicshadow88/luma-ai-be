@@ -66,6 +66,7 @@
     "redis": "^5.0.1",
     "supertest": "^7.1.0",
     "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "yarn": "^1.22.22"
   },
   "devDependencies": {

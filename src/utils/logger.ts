@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import path from 'path';
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 import config from '../config';
 
@@ -28,9 +29,23 @@ export const createLogger = (filename?: string): winston.Logger => {
           return chalk.white(`[${level.toUpperCase()}] ${message}`); // fallback for other levels
         }),
       }),
-      new winston.transports.File({
-        filename: 'logs/error.log',
+
+      new DailyRotateFile({
+        dirname: 'logs/combined',
+        filename: 'combined-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        level: 'info',
+        maxSize: '20m',
+        maxFiles: '1d',
+      }),
+
+      new DailyRotateFile({
+        dirname: 'logs/error',
+        filename: 'error-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
         level: 'error',
+        maxSize: '20m',
+        maxFiles: '10d',
       }),
     ],
   });
