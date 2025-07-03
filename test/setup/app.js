@@ -4,7 +4,6 @@ async function loadApp() {
     if (application) {
         return application;
     }
-    console.log('Loading application...');
     const app = require('../../dist/loaders/app').default;
     application = app;
     return application;
