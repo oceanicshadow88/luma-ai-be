@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
 import { HttpStatusCode } from 'axios';
+import { Request, Response } from 'express';
+
 import { InvitationService } from '../services/invitationService';
 import { GenerateInvitationRequest } from '../types/invitation';
 
@@ -18,6 +19,7 @@ export const generateInvitation = async (
       role,
     },
     req.companyId,
+    req.frontendBaseUrl,
   );
   res.status(HttpStatusCode.Ok).json({
     success: true,

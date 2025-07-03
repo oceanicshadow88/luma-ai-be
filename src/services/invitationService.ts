@@ -1,11 +1,25 @@
-import { generateInvitationLink } from '../utils/invitationLink';
-import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
-import { EXPIRES_TIME_CONFIG, MEMBERSHIP_STATUS, ROLE } from '../config';
-import { RegisterUserInput } from '../controllers/auth/registerController';
-import { userService } from './userService';
-import { membershipService } from './membershipService';
+import mongoose, { Types } from 'mongoose';
+import { LocaleType } from 'src/config';
 
-const createUserAndTokens = async (userInput: RegisterUserInput) => {
+import { EXPIRES_TIME_CONFIG, MEMBERSHIP_STATUS, ROLE } from '../config';
+import { generateRandomUsername } from '../lib/generateRandomUsername';
+import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
+import { generateInvitationLinkAndStoreToken } from '../utils/invitationLink';
+import { membershipService } from './membershipService';
+import { userService } from './userService';
+
+export interface RegisterUserInputByInvitation {
+  firstName: string;
+  lastName: string;
+  username: string;
+  password: string;
+  email: string;
+  avatarUrl?: string;
+  locale?: LocaleType;
+  active: boolean;
+}
+
+const createUserAndTokens = async (userInput: RegisterUserInputByInvitation) => {
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
@@ -17,23 +31,25 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
 export class InvitationService {
   static async generateInvitation(
     { email, role }: GenerateInvitationRequest,
-    companyId: any,
+    companyId: string,
+    frontendBaseUrl: string,
   ): Promise<GenerateInvitationResponse> {
+    const newUsername = await generateRandomUsername();
     const { newUser } = await createUserAndTokens({
       email,
-      password: 'any',
-      username: 'teacher5',
-      firstName: 'teacher',
-      lastName: 'teacher',
-      verifyValue: '66666',
+      password: '123@Password',
+      username: newUsername,
+      firstName: 'Invited',
+      lastName: 'Teacher',
+      active: false,
     });
     await membershipService.createMembership({
-      company: companyId,
-      user: newUser._id as any,
+      company: new mongoose.Types.ObjectId(companyId),
+      user: newUser._id as Types.ObjectId,
       role: ROLE.INSTRUCTOR,
       status: MEMBERSHIP_STATUS.INVITED,
     });
-    const invitationLink = await generateInvitationLink(email, role);
+    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
 
     return {
       invitationLink,

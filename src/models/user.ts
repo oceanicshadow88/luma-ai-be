@@ -1,10 +1,11 @@
-import mongoose, { Document, Schema, Model, Types } from 'mongoose';
-import bcrypt from 'bcryptjs';
-import MembershipModel from './membership';
-import { jwtUtils } from '../lib/jwtUtils';
-import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import bcrypt from 'bcryptjs';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
+
 import { DEFAULT_LOCALE, LOCALES, LocaleType } from '../config';
+import AppException from '../exceptions/appException';
+import { jwtUtils } from '../lib/jwtUtils';
+import MembershipModel from './membership';
 
 export interface User extends Document {
   firstName: string;
@@ -112,11 +113,6 @@ const userSchema: Schema<User> = new Schema(
   { timestamps: true },
 );
 
-// password: use 'this:' no arrow function
-userSchema.methods.hashPassword = async function (this: User): Promise<void> {
-  this.password = await bcrypt.hash(this.password, 12);
-};
-
 userSchema.methods.validatePassword = async function (
   this: User,
   password: string,
@@ -150,8 +146,8 @@ userSchema.methods.generateTokens = async function (
   this: User,
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const userId = (this._id as Types.ObjectId).toString();
-  const accessToken = jwtUtils.generateAccessToken({ user: userId });
-  const refreshToken = jwtUtils.generateRefreshToken({ user: userId });
+  const accessToken = jwtUtils.generateAccessToken({ userId });
+  const refreshToken = jwtUtils.generateRefreshToken({ userId });
 
   return { accessToken, refreshToken };
 };
@@ -167,10 +163,10 @@ userSchema.statics.refreshAuthToken = async function (
   }
 
   const newAccessToken = jwtUtils.generateAccessToken({
-    user: (user._id as Types.ObjectId).toString(),
+    userId: (user._id as Types.ObjectId).toString(),
   });
   const newRefreshToken = jwtUtils.generateRefreshToken({
-    user: (user._id as Types.ObjectId).toString(),
+    userId: (user._id as Types.ObjectId).toString(),
   });
 
   user.refreshToken = newRefreshToken;
@@ -181,6 +177,16 @@ userSchema.statics.refreshAuthToken = async function (
     refreshToken: newRefreshToken,
   };
 };
+
+// Hash password before saving if it's modified
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
 
 // When deleting a user, delete the relevant membership
 userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {

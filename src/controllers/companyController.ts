@@ -1,16 +1,16 @@
-import { Request, Response } from 'express';
-import AppException from '../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
-import { userService } from '../services/userService';
-import { companyService } from '../services/companyService';
+import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import { membershipService } from '../services/membershipService';
+
 import { ROLE } from '../config';
-import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
-import { checkVerificationCode } from '../services/auth/registerService';
-import { RegisterUserInput } from './auth/registerController';
+import AppException from '../exceptions/appException';
 import UserModel, { User } from '../models/user';
+import { companyService } from '../services/companyService';
+import { membershipService } from '../services/membershipService';
+import { userService } from '../services/userService';
+import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
+import { clearPendingUserData, getPendingUserData } from '../utils/storagePendingUser';
+import { RegisterUserInput } from './auth/registerController';
 
 export const companyController = {
   createCompany: async (req: Request, res: Response) => {
@@ -26,10 +26,8 @@ export const companyController = {
       return res.status(400).json({ message: 'Missing user registration data' });
     }
 
-    // verify code
-    if (pendingUser.verifyValue) {
-      await checkVerificationCode(pendingUser.verifyValue, pendingUser.email);
-    }
+    // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
+
     // check company slug
     const slug = await extractCompanySlug(pendingUser.email);
     if (!slug) {

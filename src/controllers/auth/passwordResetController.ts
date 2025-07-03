@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
-import { isValidEmail, isValidPassword } from '../../utils';
-import UserModel from '../../models/user';
+
 import ResetCodeModel from '../../models/resetCode';
+import UserModel from '../../models/user';
+import { VerifyCodeType } from '../../types/invitation';
+import { isValidEmail, isValidPassword } from '../../utils';
 
 /**
  * Combined verify code and reset password
- * Validates the verification code and resets the password in one step
+ * Validates the verification value and resets the password in one step
  */
 export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, code, newPassword } = req.body;
-
   // Validation
   if (!email) {
     return res.status(422).json({
@@ -21,7 +22,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   if (!code) {
     return res.status(422).json({
       success: false,
-      message: 'Please enter the verification code',
+      message: 'Please enter the verification value',
     });
   }
 
@@ -59,8 +60,10 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   }
 
   // Find the reset code for this email
-  const resetCode = await ResetCodeModel.findOne({ email }).exec();
-
+  const resetCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  }).exec();
   // Check if reset code exists
   if (!resetCode) {
     return res.status(400).json({
@@ -81,7 +84,6 @@ export const verifyResetCode = async (req: Request, res: Response) => {
 
   // Code is valid - update the password
   user.password = newPassword;
-  await user.hashPassword();
 
   // Delete the reset code record
   await resetCode.deleteOne();
@@ -103,5 +105,6 @@ export const verifyResetCode = async (req: Request, res: Response) => {
  * It redirects to the combined verifyResetCode function
  */
 export const resetPassword = async (req: Request, res: Response) => {
+  // This function now delegates to verifyResetCode for consistency
   return verifyResetCode(req, res);
 };

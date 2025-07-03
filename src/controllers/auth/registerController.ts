@@ -1,8 +1,9 @@
 // Authentication and authorization
 import { Request, Response } from 'express';
-import { registerService } from '../../services/auth/registerService';
-import { LocaleType } from 'src/config';
 import { ObjectId } from 'mongoose';
+import { LocaleType } from 'src/config';
+
+import { registerService } from '../../services/auth/registerService';
 
 export interface RegisterUserInput {
   firstName: string;
@@ -44,7 +45,11 @@ export const adminRegister = async (req: Request, res: Response) => {
 
 export const teacherRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
-  await registerService.teacherRegister(userInput);
+  const { refreshToken, accessToken } = await registerService.teacherRegister(userInput);
 
-  res.sendStatus(201);
+  res.status(201).json({
+    message: 'Successfully signed up!',
+    refreshToken,
+    accessToken,
+  });
 };

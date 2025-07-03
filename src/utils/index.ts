@@ -1,7 +1,7 @@
 /**
  * Utility functions for the application
  */
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 /**
  * Format response object

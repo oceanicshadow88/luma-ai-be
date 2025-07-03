@@ -1,19 +1,21 @@
-import ResetCodeModel from '../../models/resetCode';
-import { userService } from '../userService';
-import { membershipService } from '../membershipService';
-import { ROLE } from '../../config';
-import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import { RegisterUserInput } from '../../controllers/auth/registerController';
 import { Types } from 'mongoose';
+
+import { ROLE, RoleType } from '../../config';
+import { RegisterUserInput } from '../../controllers/auth/registerController';
+import AppException from '../../exceptions/appException';
+import ResetCodeModel from '../../models/resetCode';
 import UserModel from '../../models/user';
+import { VerifyCodeType } from '../../types/invitation';
+import { membershipService } from '../membershipService';
+import { userService } from '../userService';
 
 // Create user and generate authentication tokens
-const createUserAndTokens = async (userInput: RegisterUserInput) => {
-  // Validate verification code if provided
-  // if (userInput.verifyValue) {
-  //   await checkVerificationCode(userInput.verifyValue, userInput.email);
-  // }
+const createUserAndTokens = async (userInput: RegisterUserInput, role: RoleType) => {
+  // Validate verification value is checked in pre-check for admin register
+  if (role === ROLE.LEARNER) {
+    await checkVerificationCode(userInput.verifyValue, userInput.email);
+  }
   // Create new user
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
@@ -28,16 +30,21 @@ export const registerService = {
     const user = await UserModel.findOne({ email: userInput.email });
     //this need to be change to email
     if (!user) {
-      throw new Error('Cannot find user');
+      throw new AppException(HttpStatusCode.NotFound, 'Non invited users');
     }
-    const updateUser = await UserModel.findOneAndUpdate({ email: userInput.email }, userInput, {
-      new: true,
-    });
-    await updateUser;
+
+    // Update user data and save - this will trigger pre-save hook for password hashing
+    Object.assign(user, userInput, { active: true });
+    await user.save();
+
+    const { refreshToken, accessToken } = await user.generateTokens();
+    await userService.updateUserById(user.id, { refreshToken });
+
+    return { refreshToken, accessToken };
   },
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput, ROLE.ADMIN);
 
     // Create admin membership
     await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
@@ -47,7 +54,10 @@ export const registerService = {
 
   // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(
+      userInput,
+      ROLE.LEARNER,
+    );
 
     // Create learner membership with organization association
     await membershipService.createMembership({
@@ -61,12 +71,14 @@ export const registerService = {
 
 export const checkVerificationCode = async (verifyValue: string, email: string) => {
   if (!verifyValue) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Verification code is required');
+    throw new AppException(HttpStatusCode.Unauthorized, 'VerifyValue is required');
   }
-
-  const resetCode = await ResetCodeModel.findOne({ email });
+  const resetCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  });
   if (!resetCode) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification code');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification value');
   }
 
   const { isValid, message } = await resetCode.validateResetCode(verifyValue);

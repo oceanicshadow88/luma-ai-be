@@ -1,11 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import Company from '../../models/company';
+import { NextFunction, Request, Response } from 'express';
+
+import AppException from '../../exceptions/appException';
+import CompanyModel, { Company } from '../../models/company';
 import UserModel from '../../models/user';
 
-export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
+export const teacherRegistrationPreCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { email, username } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
@@ -18,22 +22,19 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     });
     return;
   }
+
   if (process.env.NODE_ENV === 'local') {
-    const existCompany = await Company.findOne({ slug: 'default-company' });
+    const existCompany = await CompanyModel.findOne({ slug: 'default-company' });
     if (!existCompany) {
       throw new Error('Cannot not find default company');
     }
-    req.company = existCompany as any;
+    req.company = existCompany as Company;
     req.companyId = existCompany._id as string;
   } else {
     // check company
-    const companySlug = await extractCompanySlug(email);
-    if (!companySlug) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
-    }
-    const existCompany = await Company.findOne({ slug: companySlug });
+    const existCompany = await CompanyModel.findOne({ slug: req.company.slug });
     if (!existCompany) {
-      throw new Error('Company does not exits');
+      throw new AppException(HttpStatusCode.NotFound, 'Company does not exits');
     }
   }
   // company exist, user not exist

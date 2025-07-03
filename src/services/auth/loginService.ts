@@ -1,10 +1,11 @@
-import UserModel from '../../models/user';
-import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import MembershipModel from '../../models/membership';
-import { RoleType } from '../../config';
 import { Types } from 'mongoose';
+
+import { RoleType } from '../../config';
+import AppException from '../../exceptions/appException';
 import { Company } from '../../models/company';
+import MembershipModel from '../../models/membership';
+import UserModel from '../../models/user';
 export interface LoginResult {
   refreshToken?: string;
   accessToken?: string;

@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
-import { jwtUtils } from '../lib/jwtUtils';
-import UserModel from '../models/user';
+import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
 
-// 扩展Request接口，添加user属性
+import { jwtUtils } from '../lib/jwtUtils';
+import UserModel from '../models/user';
+
 declare global {
   namespace Express {
     interface Request {

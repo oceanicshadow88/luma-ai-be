@@ -1,13 +1,15 @@
+import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-import { isValidEmail } from '../../utils';
-import ResetCodeModel from '../../models/resetCode';
+
 import config from '../../config';
 import AppException from '../../exceptions/appException';
-import { HttpStatusCode } from 'axios';
+import ResetCodeModel from '../../models/resetCode';
+import { VerifyCodeType } from '../../types/invitation';
+import { isValidEmail } from '../../utils';
 
 /**
- * Request verification code
- * Accepts an email, validates it, and generates a verification code that can be used
+ * Request verification value
+ * Accepts an email, validates it, and generates a verification value that can be used
  * for password reset or account registration
  */
 export const requestVerificationCode = async (req: Request, res: Response) => {
@@ -23,7 +25,10 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   }
 
   // Check for existing code
-  const existingCode = await ResetCodeModel.findOne({ email }).exec();
+  const existingCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  }).exec();
   const now = new Date();
 
   // Check for rate limiting
@@ -49,7 +54,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
     }
   }
 
-  // Generate verification code
+  // Generate verification value
   const verificationCode = '888888';
 
   // Calculate expiry time (current time + 15 minutes)
@@ -60,11 +65,11 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   if (existingCode) {
     await existingCode.deleteOne();
   }
-
   // Store code in the database
   await ResetCodeModel.create({
     email,
     code: verificationCode,
+    verifyType: VerifyCodeType.VERIFICATION,
     expiresAt: expiryTime,
     attempts: 0,
   });
@@ -79,7 +84,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
 };
 
 /**
- * Verify a verification code
+ * Verify a verification value
  * This is a generic verification function that can be used by both
  * password reset and registration flows
  */
@@ -92,14 +97,18 @@ export const verifyCode = async (req: Request, res: Response) => {
   }
 
   if (!code) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter the verification code');
+    throw new AppException(HttpStatusCode.BadRequest, 'Please enter the verification value');
   }
 
   if (!isValidEmail(email)) {
     throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
+
   // Find the code for this email
-  const resetCode = await ResetCodeModel.findOne({ email }).exec();
+  const resetCode = await ResetCodeModel.findOne({
+    email,
+    verifyType: VerifyCodeType.VERIFICATION,
+  }).exec();
 
   // Check if code exists
   if (!resetCode) {

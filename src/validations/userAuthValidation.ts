@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 import { DEFAULT_LOCALE, LOCALE_LIST } from '../config';
 
 const baseAuthSchema = Joi.object({
@@ -70,7 +71,7 @@ const registerSchema = baseAuthSchema.keys({
     }),
 
   verifyValue: Joi.string().required().messages({
-    'string.empty': 'Verification code is required',
+    'string.empty': 'VerifyValue is required',
   }),
 
   termsAccepted: Joi.boolean().valid(true).required().messages({

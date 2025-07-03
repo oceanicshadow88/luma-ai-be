@@ -1,14 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
-import AppException from '../../exceptions/appException';
 import { HttpStatusCode } from 'axios';
+import { NextFunction, Request, Response } from 'express';
+
+import { RegisterUserInput } from '../../controllers/auth/registerController';
+import AppException from '../../exceptions/appException';
 import CompanyModel from '../../models/company';
 import UserModel from '../../models/user';
+import { checkVerificationCode } from '../../services/auth/registerService';
+import { extractCompanySlug } from '../../utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '../../utils/storagePendingUser';
-import { RegisterUserInput } from '../../controllers/auth/registerController';
 
-export const validateRegistration = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, username } = req.body;
+export const adminRegistrationPreCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { email, username, verifyValue } = req.body;
   if (!email) {
     throw new AppException(HttpStatusCode.BadRequest, 'Email is required');
   }
@@ -29,6 +35,9 @@ export const validateRegistration = async (req: Request, res: Response, next: Ne
     });
     return;
   }
+
+  // check verification value, error will be thrown if verification value is not valid
+  await checkVerificationCode(verifyValue, email);
 
   // check company
   const companySlug = await extractCompanySlug(email);
