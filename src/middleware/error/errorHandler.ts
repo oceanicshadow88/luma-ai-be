@@ -6,46 +6,48 @@ import multer from 'multer';
 import AppException from '../../exceptions/appException';
 import logger from '../../utils/logger';
 
-const isDev = process.env.NODE_ENV !== 'production';
-
-function logAndRespond(
-  err: Error,
-  res: Response,
-  logLabel: string,
-  statusCode: number,
-  payload?: object,
-): void {
-  logger.error(`[${logLabel}]: ${err.message}`, payload);
-
-  res.status(statusCode).json({
-    success: false,
-    message: isDev ? err.message : 'Internal Server Error',
-  });
-}
-
 const errorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
     logger.error(`[HeadersSent Error]: ${err.message}`);
-    return next(err);
+    return next(err); //Error passed to express for default handling
   }
 
+  // JWT token Error
   if (err instanceof TokenExpiredError) {
-    return logAndRespond(err, res, 'TokenExpired Error', 401);
+    logger.error(`[TokenExpired Error]: ${err.message}`);
+    res.status(401).json({
+      success: false,
+      message: 'Token has expired',
+    });
+    return;
   }
 
   if (err instanceof JsonWebTokenError) {
-    return logAndRespond(err, res, 'JsonWebToken Error', 401);
+    logger.error(`[JsonWebToken Error]: ${err.message}`);
+    res.status(401).json({
+      success: false,
+      message: 'Invalid token',
+    });
+    return;
   }
 
+  //Joi Error
   if (err instanceof Joi.ValidationError) {
-    return logAndRespond(err, res, 'Validation Error', 400);
+    logger.error(`[Validation Error]: ${err.message}`);
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+    return;
   }
 
+  //File upload
   if (err instanceof multer.MulterError) {
     let message = 'File upload error';
 
@@ -58,17 +60,31 @@ const errorHandler: ErrorRequestHandler = (
         break;
     }
 
-    return logAndRespond(err, res, 'File upload error', 400, { reason: message });
+    logger.error(`[File upload error]: ${err.message}`);
+    res.status(400).json({ message });
+    return;
   }
 
+  // Custom error handler
   if (err instanceof AppException) {
-    return logAndRespond(err, res, 'AppException', err.statusCode, {
+    logger.error(`[AppException]: ${err.message}`, {
+      statusCode: err.statusCode,
       stack: err.stack,
       ...(err.payload ? { payload: err.payload } : {}),
     });
+
+    res.status(err.statusCode).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+    return;
   }
 
-  return logAndRespond(err, res, 'Unhandled Error', 500, { stack: err.stack });
+  logger.error(`[Unhandled Error]: ${err.message}`);
+  res.status(500).json({
+    success: false,
+    message: 'Unhandled Error',
+  });
 };
 
 export default errorHandler;
