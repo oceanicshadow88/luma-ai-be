@@ -1,26 +1,10 @@
-module.exports = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/tests'],
-  testMatch: ['**/*.test.ts'],
+  coverageProvider: 'v8',
+  globalTeardown: './test/testTeardownGlobals.js',
+  setupFilesAfterEnv: ['./test/setup/jest-setup.js'],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.(js|ts|tsx)$': 'babel-jest',
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
-  verbose: true,
-  forceExit: true,
-  clearMocks: true,
-  resetMocks: true,
-  restoreMocks: true,
-  moduleDirectories: ['node_modules', 'src'],
-  moduleNameMapper: {
-    '^@src/(.*)$': '<rootDir>/src/$1',
-    '^src/(.*)$': '<rootDir>/src/$1',
-  },
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coverageReporters: ['lcov', 'text'],
 };

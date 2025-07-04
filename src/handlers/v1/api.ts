@@ -8,9 +8,9 @@ import {
   adminRegister,
   learnerRegister,
   teacherRegister,
+  handleOwnerRegistrationProcess ,
 } from '../../controllers/auth/registerController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
-import { companyController } from '../../controllers/companyController';
 import { dashboardController } from '../../controllers/dashboardController';
 import { generateInvitation } from '../../controllers/invitationController';
 import { authGuard } from '../../middleware/authGuard';
@@ -101,12 +101,12 @@ const logoUploader = createFileUploader({
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/auth/signup/institution',
+    path: '/auth/signup/institution', //TODO: Change to /owner/register
     middlewares: [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
     ],
-    handler: companyController.createCompany,
+    handler: handleOwnerRegistrationProcess,
   },
 ]);
 
