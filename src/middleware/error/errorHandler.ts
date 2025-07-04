@@ -104,9 +104,8 @@ function getMulterErrorMessage(err: multer.MulterError): string {
   return multerErrorMessages[err.code] ?? 'File upload failed';
 }
 
-function logError(err: Error, { logTag, logPayload }: ErrorInfo): void {
-  logger.error(`[${logTag}]: ${err.message}`, {
-    stack: err.stack,
+function logError(err: Error, { logTag, logPayload, statusCode }: ErrorInfo): void {
+  logger.error(`[${logTag} ${statusCode}]: ${err.message}`, {
     ...logPayload,
   });
 }
