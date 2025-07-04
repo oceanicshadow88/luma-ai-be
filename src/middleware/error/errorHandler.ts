@@ -98,6 +98,12 @@ function processError(err: Error, req: Request): ErrorInfo {
 const multerErrorMessages: Record<string, string> = {
   LIMIT_FILE_SIZE: 'File size exceeds 5MB limit',
   LIMIT_UNEXPECTED_FILE: 'Invalid file type',
+  UNEXPECTED_FIELD: 'Unexpected field name in file upload',
+  LIMIT_FILE_COUNT: 'Too many files uploaded',
+  LIMIT_FIELD_KEY: 'Field name too long',
+  LIMIT_FIELD_VALUE: 'Field value too long',
+  LIMIT_FIELD_COUNT: 'Too many fields',
+  LIMIT_PART_COUNT: 'Too many parts',
 } as const;
 
 function getMulterErrorMessage(err: multer.MulterError): string {
