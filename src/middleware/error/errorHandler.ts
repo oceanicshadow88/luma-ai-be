@@ -14,12 +14,13 @@ const errorHandler: ErrorRequestHandler = (
 ) => {
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
-    logger.error('[HeadersSent Error]', err);
+    logger.error(`[HeadersSent Error]: ${err.message}`);
     return next(err); //Error passed to express for default handling
   }
 
   // JWT token Error
   if (err instanceof TokenExpiredError) {
+    logger.error(`[TokenExpired Error]: ${err.message}`);
     res.status(401).json({
       success: false,
       message: 'Token has expired',
@@ -28,6 +29,7 @@ const errorHandler: ErrorRequestHandler = (
   }
 
   if (err instanceof JsonWebTokenError) {
+    logger.error(`[JsonWebToken Error]: ${err.message}`);
     res.status(401).json({
       success: false,
       message: 'Invalid token',
@@ -37,6 +39,7 @@ const errorHandler: ErrorRequestHandler = (
 
   //Joi Error
   if (err instanceof Joi.ValidationError) {
+    logger.error(`[Validation Error]: ${err.message}`);
     res.status(400).json({
       success: false,
       message: err.message,
@@ -57,6 +60,7 @@ const errorHandler: ErrorRequestHandler = (
         break;
     }
 
+    logger.error(`[File upload error]: ${err.message}`);
     res.status(400).json({ message });
     return;
   }
@@ -76,7 +80,7 @@ const errorHandler: ErrorRequestHandler = (
     return;
   }
 
-  logger.error('[Unhandled Error]: ', err);
+  logger.error(`[Unhandled Error]: ${err.message}`);
   res.status(500).json({
     success: false,
     message: 'Unhandled Error',
