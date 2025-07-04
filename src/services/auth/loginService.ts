@@ -49,7 +49,7 @@ export const loginService = {
     }
     const matchedMembershipWithSlug = memberships.find(m => m.company.slug === slug);
     if (!matchedMembershipWithSlug) {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Slug not match with domain.');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Slug not match with domain.');
     }
     const role = matchedMembershipWithSlug.role;
     if (!allowedRoles.includes(role)) {
