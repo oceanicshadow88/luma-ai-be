@@ -9,6 +9,7 @@ interface ErrorInfo {
   statusCode: number;
   message: string;
   logTag: string;
+  logMessage?: string;
   logPayload?: Record<string, unknown>;
 }
 
@@ -35,6 +36,7 @@ function processError(err: Error, req: Request): ErrorInfo {
     return {
       statusCode: 401,
       message: 'Token has expired',
+      logMessage: 'Token has expired',
       logTag: 'TokenExpired Error',
     };
   }
@@ -44,6 +46,7 @@ function processError(err: Error, req: Request): ErrorInfo {
     return {
       statusCode: 500,
       message: 'Internal Server Error',
+      logMessage: 'Invalid token',
       logTag: 'JsonWebToken Error',
     };
   }
@@ -59,10 +62,10 @@ function processError(err: Error, req: Request): ErrorInfo {
 
   // File upload error
   if (err instanceof multer.MulterError) {
-    err.message = getMulterErrorMessage(err) ?? err.message;
     return {
       statusCode: 400,
       message: getMulterErrorMessage(err),
+      logMessage: getMulterErrorMessage(err),
       logTag: 'Multer Error',
     };
   }
@@ -105,8 +108,8 @@ function getMulterErrorMessage(err: multer.MulterError): string {
   return multerErrorMessages[err.code] ?? 'File upload failed';
 }
 
-function logError(err: Error, { logTag, logPayload, statusCode }: ErrorInfo): void {
-  logger.error(`[${logTag} ${statusCode}]: ${err.message}`, {
+function logError(err: Error, { logTag, logMessage, logPayload, statusCode }: ErrorInfo): void {
+  logger.error(`[${logTag} ${statusCode}]: ${logMessage ?? err.message}`, {
     ...logPayload,
   });
 }
