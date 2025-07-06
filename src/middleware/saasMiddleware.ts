@@ -10,7 +10,7 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
   if (isLocalEnv) {
     const defaultCompany = await CompanyModel.findOne({ slug: 'default-company' });
     if (!defaultCompany) {
-      throw new Error('Cannot not find default company');
+      throw new AppException(HttpStatusCode.NotFound, 'Cannot not find default company');
     }
     req.company = defaultCompany as Company;
     req.companyId = defaultCompany._id as string;
@@ -22,23 +22,29 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
 
   const hostname = new URL(origin).hostname.toLowerCase();
   if (!hostname) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Invalid hostname');
+    throw new AppException(HttpStatusCode.InternalServerError, `Invalid hostname: ${hostname}`);
   }
 
   const firstDotIndex = hostname.indexOf('.');
   if (firstDotIndex === -1) {
     // e.g., "localhost", no subdomain
-    throw new AppException(HttpStatusCode.BadRequest, 'Missing subdomain');
+    throw new AppException(
+      HttpStatusCode.InternalServerError,
+      `Missing subdomain: ${firstDotIndex}`,
+    );
   }
 
   const slug = hostname.substring(0, firstDotIndex);
   if (!slug) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Invalid subdomain');
+    throw new AppException(HttpStatusCode.InternalServerError, `Invalid subdomain: ${slug}`);
   }
 
   const existCompany = await CompanyModel.findOne({ slug }).lean();
   if (!existCompany) {
-    throw new AppException(HttpStatusCode.NotFound, `Company not found for slug: ${slug}`);
+    throw new AppException(
+      HttpStatusCode.InternalServerError,
+      `Company not found for slug: ${slug}`,
+    );
   }
 
   req.company = existCompany as Company;
