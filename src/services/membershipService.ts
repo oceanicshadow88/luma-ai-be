@@ -1,12 +1,11 @@
+import { MembershipStatusType, RoleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import CompanyModel from '@src/models/company';
+import MembershipModel, { Membership } from '@src/models/membership';
+import { User } from '@src/models/user';
+import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
-import { MembershipStatusType, RoleType } from 'src/config';
-
-import AppException from '../exceptions/appException';
-import CompanyModel from '../models/company';
-import MembershipModel, { Membership } from '../models/membership';
-import { User } from '../models/user';
-import { extractCompanySlug } from '../utils/extractCompanySlugFromEmail';
 
 export interface MembershipInput {
   company: Types.ObjectId;
@@ -36,7 +35,7 @@ export const membershipService = {
     );
     if (membershipExists) {
       throw new AppException(
-        HttpStatusCode.Conflict,
+        HttpStatusCode.InternalServerError,
         'Membership already exists for this user, company, and role',
       );
     }
@@ -45,13 +44,13 @@ export const membershipService = {
 
   createAdminMembershipByUser: async (user: User, role: RoleType): Promise<Membership> => {
     const slug = await extractCompanySlug(user.email);
-    if (!slug) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Cannot extract company from email');
-    }
 
     const existCompany = await CompanyModel.findOne({ slug });
     if (!existCompany) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Company not exist');
+      throw new AppException(
+        HttpStatusCode.InternalServerError,
+        `Company not exist with slug: ${slug}`,
+      );
     }
     return membershipService.createMembership({
       user: user._id as Types.ObjectId,
