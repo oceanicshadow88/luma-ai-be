@@ -1,22 +1,16 @@
+import { ROLE } from '@src/config';
+import { RegisterUserInput } from '@src/controllers/auth/registerController';
+import AppException from '@src/exceptions/appException';
+import ResetCodeModel from '@src/models/resetCode';
+import UserModel from '@src/models/user';
+import { membershipService } from '@src/services/membershipService';
+import { userService } from '@src/services/userService';
+import { VerifyCodeType } from '@src/types/invitation';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 
-import { ROLE, RoleType } from '../../config';
-import { RegisterUserInput } from '../../controllers/auth/registerController';
-import AppException from '../../exceptions/appException';
-import ResetCodeModel from '../../models/resetCode';
-import UserModel from '../../models/user';
-import { VerifyCodeType } from '../../types/invitation';
-import { membershipService } from '../membershipService';
-import { userService } from '../userService';
-
 // Create user and generate authentication tokens
-const createUserAndTokens = async (userInput: RegisterUserInput, role: RoleType) => {
-  // Validate verification value is checked in pre-check for admin register
-  if (role === ROLE.LEARNER) {
-    await checkVerificationCode(userInput.verifyValue, userInput.email);
-  }
-  // Create new user
+const createUserAndTokens = async (userInput: RegisterUserInput) => {
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
@@ -27,6 +21,11 @@ const createUserAndTokens = async (userInput: RegisterUserInput, role: RoleType)
 
 export const registerService = {
   teacherRegister: async (userInput: RegisterUserInput) => {
+    const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
+    if (userExistWithUsername) {
+      throw new AppException(HttpStatusCode.Conflict, 'User already exist with username');
+    }
+
     const user = await UserModel.findOne({ email: userInput.email });
     //this need to be change to email
     if (!user) {
@@ -42,9 +41,10 @@ export const registerService = {
 
     return { refreshToken, accessToken };
   },
+
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput, ROLE.ADMIN);
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create admin membership
     await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
@@ -54,10 +54,9 @@ export const registerService = {
 
   // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(
-      userInput,
-      ROLE.LEARNER,
-    );
+    await checkVerificationCode(userInput.verifyValue, userInput.email);
+
+    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
     // Create learner membership with organization association
     await membershipService.createMembership({

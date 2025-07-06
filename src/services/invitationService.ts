@@ -1,12 +1,10 @@
+import { EXPIRES_TIME_CONFIG, LocaleType, MEMBERSHIP_STATUS, ROLE } from '@src/config';
+import { generateRandomUsername } from '@src/lib/generateRandomUsername';
+import { membershipService } from '@src/services/membershipService';
+import { userService } from '@src/services/userService';
+import { GenerateInvitationRequest, GenerateInvitationResponse } from '@src/types/invitation';
+import { generateInvitationLinkAndStoreToken } from '@src/utils/invitationLink';
 import mongoose, { Types } from 'mongoose';
-import { LocaleType } from 'src/config';
-
-import { EXPIRES_TIME_CONFIG, MEMBERSHIP_STATUS, ROLE } from '../config';
-import { generateRandomUsername } from '../lib/generateRandomUsername';
-import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
-import { generateInvitationLinkAndStoreToken } from '../utils/invitationLink';
-import { membershipService } from './membershipService';
-import { userService } from './userService';
 
 export interface RegisterUserInputByInvitation {
   firstName: string;

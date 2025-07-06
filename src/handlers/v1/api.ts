@@ -23,7 +23,6 @@ import {
 import { saas } from '../../middleware/saasMiddleware';
 import { refreshToken } from '../../middleware/tokenHandler';
 import { adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { registerRoutes } from '../../utils/registerRoutes';
 import { companyValidationSchema } from '../../validations/companyValidation';
@@ -43,7 +42,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/instructor',
-    middlewares: [saas, validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
+    middlewares: [saas, validateBody(authValidationSchema.register)],
     handler: teacherRegister,
   },
   {
@@ -106,7 +105,7 @@ registerRoutes(router, [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
     ],
-    handler: companyController.createCompany,
+    handler: companyController.initCompanyAndOwner,
   },
 ]);
 
