@@ -1,90 +1,124 @@
+import AppException from '@src/exceptions/appException';
+import logger from '@src/utils/logger';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import multer from 'multer';
 
-import AppException from '../../exceptions/appException';
-import logger from '../../utils/logger';
+interface ErrorInfo {
+  statusCode: number;
+  message: string;
+  logTag: string;
+  logMessage?: string;
+  logPayload?: Record<string, unknown>;
+}
 
 const errorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
+): void => {
   // If the response header has already been sent, skip the subsequent processing directly
   if (res.headersSent) {
     logger.error(`[HeadersSent Error]: ${err.message}`);
-    return next(err); //Error passed to express for default handling
+    return next(err);
   }
 
-  // JWT token Error
-  if (err instanceof TokenExpiredError) {
-    logger.error(`[TokenExpired Error]: ${err.message}`);
-    res.status(401).json({
-      success: false,
-      message: 'Token has expired',
-    });
-    return;
-  }
-
-  if (err instanceof JsonWebTokenError) {
-    logger.error(`[JsonWebToken Error]: ${err.message}`);
-    res.status(401).json({
-      success: false,
-      message: 'Invalid token',
-    });
-    return;
-  }
-
-  //Joi Error
-  if (err instanceof Joi.ValidationError) {
-    logger.error(`[Validation Error]: ${err.message}`);
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-    return;
-  }
-
-  //File upload
-  if (err instanceof multer.MulterError) {
-    let message = 'File upload error';
-
-    switch (err.code) {
-      case 'LIMIT_FILE_SIZE':
-        message = 'File size exceeds 5MB limit';
-        break;
-      case 'LIMIT_UNEXPECTED_FILE':
-        message = 'Invalid file type';
-        break;
-    }
-
-    logger.error(`[File upload error]: ${err.message}`);
-    res.status(400).json({ message });
-    return;
-  }
-
-  // Custom error handler
-  if (err instanceof AppException) {
-    logger.error(`[AppException]: ${err.message}`, {
-      statusCode: err.statusCode,
-      stack: err.stack,
-      ...(err.payload ? { payload: err.payload } : {}),
-    });
-
-    res.status(err.statusCode).json({
-      success: false,
-      message: 'Internal Server Error',
-    });
-    return;
-  }
-
-  logger.error(`[Unhandled Error]: ${err.message}`);
-  res.status(500).json({
-    success: false,
-    message: 'Unhandled Error',
-  });
+  const errorInfo = processError(err, req);
+  logError(err, errorInfo);
+  sendErrorResponse(res, errorInfo);
 };
+
+function processError(err: Error, req: Request): ErrorInfo {
+  // Token expired error
+  if (err instanceof TokenExpiredError) {
+    return {
+      statusCode: 401,
+      message: 'Token has expired',
+      logMessage: 'Token has expired',
+      logTag: 'TokenExpired Error',
+    };
+  }
+
+  // JWT token error
+  if (err instanceof JsonWebTokenError) {
+    return {
+      statusCode: 500,
+      message: 'Internal Server Error',
+      logMessage: 'Invalid token',
+      logTag: 'JsonWebToken Error',
+    };
+  }
+
+  // Data validation error
+  if (err instanceof Joi.ValidationError) {
+    return {
+      statusCode: 400,
+      message: err.message,
+      logTag: 'Validation Error',
+    };
+  }
+
+  // File upload error
+  if (err instanceof multer.MulterError) {
+    return {
+      statusCode: 400,
+      message: getMulterErrorMessage(err),
+      logMessage: getMulterErrorMessage(err),
+      logTag: 'Multer Error',
+    };
+  }
+
+  // Custom application error
+  if (err instanceof AppException) {
+    return {
+      statusCode: err.statusCode,
+      message: err.statusCode === 500 ? 'Internal Server Error' : err.message,
+      logTag: 'AppException',
+      logPayload: {
+        url: req.originalUrl,
+        method: req.method,
+        stack: err.stack,
+        ...err.payload,
+      },
+    };
+  }
+
+  // Unhandled error
+  return {
+    statusCode: 500,
+    message: 'Internal Server Error',
+    logTag: 'Unhandled Error',
+    logPayload: {
+      url: req.originalUrl,
+      method: req.method,
+      stack: err.stack,
+    },
+  };
+}
+
+// Multer error message mapping
+const multerErrorMessages: Record<string, string> = {
+  LIMIT_FILE_SIZE: 'File size exceeds 5MB limit',
+  LIMIT_UNEXPECTED_FILE: 'Invalid file type',
+} as const;
+
+function getMulterErrorMessage(err: multer.MulterError): string {
+  return multerErrorMessages[err.code] ?? 'File upload failed';
+}
+
+function logError(err: Error, { logTag, logMessage, logPayload, statusCode }: ErrorInfo): void {
+  logger.error(`[${logTag} ${statusCode}]: ${logMessage ?? err.message}`, {
+    ...logPayload,
+  });
+}
+
+function sendErrorResponse(res: Response, { statusCode, message }: ErrorInfo): void {
+  res.status(statusCode).json({
+    success: false,
+    message,
+  });
+}
 
 export default errorHandler;

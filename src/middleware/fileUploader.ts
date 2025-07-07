@@ -3,8 +3,6 @@ import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
 
-import logger from '../utils/logger';
-
 interface FileUploadOptions {
   folderName: string;
   allowedMimeTypes: string[];
@@ -54,7 +52,6 @@ export function wrapMulterMiddleware(
   return (req: Request, res: Response, next: NextFunction) => {
     multerMiddleware(req, res, err => {
       if (err) {
-        logger.error('File upload error:', err);
         return next(err);
       }
       next();
