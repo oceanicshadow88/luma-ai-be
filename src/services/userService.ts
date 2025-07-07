@@ -1,11 +1,10 @@
+import { LocaleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { Company } from '@src/models/company';
+import Membership from '@src/models/membership';
+import UserModel, { User } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
-import { LocaleType } from 'src/config';
-
-import AppException from '../exceptions/appException';
-import { Company } from '../models/company';
-import Membership from '../models/membership';
-import UserModel, { User } from '../models/user';
 
 export interface UserCreateInput {
   firstName: string;
@@ -36,11 +35,11 @@ export const userService = {
   // Get user by ID
   getUserById: async (userId: string): Promise<User> => {
     if (!Types.ObjectId.isValid(userId)) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Invalid user ID');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid user ID');
     }
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
+      throw new AppException(HttpStatusCode.InternalServerError, 'User not found');
     }
 
     return user;
@@ -69,7 +68,7 @@ export const userService = {
       .lean();
 
     if (!membership?.company || !membership?.user) {
-      throw new AppException(HttpStatusCode.NotFound, 'Invalid Membership');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid Membership');
     }
 
     return {
