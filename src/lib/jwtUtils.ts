@@ -1,8 +1,7 @@
+import { config } from '@src/config';
+import AppException from '@src/exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
-
-import { config } from '../config';
-import AppException from '../exceptions/appException';
 
 export type StringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 
@@ -56,7 +55,7 @@ export const jwtUtils = {
     const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
     if (decoded.purpose !== 'password-reset') {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid token purpose');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid token purpose');
     }
     return decoded;
   },

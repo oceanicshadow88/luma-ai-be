@@ -9,7 +9,10 @@ export const authService = {
     const payload = jwtUtils.verifyAccessToken(token);
     const user = await UserModel.find({ email: payload?.email });
     if (!user) {
-      throw new AppException(HttpStatusCode.Forbidden);
+      throw new AppException(
+        HttpStatusCode.InternalServerError,
+        'User not exist with this token email',
+      );
     }
     return user;
   },

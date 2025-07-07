@@ -1,11 +1,10 @@
+import AppException from '@src//exceptions/appException';
+import ResetCodeModel from '@src//models/resetCode';
+import { VerifyCodeType } from '@src//types/invitation';
+import config from '@src/config';
+import { isValidEmail } from '@src/utils';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-
-import config from '../../config';
-import AppException from '../../exceptions/appException';
-import ResetCodeModel from '../../models/resetCode';
-import { VerifyCodeType } from '../../types/invitation';
-import { isValidEmail } from '../../utils';
 
 /**
  * Request verification value
@@ -21,7 +20,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   }
 
   if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
+    throw new AppException(HttpStatusCode.BadRequest, 'Sorry, please type a valid email');
   }
 
   // Check for existing code
@@ -46,11 +45,10 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
         (config.resetCodeRateLimitExpiry * 1000 - timeSinceCreation) / 1000,
       );
 
-      return res.status(429).json({
-        success: false,
-        message: 'Too many requests. Please try again later.',
-        coolDownSeconds: secondsRemaining,
-      });
+      throw new AppException(
+        HttpStatusCode.TooManyRequests,
+        `Too many requests. Please try again later.  coolDownSeconds: ${secondsRemaining}`,
+      );
     }
   }
 
@@ -101,7 +99,7 @@ export const verifyCode = async (req: Request, res: Response) => {
   }
 
   if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
+    throw new AppException(HttpStatusCode.BadRequest, 'Sorry, please type a valid email');
   }
 
   // Find the code for this email
