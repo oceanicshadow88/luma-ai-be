@@ -119,11 +119,7 @@ export const verifyCode = async (req: Request, res: Response) => {
   }
 
   // Validate the code
-  const validationResult = await resetCode.validateResetCode(code);
-
-  if (!validationResult.isValid) {
-    throw new AppException(HttpStatusCode.TooManyRequests, validationResult.message);
-  }
+  await resetCode.validateResetCode(code);
 
   // Code is valid
   return res.status(200).json({

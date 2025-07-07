@@ -1,6 +1,8 @@
+import { HttpStatusCode } from 'axios';
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 import config from '../config';
+import AppException from '../exceptions/appException';
 import { VerifyCodeType } from '../types/invitation';
 
 export interface ResetCode extends Document {
@@ -9,10 +11,7 @@ export interface ResetCode extends Document {
   verifyType: VerifyCodeType; // Use enum instead of union type
   expiresAt: Date;
   attempts: number;
-  validateResetCode(code: string): Promise<{
-    isValid: boolean;
-    message: string;
-  }>;
+  validateResetCode(code: string): Promise<void>;
 }
 
 const resetCodeSchema: Schema<ResetCode> = new Schema(
@@ -50,14 +49,14 @@ const resetCodeSchema: Schema<ResetCode> = new Schema(
 resetCodeSchema.methods.validateResetCode = async function (
   this: ResetCode,
   code: string,
-): Promise<{ isValid: boolean; message: string }> {
+): Promise<void> {
   // Check if code is expired
   if (this.expiresAt < new Date()) {
     // No need to delete, MongoDB TTL will handle this
-    return {
-      isValid: false,
-      message: 'Invalid or expired code. Please request a new one.',
-    };
+    throw new AppException(
+      HttpStatusCode.Unauthorized,
+      'Invalid or expired code. Please request a new one.',
+    );
   }
 
   // Increment attempt counter to prevent brute force
@@ -68,27 +67,20 @@ resetCodeSchema.methods.validateResetCode = async function (
     // Delete the code after too many attempts
     await this.deleteOne();
 
-    return {
-      isValid: false,
-      message: 'Too many incorrect attempts. Please request a new verification value.',
-    };
+    throw new AppException(
+      HttpStatusCode.TooManyRequests,
+      'Too many incorrect attempts. Please request a new verification value.',
+    );
   }
 
   // Verify the code
   if (this.code !== code) {
     await this.save(); // Save the incremented attempt counter
 
-    return {
-      isValid: false,
-      message: 'Invalid verifyValue. Please try again.',
-    };
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verifyValue. Please try again.');
   }
 
-  // If we get here, the code is valid
-  return {
-    isValid: true,
-    message: 'Code verified successfully',
-  };
+  // If we get here, the code is valid - no return needed
 };
 
 // Prevent duplicate model registration in development (hot reload)

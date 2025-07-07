@@ -81,8 +81,5 @@ export const checkVerificationCode = async (verifyValue: string, email: string) 
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification value');
   }
 
-  const { isValid, message } = await resetCode.validateResetCode(verifyValue);
-  if (!isValid) {
-    throw new AppException(HttpStatusCode.Unauthorized, message);
-  }
+  await resetCode.validateResetCode(verifyValue);
 };

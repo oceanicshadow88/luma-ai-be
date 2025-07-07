@@ -73,14 +73,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   }
 
   // Validate the reset code
-  const validationResult = await resetCode.validateResetCode(code);
-
-  if (!validationResult.isValid) {
-    return res.status(429).json({
-      success: false,
-      message: validationResult.message,
-    });
-  }
+  await resetCode.validateResetCode(code);
 
   // Code is valid - update the password
   user.password = newPassword;

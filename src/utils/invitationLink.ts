@@ -101,11 +101,7 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
     );
   }
   // Use the existing validateResetCode method to check expiration and attempts
-  const validation = await invitationRecord.validateResetCode(token);
-
-  if (!validation.isValid) {
-    throw new AppException(HttpStatusCode.Unauthorized, validation.message);
-  }
+  await invitationRecord.validateResetCode(token);
 
   // If validation is successful, delete the token (one-time use)
   await invitationRecord.deleteOne();
