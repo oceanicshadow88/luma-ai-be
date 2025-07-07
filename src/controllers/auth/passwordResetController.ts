@@ -32,7 +32,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   // Check password strength
   if (!isValidPassword(newPassword)) {
     throw new AppException(
-      HttpStatusCode.BadRequest,
+      HttpStatusCode.UnprocessableEntity,
       'Password must be 8-20 characters and contain at least one uppercase letter, lowercase letter, number and special character',
     );
   }
