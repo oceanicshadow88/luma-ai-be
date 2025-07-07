@@ -70,9 +70,6 @@ export const registerService = {
 };
 
 export const checkVerificationCode = async (verifyValue: string, email: string) => {
-  if (!verifyValue) {
-    throw new AppException(HttpStatusCode.BadRequest, 'VerifyValue is required');
-  }
   const resetCode = await ResetCodeModel.findOne({
     email,
     verifyType: VerifyCodeType.VERIFICATION,
