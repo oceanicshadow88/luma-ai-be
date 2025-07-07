@@ -1,6 +1,6 @@
-import bcrypt from 'bcryptjs';
-
-import UserModel from '../../models/user';
+import AppException from '@src/exceptions/appException';
+import UserModel from '@src/models/user';
+import { HttpStatusCode } from 'axios';
 export const userSeeder = {
   async seedDefault() {
     try {
@@ -9,21 +9,22 @@ export const userSeeder = {
         return existing;
       }
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-
       const newUser = await UserModel.create({
         username: 'defaultAdmin',
         firstName: 'admin',
         lastName: 'admin',
         email: 'test@test.com',
-        password: hashedPassword,
+        password: '123@Password',
       });
       return newUser;
     } catch (err) {
       if (err instanceof Error) {
-        throw new Error('❌ Error seeding user: ' + err.message);
+        throw new AppException(
+          HttpStatusCode.InternalServerError,
+          '❌ Error seeding user: ' + err.message,
+        );
       }
-      throw new Error('❌ Unknown error seeding user');
+      throw new AppException(HttpStatusCode.InternalServerError, '❌ Unknown error seeding user');
     }
   },
 };
