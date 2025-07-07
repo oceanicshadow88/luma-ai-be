@@ -159,7 +159,9 @@ userSchema.statics.refreshAuthToken = async function (
 
   const user = await this.findOne({ _id: payload.userId, refreshToken });
   if (!user) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid refresh token');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
+      payload: `Refresh token validation failed for userId=${payload.userId}`,
+    });
   }
 
   const newAccessToken = jwtUtils.generateAccessToken({
