@@ -83,7 +83,7 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
 
   if (decoded.purpose !== 'invitation') {
     throw new AppException(
-      HttpStatusCode.Unauthorized,
+      HttpStatusCode.InternalServerError,
       'Invalid token purpose. This is not an invitation token.',
     );
   }
@@ -96,7 +96,7 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
 
   if (!invitationRecord) {
     throw new AppException(
-      HttpStatusCode.Unauthorized,
+      HttpStatusCode.InternalServerError,
       'Invitation token not found or has been used.',
     );
   }
