@@ -20,7 +20,7 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   }
 
   if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Sorry, please type a valid email');
+    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
 
   // Check for existing code
@@ -99,7 +99,7 @@ export const verifyCode = async (req: Request, res: Response) => {
   }
 
   if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Sorry, please type a valid email');
+    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
   }
 
   // Find the code for this email

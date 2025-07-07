@@ -11,7 +11,7 @@ export const authService = {
     if (!user) {
       throw new AppException(
         HttpStatusCode.InternalServerError,
-        'User not exist with this token email',
+        `User not exist with this token email: ${payload?.email}`,
       );
     }
     return user;
