@@ -28,10 +28,9 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
   const authHeader = req.header('Authorization');
 
   if (!authHeader?.startsWith('Bearer ')) {
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      'Access denied. No token provided with Bearer Auth.',
-    );
+    throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
+      payload: 'Access denied. No token provided with Bearer Auth.',
+    });
   }
 
   // Extract token
@@ -40,20 +39,23 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
   // Verify token signature and expiration
   const payload = jwtUtils.verifyAccessToken(token);
   if (!payload) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'Cannot find payload');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
+      payload: 'Cannot find token payload',
+    });
   }
   // Check if user still exists and is active
   const user = await UserModel.findById(payload.userId).select('-password -refreshToken');
 
   if (!user) {
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      'Token is valid but user no longer exists.',
-    );
+    throw new AppException(HttpStatusCode.Forbidden, 'Unauthorized Access', {
+      payload: 'Token is valid but user no longer exists.',
+    });
   }
 
   if (!user.active) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'User account is inactive.');
+    throw new AppException(HttpStatusCode.Forbidden, 'Unauthorized Access', {
+      payload: 'User account is inactive.',
+    });
   } // Add user info to request object
   req.user = {
     id: (user._id as Types.ObjectId).toString(),
@@ -72,17 +74,18 @@ export const authGuardLite = (req: Request, res: Response, next: NextFunction): 
   const authHeader = req.header('Authorization');
 
   if (!authHeader?.startsWith('Bearer ')) {
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      'Access denied. No token provided with Bearer Auth.',
-    );
+    throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
+      payload: 'Access denied. No token provided with Bearer Auth.',
+    });
   }
 
   const token = authHeader.substring(7);
 
   const payload = jwtUtils.verifyAccessToken(token);
   if (!payload) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'Cannot find payload');
+    throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
+      payload: 'Cannot find token payload',
+    });
   }
 
   req.user = {
