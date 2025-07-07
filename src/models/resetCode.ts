@@ -77,7 +77,10 @@ resetCodeSchema.methods.validateResetCode = async function (
   if (this.code !== code) {
     await this.save(); // Save the incremented attempt counter
 
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verifyValue. Please try again.');
+    throw new AppException(
+      HttpStatusCode.Unauthorized,
+      'Invalid or expired code. Please request a new one.',
+    );
   }
 
   // If we get here, the code is valid - no return needed
