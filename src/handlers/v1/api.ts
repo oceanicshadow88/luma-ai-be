@@ -82,6 +82,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/reset-password',
+    middlewares: [validateBody(authValidationSchema.resetPassword)],
     handler: resetPassword,
   },
   {

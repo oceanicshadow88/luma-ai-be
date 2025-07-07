@@ -2,7 +2,6 @@ import AppException from '@src/exceptions/appException';
 import ResetCodeModel from '@src/models/resetCode';
 import UserModel from '@src/models/user';
 import { VerifyCodeType } from '@src/types/invitation';
-import { isValidEmail, isValidPassword } from '@src/utils';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
@@ -12,35 +11,11 @@ import { Request, Response } from 'express';
  */
 export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, code, newPassword } = req.body;
-  // Validation
-  if (!email) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
-  }
-
-  if (!code) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter the verification code');
-  }
-
-  if (!newPassword) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your new password');
-  }
-
-  if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Sorry, please type a valid email');
-  }
-
-  // Check password strength
-  if (!isValidPassword(newPassword)) {
-    throw new AppException(
-      HttpStatusCode.UnprocessableEntity,
-      'Password must be 8-20 characters and contain at least one uppercase letter, lowercase letter, number and special character',
-    );
-  }
 
   // Find user by email
   const user = await UserModel.findOne({ email }).exec();
 
-  // Check if user exists
+  // User not exist still return true
   if (!user) {
     return res.status(200).json({
       success: true,

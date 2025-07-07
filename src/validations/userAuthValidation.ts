@@ -2,29 +2,31 @@ import Joi from 'joi';
 
 import { DEFAULT_LOCALE, LOCALE_LIST } from '../config';
 
-const baseAuthSchema = Joi.object({
-  email: Joi.string()
-    .required()
-    .trim()
-    .lowercase()
-    .pattern(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-    .messages({
-      'string.pattern.base': 'Sorry, please type a valid email',
-      'string.empty': 'Please enter your email',
-    }),
+const emailSchema = Joi.string()
+  .required()
+  .trim()
+  .lowercase()
+  .pattern(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+  .messages({
+    'string.pattern.base': 'Sorry, please type a valid email',
+    'string.empty': 'Please enter your email',
+  });
 
-  password: Joi.string()
-    .required()
-    .min(8)
-    .max(20)
-    .trim()
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/)
-    .messages({
-      'string.empty': 'Please enter your password',
-      'string.min': 'Please lengthen this text to 8 characters or more',
-      'string.pattern.base':
-        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
-    }),
+const passwordSchema = Joi.string()
+  .required()
+  .min(8)
+  .max(20)
+  .trim()
+  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/)
+  .messages({
+    'string.min': 'Please lengthen this text to 8 characters or more',
+    'string.pattern.base':
+      'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
+  });
+
+const baseAuthSchema = Joi.object({
+  email: emailSchema,
+  password: passwordSchema,
 });
 
 const registerSchema = baseAuthSchema.keys({
@@ -89,11 +91,20 @@ const freshTokenSchema = Joi.object({
   }),
 });
 
+const resetPasswordSchema = Joi.object({
+  email: emailSchema,
+  newPassword: passwordSchema,
+  verifyValue: Joi.string().required().messages({
+    'string.empty': 'VerifyValue is required',
+  }),
+});
+
 const authValidationSchema = {
   register: registerSchema,
   learnerRegister: registerSchema,
   login: baseAuthSchema,
   freshToken: freshTokenSchema,
+  resetPassword: resetPasswordSchema,
 };
 
 export default authValidationSchema;
