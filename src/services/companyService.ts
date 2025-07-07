@@ -28,11 +28,11 @@ export const companyService = {
     }
     const existOwner = await UserModel.exists({ _id: companyInput.owner });
     if (!existOwner) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Owner user not found');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Owner user not found');
     }
     const ownedCompany = await CompanyModel.findOne({ owner: companyInput.owner });
     if (ownedCompany) {
-      throw new AppException(HttpStatusCode.Conflict, 'Owner already has a company');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Owner already has a company');
     }
 
     // create company
