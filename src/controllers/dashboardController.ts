@@ -1,16 +1,17 @@
+import AppException from '@src/exceptions/appException';
+import { adminDashboardDataMock, DEFAULT_MOCK_COUNT } from '@src/mockData/adminDashboardDataMock';
+import { companyUsageService } from '@src/services/companyUsageService';
+import { userService } from '@src/services/userService';
+import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-
-import { adminDashboardDataMock, DEFAULT_MOCK_COUNT } from '../mockData/adminDashboardDataMock';
-import { companyUsageService } from '../services/companyUsageService';
-import { userService } from '../services/userService';
 
 export const dashboardController = {
   getAdminDashboard: async (req: Request, res: Response) => {
     if (!req.user?.id) {
-      return res.status(401).json({ success: false, message: 'Unauthorized User' });
+      throw new AppException(HttpStatusCode.InternalServerError, 'Unauthorized User');
     }
     if (!req.companyId) {
-      return res.status(401).json({ success: false, message: 'Missing company' });
+      throw new AppException(HttpStatusCode.InternalServerError, 'Missing company');
     }
 
     const companyUsage = await companyUsageService.upsertCompanyUsage(req.companyId);
