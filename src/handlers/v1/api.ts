@@ -105,7 +105,7 @@ registerRoutes(router, [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
     ],
-    handler: companyController.initCompanyAndOwner,
+    handler: companyController.createCompany,
   },
 ]);
 
