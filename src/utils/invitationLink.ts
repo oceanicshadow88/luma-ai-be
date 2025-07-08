@@ -1,8 +1,7 @@
 import { HttpStatusCode } from 'axios';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
-import { EXPIRES_TIME_CONFIG, ROLE, RoleType } from '../config';
-import { config } from '../config';
+import { config, EXPIRES_TIME_CONFIG, ROLE, RoleType } from '../config';
 import AppException from '../exceptions/appException';
 import ResetCodeModel from '../models/resetCode';
 import { VerifyCodeType } from '../types/invitation';
@@ -82,10 +81,9 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
   const decoded = jwt.verify(token, secret) as InvitationTokenPayload;
 
   if (decoded.purpose !== 'invitation') {
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      'Invalid token purpose. This is not an invitation token.',
-    );
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or  expired token', {
+      payload: 'Invalid token purpose. This is not an invitation token.',
+    });
   }
   // Check if token exists in database
   const invitationRecord = await ResetCodeModel.findOne({
@@ -95,10 +93,9 @@ export async function verifyInvitationToken(token: string): Promise<InvitationTo
   });
 
   if (!invitationRecord) {
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      'Invitation token not found or has been used.',
-    );
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or  expired token', {
+      payload: 'Invitation token not found or has been used.',
+    });
   }
   // Use the existing validateResetCode method to check expiration and attempts
   await invitationRecord.validateResetCode(token);
