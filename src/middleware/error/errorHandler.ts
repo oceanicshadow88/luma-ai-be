@@ -11,6 +11,7 @@ interface ErrorInfo {
   logTag: string;
   logMessage?: string;
   logPayload?: Record<string, unknown>;
+  field?: string;
 }
 
 const errorHandler: ErrorRequestHandler = (
@@ -72,6 +73,7 @@ function processError(err: Error, req: Request): ErrorInfo {
 
   // Custom application error
   if (err instanceof AppException) {
+    const { field } = err.payload ?? {};
     return {
       statusCode: err.statusCode,
       message: err.statusCode === 500 ? 'Internal Server Error' : err.message,
@@ -82,6 +84,7 @@ function processError(err: Error, req: Request): ErrorInfo {
         stack: err.stack,
         ...err.payload,
       },
+      field: typeof field === 'string' ? field : undefined,
     };
   }
 
@@ -114,10 +117,11 @@ function logError(err: Error, { logTag, logMessage, logPayload, statusCode }: Er
   });
 }
 
-function sendErrorResponse(res: Response, { statusCode, message }: ErrorInfo): void {
+function sendErrorResponse(res: Response, { statusCode, message, field }: ErrorInfo): void {
   res.status(statusCode).json({
     success: false,
     message,
+    ...(field && { field }),
   });
 }
 
