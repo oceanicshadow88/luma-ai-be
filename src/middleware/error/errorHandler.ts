@@ -63,7 +63,7 @@ function processError(err: Error, req: Request): ErrorInfo {
   // File upload error
   if (err instanceof multer.MulterError) {
     return {
-      statusCode: 400,
+      statusCode: 422,
       message: getMulterErrorMessage(err),
       logMessage: getMulterErrorMessage(err),
       logTag: 'Multer Error',

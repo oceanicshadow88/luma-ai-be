@@ -69,7 +69,10 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
   // get user from user register
   const pendingUser = getPendingUserData() as RegisterUserInput;
   if (!pendingUser) {
-    return res.status(400).json({ message: 'Missing user registration data' });
+    throw new AppException(
+      HttpStatusCode.BadRequest,
+      'Missing user registration data, please return Admin Signup Page',
+    );
   }
 
   // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
