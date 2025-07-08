@@ -12,7 +12,8 @@
     // Auto fix ESLint errors on save
     "editor.codeActionsOnSave": {
         "source.fixAll": "always",
-        "source.fixAll.eslint": "always"
+        "source.fixAll.eslint": "always",
+        "source.organizeImports": "always",
     },
     "typescript.updateImportsOnFileMove.enabled": "always",
     // Use relative imports in TS
