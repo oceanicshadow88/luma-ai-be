@@ -35,7 +35,7 @@ function processError(err: Error, req: Request): ErrorInfo {
   if (err instanceof TokenExpiredError) {
     return {
       statusCode: 401,
-      message: 'Token has expired',
+      message: 'Invalid or expired token',
       logMessage: 'Token has expired',
       logTag: 'TokenExpired Error',
     };
@@ -44,8 +44,8 @@ function processError(err: Error, req: Request): ErrorInfo {
   // JWT token error
   if (err instanceof JsonWebTokenError) {
     return {
-      statusCode: 500,
-      message: 'Internal Server Error',
+      statusCode: 401,
+      message: 'Invalid or expired token',
       logMessage: 'Invalid token',
       logTag: 'JsonWebToken Error',
     };
@@ -54,7 +54,7 @@ function processError(err: Error, req: Request): ErrorInfo {
   // Data validation error
   if (err instanceof Joi.ValidationError) {
     return {
-      statusCode: 400,
+      statusCode: 422,
       message: err.message,
       logTag: 'Validation Error',
     };
