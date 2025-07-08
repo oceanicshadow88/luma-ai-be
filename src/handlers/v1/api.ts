@@ -6,9 +6,9 @@ import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import {
   adminRegister,
+  handleOwnerRegistrationProcess,
   learnerRegister,
   teacherRegister,
-  handleOwnerRegistrationProcess ,
 } from '../../controllers/auth/registerController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { dashboardController } from '../../controllers/dashboardController';
@@ -76,11 +76,13 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/request-verification-code',
+    middlewares: [validateBody(authValidationSchema.verificationCode)],
     handler: requestVerificationCode,
   },
   {
     method: 'post',
     path: '/auth/reset-password',
+    middlewares: [validateBody(authValidationSchema.resetPassword)],
     handler: resetPassword,
   },
   {

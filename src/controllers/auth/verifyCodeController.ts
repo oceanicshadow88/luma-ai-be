@@ -1,11 +1,9 @@
+import config from '@src/config';
+import AppException from '@src/exceptions/appException';
+import ResetCodeModel from '@src/models/resetCode';
+import { VerifyCodeType } from '@src/types/invitation';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-
-import config from '../../config';
-import AppException from '../../exceptions/appException';
-import ResetCodeModel from '../../models/resetCode';
-import { VerifyCodeType } from '../../types/invitation';
-import { isValidEmail } from '../../utils';
 
 /**
  * Request verification value
@@ -14,15 +12,6 @@ import { isValidEmail } from '../../utils';
  */
 export const requestVerificationCode = async (req: Request, res: Response) => {
   const { email } = req.body;
-
-  // Email validation
-  if (!email) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
-  }
-
-  if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
-  }
 
   // Check for existing code
   const existingCode = await ResetCodeModel.findOne({
@@ -46,11 +35,10 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
         (config.resetCodeRateLimitExpiry * 1000 - timeSinceCreation) / 1000,
       );
 
-      return res.status(429).json({
-        success: false,
-        message: 'Too many requests. Please try again later.',
-        coolDownSeconds: secondsRemaining,
-      });
+      throw new AppException(
+        HttpStatusCode.TooManyRequests,
+        `Too many requests. Please try again later.  coolDownSeconds: ${secondsRemaining}`,
+      );
     }
   }
 
@@ -80,50 +68,5 @@ export const requestVerificationCode = async (req: Request, res: Response) => {
   // Return success response with the code (in production, this would be removed)
   return res.status(200).json({
     success: true,
-  });
-};
-
-/**
- * Verify a verification value
- * This is a generic verification function that can be used by both
- * password reset and registration flows
- */
-export const verifyCode = async (req: Request, res: Response) => {
-  const { email, code } = req.body;
-
-  // Validation
-  if (!email) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter your email address');
-  }
-
-  if (!code) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please enter the verification value');
-  }
-
-  if (!isValidEmail(email)) {
-    throw new AppException(HttpStatusCode.UnprocessableEntity, 'Sorry, please type a valid email');
-  }
-
-  // Find the code for this email
-  const resetCode = await ResetCodeModel.findOne({
-    email,
-    verifyType: VerifyCodeType.VERIFICATION,
-  }).exec();
-
-  // Check if code exists
-  if (!resetCode) {
-    throw new AppException(
-      HttpStatusCode.BadRequest,
-      'Invalid or expired code. Please request a new one.',
-    );
-  }
-
-  // Validate the code
-  await resetCode.validateResetCode(code);
-
-  // Code is valid
-  return res.status(200).json({
-    success: true,
-    message: 'Code verified successfully',
   });
 };
