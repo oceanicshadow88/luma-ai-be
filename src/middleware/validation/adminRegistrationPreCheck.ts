@@ -19,13 +19,16 @@ export const adminRegistrationPreCheck = async (
   const userExistWithEmail = await UserModel.findOne({ email });
   if (userExistWithEmail) {
     // user and company all exist
-    throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.');
+    throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
+      field: 'email',
+    });
   }
   const userExistWithUsername = await UserModel.findOne({ username });
   if (userExistWithUsername) {
     throw new AppException(
       HttpStatusCode.Conflict,
       'Username already in use. Try a different one.',
+      { field: 'username' },
     );
   }
 

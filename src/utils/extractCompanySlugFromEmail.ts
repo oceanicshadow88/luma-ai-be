@@ -18,6 +18,10 @@ export const extractCompanySlug = async (email: string): Promise<string> => {
     throw new AppException(
       HttpStatusCode.UnprocessableEntity,
       'Public email providers are not allowed',
+      {
+        field: 'email',
+      },
+
     );
   }
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc

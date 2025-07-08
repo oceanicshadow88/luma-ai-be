@@ -23,7 +23,11 @@ export const registerService = {
   teacherRegister: async (userInput: RegisterUserInput) => {
     const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
     if (userExistWithUsername) {
-      throw new AppException(HttpStatusCode.Conflict, 'User already exist with username');
+      throw new AppException(
+        HttpStatusCode.Conflict,
+        'Username already in use. Try a different one.',
+        { field: 'username' },
+      );
     }
 
     const user = await UserModel.findOne({ email: userInput.email });
