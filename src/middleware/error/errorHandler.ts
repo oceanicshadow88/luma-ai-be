@@ -35,7 +35,7 @@ function processError(err: Error, req: Request): ErrorInfo {
   if (err instanceof TokenExpiredError) {
     return {
       statusCode: 401,
-      message: 'Invalid or expired token',
+      message: 'Token has expired',
       logMessage: 'Token has expired',
       logTag: 'TokenExpired Error',
     };
@@ -44,8 +44,8 @@ function processError(err: Error, req: Request): ErrorInfo {
   // JWT token error
   if (err instanceof JsonWebTokenError) {
     return {
-      statusCode: 401,
-      message: 'Invalid or expired token',
+      statusCode: 500,
+      message: 'Internal Server Error',
       logMessage: 'Invalid token',
       logTag: 'JsonWebToken Error',
     };
