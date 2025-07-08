@@ -34,9 +34,6 @@ export const adminRegistrationPreCheck = async (
 
   // check company
   const companySlug = await extractCompanySlug(email);
-  if (!companySlug) {
-    throw new AppException(HttpStatusCode.BadRequest, 'Please provide work email');
-  }
 
   // check verification value, error will be thrown if verification value is not valid
   await checkVerificationCode(verifyValue, email);

@@ -1,11 +1,10 @@
 // @ts-ignore
+import AppException from '@src/exceptions/appException';
 import { HttpStatusCode } from 'axios';
 import freemail from 'freemail';
 import { parse } from 'psl';
 
-import AppException from '../exceptions/appException';
-
-export const extractCompanySlug = async (email: string): Promise<string | null> => {
+export const extractCompanySlug = async (email: string): Promise<string> => {
   const domain = email.split('@')[1]?.toLowerCase();
   // email required
   if (!domain) {
@@ -22,6 +21,7 @@ export const extractCompanySlug = async (email: string): Promise<string | null> 
       {
         field: 'email',
       },
+
     );
   }
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc

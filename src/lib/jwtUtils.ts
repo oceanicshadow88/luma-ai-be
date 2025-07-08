@@ -56,7 +56,9 @@ export const jwtUtils = {
     const decoded = jwt.verify(token, secret) as ResetTokenPayload;
 
     if (decoded.purpose !== 'password-reset') {
-      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid token purpose');
+      throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token.', {
+        payload: 'Invalid token purpose',
+      });
     }
     return decoded;
   },
