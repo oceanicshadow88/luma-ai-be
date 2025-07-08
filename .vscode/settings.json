@@ -16,7 +16,6 @@
         "source.organizeImports": "always",
     },
     "typescript.updateImportsOnFileMove.enabled": "always",
-    // Use relative imports in TS
     "typescript.preferences.importModuleSpecifier": "non-relative",
     "javascript.preferences.importModuleSpecifier": "non-relative",
     "workbench.editor.enablePreview": false,
