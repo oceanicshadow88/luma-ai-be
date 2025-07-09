@@ -1,9 +1,8 @@
+import config from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { VerifyCodeType } from '@src/types/invitation';
 import { HttpStatusCode } from 'axios';
 import mongoose, { Document, Model, Schema } from 'mongoose';
-
-import config from '../config';
-import AppException from '../exceptions/appException';
-import { VerifyCodeType } from '../types/invitation';
 
 export interface ResetCode extends Document {
   email: string;
@@ -56,6 +55,7 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.Unauthorized,
       'Invalid or expired code. Please request a new one.',
+      { field: 'code', payload: 'Expired code' },
     );
   }
 
@@ -70,6 +70,7 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.TooManyRequests,
       'Too many incorrect attempts. Please request a new verification value.',
+      { field: 'code' },
     );
   }
 
@@ -80,6 +81,7 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.Unauthorized,
       'Invalid or expired code. Please request a new one.',
+      { field: 'code', payload: 'Invalid code' },
     );
   }
 

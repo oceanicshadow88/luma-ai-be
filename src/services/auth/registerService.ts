@@ -73,15 +73,12 @@ export const registerService = {
 };
 
 export const checkVerificationCode = async (verifyValue: string, email: string) => {
-  if (!verifyValue) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'VerifyValue is required');
-  }
   const resetCode = await ResetCodeModel.findOne({
     email,
     verifyType: VerifyCodeType.VERIFICATION,
   });
   if (!resetCode) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid verification value');
+    throw new AppException(HttpStatusCode.NotFound, 'Invalid or expired verification value');
   }
 
   await resetCode.validateResetCode(verifyValue);

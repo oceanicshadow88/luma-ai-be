@@ -1,9 +1,9 @@
+import AppException from '@src/exceptions/appException';
+import ResetCodeModel from '@src/models/resetCode';
+import UserModel from '@src/models/user';
+import { VerifyCodeType } from '@src/types/invitation';
+import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-
-import ResetCodeModel from '../../models/resetCode';
-import UserModel from '../../models/user';
-import { VerifyCodeType } from '../../types/invitation';
-import { isValidEmail, isValidPassword } from '../../utils';
 
 /**
  * Combined verify code and reset password
@@ -11,48 +11,11 @@ import { isValidEmail, isValidPassword } from '../../utils';
  */
 export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, code, newPassword } = req.body;
-  // Validation
-  if (!email) {
-    return res.status(422).json({
-      success: false,
-      message: 'Please enter your email address',
-    });
-  }
-
-  if (!code) {
-    return res.status(422).json({
-      success: false,
-      message: 'Please enter the verification value',
-    });
-  }
-
-  if (!newPassword) {
-    return res.status(422).json({
-      success: false,
-      message: 'Please enter a new password',
-    });
-  }
-
-  if (!isValidEmail(email)) {
-    return res.status(422).json({
-      success: false,
-      message: 'Sorry, please type a valid email',
-    });
-  }
-
-  // Check password strength
-  if (!isValidPassword(newPassword)) {
-    return res.status(422).json({
-      success: false,
-      message:
-        'Password must be 8-20 characters and contain at least one uppercase letter, lowercase letter, number and special character',
-    });
-  }
 
   // Find user by email
   const user = await UserModel.findOne({ email }).exec();
 
-  // Check if user exists
+  // User not exist still return true
   if (!user) {
     return res.status(200).json({
       success: true,
@@ -66,10 +29,11 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   }).exec();
   // Check if reset code exists
   if (!resetCode) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid or expired code. Please request a new one.',
-    });
+    throw new AppException(
+      HttpStatusCode.NotFound,
+      'Invalid or expired code. Please request a new one.',
+      { field: 'code' },
+    );
   }
 
   // Validate the reset code
