@@ -18,7 +18,7 @@ export const dashboardController = {
 
     const currentUserInfo = await userService.getCurrentUserInfo(req.user.id, req.companyId);
 
-    //mock data for dashboard display(replace later)
+    //TODO: mock data for dashboard display(replace later)
     const dashboardData = {
       currentUserInfo,
       totalLearners: companyUsage?.currentLearners ?? DEFAULT_MOCK_COUNT,
