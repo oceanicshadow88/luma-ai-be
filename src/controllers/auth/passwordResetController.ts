@@ -32,7 +32,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
     throw new AppException(
       HttpStatusCode.NotFound,
       'Invalid or expired code. Please request a new one.',
-      { field: 'code' },
+      { field: 'verificationCode' },
     );
   }
 
