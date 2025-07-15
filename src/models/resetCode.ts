@@ -81,7 +81,7 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.Unauthorized,
       'Invalid or expired code. Please request a new one.',
-      { field: 'verificationCode', payload: 'Invalid code' },
+      { field: 'verificationCode', payload: `Invalid code ${code} not match with ${this.code}` },
     );
   }
 
