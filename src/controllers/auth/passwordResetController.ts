@@ -44,7 +44,10 @@ export const verifyResetCode = async (req: Request, res: Response) => {
     throw new AppException(
       HttpStatusCode.NotFound,
       'Invalid or expired code. Please request a new one.',
-      { field: 'verificationCode', payload: `ResetCode not exist with email ${email} for ${VerifyCodeType.VERIFICATION}` },
+      {
+        field: 'verificationCode',
+        payload: `ResetCode not exist with email ${email} for ${VerifyCodeType.VERIFICATION}`,
+      },
     );
   }
 
@@ -67,5 +70,3 @@ export const verifyResetCode = async (req: Request, res: Response) => {
     message: 'Password has been reset successfully',
   });
 };
-
-
