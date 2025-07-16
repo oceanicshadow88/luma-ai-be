@@ -82,4 +82,5 @@ export const checkVerificationCode = async (verifyValue: string, email: string) 
   }
 
   await resetCode.validateResetCode(verifyValue);
+  await resetCode.deleteOne();
 };
