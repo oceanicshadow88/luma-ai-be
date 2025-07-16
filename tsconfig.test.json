@@ -7,12 +7,15 @@
     "paths": {},
     "rootDirs": [
       "src",
-      "tests"
-    ]
+      "tests",
+      "test"
+    ],
+    "types": ["node", "jest"]
   },
   "include": [
     "src",
     "tests",
+    "test",
     "loaders",
     "eslint.config.js"
   ],
