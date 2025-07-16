@@ -1,8 +1,8 @@
 import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
-import UserModel from '@src/models/user';
 import { checkVerificationCode } from '@src/services/auth/registerService';
+import { userService } from '@src/services/userService';
 import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
@@ -15,22 +15,7 @@ export const adminRegistrationPreCheck = async (
 ) => {
   const { email, username, verifyValue } = req.body;
 
-  // check user with company exist
-  const userExistWithEmail = await UserModel.findOne({ email });
-  if (userExistWithEmail) {
-    // user and company all exist
-    throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
-      field: 'email',
-    });
-  }
-  const userExistWithUsername = await UserModel.findOne({ username });
-  if (userExistWithUsername) {
-    throw new AppException(
-      HttpStatusCode.Conflict,
-      'Username already in use. Try a different one.',
-      { field: 'username' },
-    );
-  }
+  await userService.checkUserConflict(email, username);
 
   // check company
   const companySlug = await extractCompanySlug(email);

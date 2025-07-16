@@ -58,6 +58,7 @@ export const registerService = {
 
   // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
+    await userService.checkUserConflict(userInput.email, userInput.username);
     await checkVerificationCode(userInput.verifyValue, userInput.email);
 
     const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
