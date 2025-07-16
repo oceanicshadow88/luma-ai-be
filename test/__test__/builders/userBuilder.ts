@@ -2,29 +2,15 @@
 
 import type { Document } from 'mongoose';
 
-import { DEFAULT_LOCALE } from '../../../src/config';
-import UserModel from '../../../src/models/user';
+import { DEFAULT_LOCALE, type LocaleType } from '../../../src/config';
+import UserModel, { type User } from '../../../src/models/user';
 
-export interface UserData {
-  firstName: string;
-  lastName: string;
-  username: string;
-  password: string;
-  email: string;
-  avatarUrl: string;
-  locale: string;
-  active: boolean;
-  refreshToken?: string;
-  loginAttempts: number;
-  lockUntil?: Date | null;
-}
-
-export interface UserDocument extends Document, UserData {
+export interface UserDocument extends Document, User {
   _id: string;
 }
 
 class UserBuilder {
-  private user: UserData;
+  private user: Partial<User>;
 
   constructor() {
     this.user = {
@@ -38,7 +24,7 @@ class UserBuilder {
       active: true,
       refreshToken: undefined,
       loginAttempts: 0,
-      lockUntil: null,
+      lockUntil: undefined,
     };
   }
 
@@ -72,7 +58,7 @@ class UserBuilder {
     return this;
   }
 
-  withLocale(locale: string): UserBuilder {
+  withLocale(locale: LocaleType): UserBuilder {
     this.user.locale = locale;
     return this;
   }
@@ -92,12 +78,12 @@ class UserBuilder {
     return this;
   }
 
-  withLockUntil(lockUntil?: Date | null): UserBuilder {
+  withLockUntil(lockUntil?: Date): UserBuilder {
     this.user.lockUntil = lockUntil;
     return this;
   }
 
-  build(): UserData {
+  build(): Partial<User> {
     return this.user;
   }
 

@@ -1,44 +1,30 @@
 /// <reference types="jest" />
 
 import type { Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 import {
   type CompanyPlanType,
   DEFAULT_COMPANY_PLAN,
   DEFAULT_LOCALE,
   DEFAULT_TIMEZONE,
+  type LocaleType,
 } from '../../../src/config';
-import CompanyModel from '../../../src/models/company';
+import CompanyModel, { type Company } from '../../../src/models/company';
 
-export interface CompanySettings {
-  timezone: string;
-  locale: string;
-  primaryColor: string;
-}
-
-export interface CompanyData {
-  companyName: string;
-  slug: string;
-  plan: CompanyPlanType;
-  owner: string | null;
-  logoUrl: string;
-  settings: CompanySettings;
-  active: boolean;
-}
-
-export interface CompanyDocument extends Document, CompanyData {
+export interface CompanyDocument extends Document, Company {
   _id: string;
 }
 
 class CompanyBuilder {
-  private company: CompanyData;
+  private company: Partial<Company>;
 
   constructor() {
     this.company = {
       companyName: 'Default Company',
       slug: 'lumaai',
       plan: DEFAULT_COMPANY_PLAN,
-      owner: null,
+      owner: new Types.ObjectId(),
       logoUrl: '',
       settings: {
         timezone: DEFAULT_TIMEZONE || 'UTC',
@@ -65,7 +51,7 @@ class CompanyBuilder {
   }
 
   withOwner(owner: string): CompanyBuilder {
-    this.company.owner = owner;
+    this.company.owner = new Types.ObjectId(owner);
     return this;
   }
 
@@ -74,22 +60,31 @@ class CompanyBuilder {
     return this;
   }
 
-  withSettings(settings: Partial<CompanySettings>): CompanyBuilder {
+  withSettings(settings: Partial<Company['settings']>): CompanyBuilder {
     this.company.settings = { ...this.company.settings, ...settings };
     return this;
   }
 
   withTimezone(timezone: string): CompanyBuilder {
+    if (!this.company.settings) {
+      this.company.settings = {};
+    }
     this.company.settings.timezone = timezone;
     return this;
   }
 
-  withLocale(locale: string): CompanyBuilder {
+  withLocale(locale: LocaleType): CompanyBuilder {
+    if (!this.company.settings) {
+      this.company.settings = {};
+    }
     this.company.settings.locale = locale;
     return this;
   }
 
   withPrimaryColor(primaryColor: string): CompanyBuilder {
+    if (!this.company.settings) {
+      this.company.settings = {};
+    }
     this.company.settings.primaryColor = primaryColor;
     return this;
   }
@@ -99,7 +94,7 @@ class CompanyBuilder {
     return this;
   }
 
-  build(): CompanyData {
+  build(): Partial<Company> {
     return this.company;
   }
 
