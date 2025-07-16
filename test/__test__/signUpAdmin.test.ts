@@ -1,11 +1,12 @@
 /// <reference types="jest" />
+
 import request from 'supertest';
 
 import { getApplication } from '../setup/app';
 import { getDefaultCompany } from '../setup/jest-setup';
 import UserBuilder from './builders/userBuilder';
 
-// Jest globals
+// Jest globals (needed for TypeScript)
 declare const describe: (name: string, fn: () => void) => void;
 declare const it: (name: string, fn: () => Promise<void>) => void;
 declare const expect: any;

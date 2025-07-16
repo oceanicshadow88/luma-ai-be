@@ -5,7 +5,7 @@ import UserBuilder, { type UserDocument } from '../__test__/builders/userBuilder
 import * as app from './app';
 import * as db from './db';
 
-// Jest globals
+// Jest globals (needed for TypeScript)
 declare const beforeAll: (fn: () => Promise<void>) => void;
 declare const beforeEach: (fn: () => Promise<void>) => void;
 declare const afterAll: (fn: () => Promise<void>) => void;

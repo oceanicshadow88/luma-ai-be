@@ -1,5 +1,3 @@
-/// <reference types="jest" />
-
 import type { Document } from 'mongoose';
 
 import { DEFAULT_LOCALE, type LocaleType } from '../../../src/config';
