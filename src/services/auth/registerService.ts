@@ -79,7 +79,14 @@ export const checkVerificationCode = async (verifyValue: string, email: string) 
     verifyType: VerifyCodeType.VERIFICATION,
   });
   if (!resetCode) {
-    throw new AppException(HttpStatusCode.NotFound, 'Invalid or expired verification value');
+    throw new AppException(
+      HttpStatusCode.NotFound,
+      'Invalid or expired code. Please request a new one.',
+      {
+        field: 'verificationCode',
+        payload: `ResetCode not exist with email ${email} for ${VerifyCodeType.VERIFICATION}`,
+      },
+    );
   }
 
   await resetCode.validateResetCode(verifyValue);
