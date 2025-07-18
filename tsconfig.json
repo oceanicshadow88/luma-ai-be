@@ -34,8 +34,8 @@
             "@loaders/*": [
                 "loaders/*"
             ],
-            "@tests/*": [
-                "tests/*"
+            "@test/*": [
+                "test/*"
             ],
         },
         // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
@@ -116,12 +116,11 @@
     },
     "include": [
         "src",
-        "tests",
+        "test",
         "loaders",
         "eslint.config.js"
     ],
     "exclude": [
-        "node_modules",
-        "test"
+        "node_modules"
     ]
 }

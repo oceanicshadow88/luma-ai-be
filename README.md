@@ -26,12 +26,13 @@ src/
 ├── handlers            # Express routes
 ├── lib/                # Reusable libraries and utilities
 ├── middleware/         # Express middleware
+├── mockData            # Mock data for display page
 ├── models/             # Mongoose models            
 ├── services/           # Business logic
 ├── types               # TypeScript type
 ├── utils/              # Utility functions
 ├── validations/        # Input validation
-tests/                  # Test scripts
+test/                  # Test scripts
 ```
 
 ## Getting Started
