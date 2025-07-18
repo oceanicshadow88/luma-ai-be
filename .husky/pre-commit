@@ -3,5 +3,5 @@
 . "$(dirname "$0")/_branch-name-check.sh"
 . "$(dirname "$0")/_no-chinese-check.sh"
 
-yarn check
 yarn lint-staged
+yarn spell
