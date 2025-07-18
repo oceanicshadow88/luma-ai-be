@@ -12,21 +12,18 @@
     "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register ./loaders/server.ts",
     "debug": "node --inspect dist/loaders/server.js",
     "test": "jest",
-    "lint": "eslint \"{src,loaders,tests}/**/*.ts\" --fix",
-    "format": "prettier --write \"{src,tests,loaders}/**/*.ts\"",
+    "lint": "eslint \"{src,loaders,test}/**/*.ts\" --fix",
     "lint:check": "eslint . --ext .ts",
-    "format:check": "prettier --check \"{src,tests,loaders}/**/*.ts\"",
-    "check": "yarn format:check && yarn lint:check && yarn test && echo 'All checks passed!'",
+    "format": "prettier --write \"**/*.{js,ts,jsx,tsx}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,jsx,tsx}\"",
     "lint-staged:run": "lint-staged",
-    "spell": "cspell \"loaders/**/*.ts\" \"src/**/*.ts\" \"tests/**/*.ts\" \"*.ts\" \"**/*.{md,json}\"",
+    "spell": "cspell \"loaders/**/*.ts\" \"src/**/*.ts\" \"test/**/*.ts\" \"*.ts\" \"**/*.{md,json}\"",
+    "check": "yarn format && yarn lint && yarn spell && yarn test && echo 'All checks passed!'",
     "commit": "cz"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "*.{js,ts,jsx,tsx}": [
       "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{md,json}": [
       "prettier --write"
     ],
     "*.{ts,tsx,json,md}": "cspell"
