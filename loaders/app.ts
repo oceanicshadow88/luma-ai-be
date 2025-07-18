@@ -43,7 +43,9 @@ function wrapRoutes(router: Router): Router {
       for (const routeLayer of layer.route.stack) {
         const handler = routeLayer.handle;
         if (handler.constructor.name === 'AsyncFunction') {
-          routeLayer.handle = catchAllErrors(handler);
+          routeLayer.handle = catchAllErrors(
+            handler as (req: Request, res: Response, next: NextFunction) => void | Promise<void>,
+          );
         }
       }
     }

@@ -1,5 +1,8 @@
 /// <reference types="jest" />
 
+import { HttpStatusCode } from 'axios';
+
+import AppException from '../../src/exceptions/appException';
 import CompanyBuilder, { type CompanyDocument } from '../__test__/builders/companyBuilder';
 import UserBuilder, { type UserDocument } from '../__test__/builders/userBuilder';
 import * as app from './app';
@@ -20,9 +23,15 @@ const createDefaultData = async (): Promise<void> => {
     .withUsername('defaultowner')
     .withFirstName('Default')
     .withLastName('Owner')
+    .withPassword('123@Password')
     .save();
 
-  defaultCompany = await new CompanyBuilder().withOwner(defaultUser._id).save();
+  defaultCompany = await new CompanyBuilder()
+    .withCompanyName('testCompany')
+    .withPlan('free')
+    .withSlug('default-company')
+    .withOwner(defaultUser._id)
+    .save();
 };
 
 beforeAll(async () => {
@@ -45,5 +54,15 @@ afterAll(async () => {
 });
 
 // Export read-only getters
-export const getDefaultUser = (): UserDocument | null => defaultUser;
-export const getDefaultCompany = (): CompanyDocument | null => defaultCompany;
+export const getDefaultUser = (): UserDocument => {
+  if (!defaultUser) {
+    throw new AppException(HttpStatusCode.InternalServerError, 'Default user creation failed!');
+  }
+  return defaultUser;
+};
+export const getDefaultCompany = (): CompanyDocument => {
+  if (!defaultCompany) {
+    throw new AppException(HttpStatusCode.InternalServerError, 'Default company creation failed!');
+  }
+  return defaultCompany;
+};
