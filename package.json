@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "reinstall": "rm -rf node_modules yarn.lock && yarn install && yarn check",
     "start": "node dist/loaders/server.js",
     "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register ./loaders/server.ts",
     "debug": "node --inspect dist/loaders/server.js",
