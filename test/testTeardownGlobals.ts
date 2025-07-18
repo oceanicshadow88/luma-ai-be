@@ -1,3 +1,5 @@
+import 'tsconfig-paths/register';
+
 import * as app from './setup/app';
 import * as db from './setup/db';
 
