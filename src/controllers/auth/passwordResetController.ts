@@ -42,7 +42,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   // Check if reset code exists
   if (!resetCode) {
     throw new AppException(
-      HttpStatusCode.NotFound,
+      HttpStatusCode.Unauthorized,
       'Invalid or expired code. Please request a new one.',
       {
         field: 'verificationCode',

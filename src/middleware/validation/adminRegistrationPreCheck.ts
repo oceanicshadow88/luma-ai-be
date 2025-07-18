@@ -30,7 +30,7 @@ export const adminRegistrationPreCheck = async (
     setPendingUserData(user);
 
     throw new AppException(
-      HttpStatusCode.NotFound,
+      HttpStatusCode.Unauthorized,
       'No existing institution found. Please create your organization.',
       { payload: { user: getSafePendingUserData() } },
     );
