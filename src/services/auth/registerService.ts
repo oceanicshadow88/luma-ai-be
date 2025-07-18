@@ -80,7 +80,7 @@ export const checkVerificationCode = async (verifyValue: string, email: string) 
   });
   if (!resetCode) {
     throw new AppException(
-      HttpStatusCode.NotFound,
+      HttpStatusCode.Unauthorized,
       'Invalid or expired code. Please request a new one.',
       {
         field: 'verificationCode',

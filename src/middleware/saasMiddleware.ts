@@ -10,7 +10,7 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
   if (isLocalEnv) {
     const defaultCompany = await CompanyModel.findOne({ slug: 'default-company' });
     if (!defaultCompany) {
-      throw new AppException(HttpStatusCode.NotFound, 'Cannot not find default company');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Cannot not find default company');
     }
     req.company = defaultCompany as Company;
     req.companyId = defaultCompany._id as string;

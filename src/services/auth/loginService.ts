@@ -27,7 +27,7 @@ export const loginService = {
     const user = await UserModel.findOne({ email });
     if (!user) {
       throw new AppException(
-        HttpStatusCode.NotFound,
+        HttpStatusCode.Unauthorized,
         'Login failed. Please check your email and password',
         { payload: `User not found with email: ${email}` },
       );
