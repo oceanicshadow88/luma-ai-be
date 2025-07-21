@@ -49,6 +49,9 @@ const localRulesPlugin = {
 
 module.exports = [
   {
+    ignores: ['**/node_modules/**', '**/dist/**', '**/coverage/**', 'eslint.config.js'],
+  },
+  {
     files: ['**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx'],
     languageOptions: {
       parser: typescriptParser,
