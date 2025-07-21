@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 
+import { afterAll, beforeAll, beforeEach } from '@jest/globals';
 import { HttpStatusCode } from 'axios';
 
 import AppException from '../../src/exceptions/appException';
@@ -7,11 +8,6 @@ import CompanyBuilder, { type CompanyDocument } from '../__test__/builders/compa
 import UserBuilder, { type UserDocument } from '../__test__/builders/userBuilder';
 import * as app from './app';
 import * as db from './db';
-
-// Jest globals (needed for TypeScript)
-declare const beforeAll: (fn: () => Promise<void>) => void;
-declare const beforeEach: (fn: () => Promise<void>) => void;
-declare const afterAll: (fn: () => Promise<void>) => void;
 
 let defaultUser: UserDocument | null = null;
 let defaultCompany: CompanyDocument | null = null;

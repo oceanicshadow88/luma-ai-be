@@ -1,15 +1,11 @@
 /// <reference types="jest" />
 
+import { describe, expect, it } from '@jest/globals';
 import request from 'supertest';
 
 import { getApplication } from '../setup/app';
 import { getDefaultCompany } from '../setup/jest-setup';
 import UserBuilder from './builders/userBuilder';
-
-// Jest globals (needed for TypeScript)
-declare const describe: (name: string, fn: () => void) => void;
-declare const it: (name: string, fn: () => Promise<void>) => void;
-declare const expect: any;
 
 describe('Sign Up Admin', () => {
   it('should create an admin user successfully', async () => {

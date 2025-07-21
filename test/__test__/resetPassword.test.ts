@@ -1,4 +1,5 @@
 /// <reference types="jest" />
+import { describe, expect, it } from '@jest/globals';
 import ResetCodeModel from '@src/models/resetCode';
 import UserModel from '@src/models/user';
 import { VerifyCodeType } from '@src/types/invitation';
@@ -7,10 +8,6 @@ import request from 'supertest';
 
 import { getApplication } from '../setup/app';
 import { getDefaultUser } from '../setup/jest-setup';
-
-declare const describe: (name: string, fn: () => void) => void;
-declare const it: (name: string, fn: () => Promise<void>) => void;
-declare const expect: any;
 
 describe('Reset password', () => {
   it('should successfully reset the password when the user exists with valid code', async () => {
