@@ -21,7 +21,6 @@ export const extractCompanySlug = async (email: string): Promise<string> => {
       {
         field: 'email',
       },
-
     );
   }
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc
