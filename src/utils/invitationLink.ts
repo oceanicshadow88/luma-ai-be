@@ -19,7 +19,7 @@ interface InvitationTokenPayload extends JwtPayload {
  */
 async function validateInvitationTokenAndRecord(token: string) {
   const decoded = jwtUtils.verifyAccessToken(token);
-  if (!decoded || typeof decoded !== 'object' || !('email' in decoded) || !('role' in decoded)) {
+  if (!decoded) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
       payload: 'Token is not a valid invitation token.',
     });
