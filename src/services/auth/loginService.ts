@@ -61,15 +61,17 @@ export const loginService = {
     const matchedMembershipWithSlug = memberships.find(m => m.company.slug === slug);
     if (!matchedMembershipWithSlug) {
       throw new AppException(
-        HttpStatusCode.InternalServerError,
-        ` Company slug not match with subdomain: ${slug}.`,
+        HttpStatusCode.Unauthorized,
+        'Login failed. Please check your email and password',
+        { payload: ` Company slug not match with subdomain: ${slug}.` },
       );
     }
     const role = matchedMembershipWithSlug.role;
     if (!allowedRoles.includes(role)) {
       throw new AppException(
-        HttpStatusCode.InternalServerError,
-        `User role: ${role} not match with ${allowedRoles}`,
+        HttpStatusCode.Unauthorized,
+        'Login failed. Please verify your login details or switch to the correct portal.',
+        { payload: `User role: ${role} not match with ${allowedRoles}` },
       );
     }
 
