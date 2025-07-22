@@ -55,7 +55,11 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.Unauthorized,
       'Invalid or expired verification value. Please request a new one.',
-      { field: 'verificationCode', payload: 'Expired verification value' },
+      {
+        field: 'verificationCode',
+        payload:
+          'Used, expired or invalid verification value. Please check your email or contact admin.',
+      },
     );
   }
 
@@ -70,7 +74,10 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.TooManyRequests,
       'Too many incorrect attempts. Please request a new verification value.',
-      { field: 'verificationCode' },
+      {
+        field: 'verificationCode',
+        payload: `Used, expired or invalid verification value. Please check your email or contact admin.`,
+      },
     );
   }
 
@@ -81,7 +88,10 @@ resetCodeSchema.methods.validateResetCode = async function (
     throw new AppException(
       HttpStatusCode.Unauthorized,
       'Invalid or expired verification value. Please request a new one.',
-      { field: 'verificationCode', payload: `Invalid verification value` },
+      {
+        field: 'verificationCode',
+        payload: `Used, expired or invalid verification value. Please check your email or contact admin.`,
+      },
     );
   }
 
