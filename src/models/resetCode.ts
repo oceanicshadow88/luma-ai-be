@@ -54,8 +54,8 @@ resetCodeSchema.methods.validateResetCode = async function (
     // No need to delete, MongoDB TTL will handle this
     throw new AppException(
       HttpStatusCode.Unauthorized,
-      'Invalid or expired code. Please request a new one.',
-      { field: 'verificationCode', payload: 'Expired code' },
+      'Invalid or expired verification value. Please request a new one.',
+      { field: 'verificationCode', payload: 'Expired verification value' },
     );
   }
 
@@ -80,8 +80,8 @@ resetCodeSchema.methods.validateResetCode = async function (
 
     throw new AppException(
       HttpStatusCode.Unauthorized,
-      'Invalid or expired code. Please request a new one.',
-      { field: 'verificationCode', payload: `Invalid code ${code} not match with ${this.code}` },
+      'Invalid or expired verification value. Please request a new one.',
+      { field: 'verificationCode', payload: `Invalid verification value` },
     );
   }
 
