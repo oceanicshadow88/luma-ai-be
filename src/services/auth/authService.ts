@@ -10,6 +10,7 @@ export const authService = {
     const user = await UserModel.find({ email: payload?.email });
     if (!user) {
       throw new AppException(HttpStatusCode.Forbidden, 'Invalid or  expired token', {
+        field: 'token',
         payload: `User not found with email: ${payload?.email} of token`,
       });
     }
