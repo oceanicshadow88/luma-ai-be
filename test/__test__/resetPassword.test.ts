@@ -59,7 +59,9 @@ describe('Reset password', () => {
     });
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toMatch(/Invalid or expired code. Please request a new one./);
+    expect(response.body.message).toMatch(
+      /Invalid or expired verification value. Please request a new one./,
+    );
     expect(response.body.field).toBe('verificationCode');
   });
 
@@ -77,7 +79,9 @@ describe('Reset password', () => {
     });
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toMatch(/Invalid or expired code/);
+    expect(response.body.message).toBe(
+      'Invalid or expired verification value. Please request a new one.',
+    );
     expect(response.body.field).toBe('verificationCode');
 
     const code = await ResetCodeModel.findOne({ email: defaultUser.email });
@@ -124,7 +128,9 @@ describe('Reset password', () => {
     });
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toBe('Invalid or expired code. Please request a new one.');
+    expect(response.body.message).toBe(
+      'Invalid or expired verification value. Please request a new one.',
+    );
     expect(response.body.field).toBe('verificationCode');
   });
 });
