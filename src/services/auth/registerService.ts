@@ -6,6 +6,7 @@ import UserModel from '@src/models/user';
 import { membershipService } from '@src/services/membershipService';
 import { userService } from '@src/services/userService';
 import { VerifyCodeType } from '@src/types/invitation';
+import { verifyInvitationToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 
@@ -35,6 +36,9 @@ export const registerService = {
     if (!user) {
       throw new AppException(HttpStatusCode.NotFound, 'Non invited users');
     }
+
+    // check the token
+    await verifyInvitationToken(userInput.verifyValue);
 
     // Update user data and save - this will trigger pre-save hook for password hashing
     Object.assign(user, userInput, { active: true });

@@ -1,3 +1,4 @@
+import { jwtUtils } from '@src/lib/jwtUtils';
 import { HttpStatusCode } from 'axios';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
@@ -10,6 +11,38 @@ interface InvitationTokenPayload extends JwtPayload {
   email: string;
   role: RoleType;
   purpose: 'invitation';
+}
+
+/**
+ * Validate invitation token and return decoded payload and DB record
+ * Throws AppException if invalid
+ */
+async function validateInvitationTokenAndRecord(token: string) {
+  const decoded = jwtUtils.verifyAccessToken(token);
+  if (!decoded) {
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
+      payload:
+        'Used, expired or invalid invitation link. Please check your email or contact admin.',
+    });
+  }
+  if (decoded.purpose !== 'invitation') {
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
+      payload:
+        'Used, expired or invalid invitation link. Please check your email or contact admin.',
+    });
+  }
+  const invitationRecord = await ResetCodeModel.findOne({
+    email: decoded.email,
+    code: token,
+    verifyType: VerifyCodeType.INVITATION,
+  });
+  if (!invitationRecord) {
+    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
+      payload:
+        'Used, expired or invalid invitation link. Please check your email or contact admin.',
+    });
+  }
+  return { decoded, invitationRecord };
 }
 
 /**
@@ -72,36 +105,18 @@ export async function generateInvitationLinkAndStoreToken(
 /**
  * Verify an invitation token against both JWT and database
  * @param token - The JWT invitation token to verify
- * @returns The decoded token payload containing email and role
  * @throws AppException if token is invalid, expired, or not found in database
  */
-export async function verifyInvitationToken(token: string): Promise<InvitationTokenPayload> {
-  // First, verify the JWT token structure and signature
-  const secret: Secret = config.jwt?.secret;
-  const decoded = jwt.verify(token, secret) as InvitationTokenPayload;
-
-  if (decoded.purpose !== 'invitation') {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or  expired token', {
-      payload: 'Invalid token purpose. This is not an invitation token.',
-    });
-  }
-  // Check if token exists in database
-  const invitationRecord = await ResetCodeModel.findOne({
-    email: decoded.email,
-    code: token,
-    verifyType: VerifyCodeType.INVITATION,
-  });
-
-  if (!invitationRecord) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or  expired token', {
-      payload: 'Invitation token not found or has been used.',
-    });
-  }
+export async function verifyInvitationToken(token: string): Promise<void> {
+  const { invitationRecord } = await validateInvitationTokenAndRecord(token);
   // Use the existing validateResetCode method to check expiration and attempts
   await invitationRecord.validateResetCode(token);
-
   // If validation is successful, delete the token (one-time use)
   await invitationRecord.deleteOne();
+}
 
-  return decoded;
+// judge whether the invitation link(inside of token) exists
+export async function VerifyInvitationLinkExist(token: string): Promise<boolean> {
+  const { invitationRecord } = await validateInvitationTokenAndRecord(token);
+  return !!invitationRecord;
 }
