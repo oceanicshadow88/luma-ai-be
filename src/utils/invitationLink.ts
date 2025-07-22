@@ -21,14 +21,14 @@ async function validateInvitationTokenAndRecord(token: string) {
   const decoded = jwtUtils.verifyAccessToken(token);
   if (!decoded) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
-      payload:
-        'Used, expired or invalid invitation link. Please check your email or contact admin.',
+      field: 'token',
+      payload: 'Invalid token',
     });
   }
   if (decoded.purpose !== 'invitation') {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
-      payload:
-        'Used, expired or invalid invitation link. Please check your email or contact admin.',
+      field: 'token',
+      payload: 'Invalid token purpose. This is not an invitation token.',
     });
   }
   const invitationRecord = await ResetCodeModel.findOne({
@@ -38,8 +38,8 @@ async function validateInvitationTokenAndRecord(token: string) {
   });
   if (!invitationRecord) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Invalid or expired token', {
-      payload:
-        'Used, expired or invalid invitation link. Please check your email or contact admin.',
+      field: 'token',
+      payload: 'Token not found or has been used.',
     });
   }
   return { decoded, invitationRecord };

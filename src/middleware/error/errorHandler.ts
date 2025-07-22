@@ -39,6 +39,7 @@ function processError(err: Error, req: Request): ErrorInfo {
       message: 'Invalid or  expired token',
       logMessage: 'Token has expired',
       logTag: 'TokenExpired Error',
+      field: 'token',
     };
   }
 
@@ -49,6 +50,7 @@ function processError(err: Error, req: Request): ErrorInfo {
       message: 'Invalid or  expired token',
       logMessage: 'Invalid token',
       logTag: 'JsonWebToken Error',
+      field: 'token',
     };
   }
 
