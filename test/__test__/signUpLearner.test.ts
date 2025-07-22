@@ -156,7 +156,9 @@ describe('Sign Up Learner', () => {
       });
 
     expect(response.statusCode).toBe(401);
-    expect(response.body.message).toBe('Invalid or expired code. Please request a new one.');
+    expect(response.body.message).toBe(
+      'Invalid or expired verification value. Please request a new one.',
+    );
     expect(response.body.field).toBe('verificationCode');
   });
 
@@ -188,7 +190,9 @@ describe('Sign Up Learner', () => {
       });
 
     expect(response.statusCode).toBe(401);
-    expect(response.body.message).toBe('Invalid or expired code. Please request a new one.');
+    expect(response.body.message).toBe(
+      'Invalid or expired verification value. Please request a new one.',
+    );
     expect(response.body.field).toBe('verificationCode');
   });
 
@@ -259,7 +263,9 @@ describe('Sign Up Learner', () => {
       });
 
     expect(response.statusCode).toBe(401);
-    expect(response.body.message).toBe('Invalid or expired code. Please request a new one.');
+    expect(response.body.message).toBe(
+      'Invalid or expired verification value. Please request a new one.',
+    );
     expect(response.body.field).toBe('verificationCode');
   });
 });

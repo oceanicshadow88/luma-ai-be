@@ -43,7 +43,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   if (!resetCode) {
     throw new AppException(
       HttpStatusCode.Unauthorized,
-      'Invalid or expired code. Please request a new one.',
+      'Invalid or expired verification value. Please request a new one.',
       {
         field: 'verificationCode',
         payload: `ResetCode not exist with email ${email} for ${VerifyCodeType.VERIFICATION}`,
