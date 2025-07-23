@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { verifyAuthToken } from '../../controllers/auth/authController';
+import { verifyAuthToken, verifySubdomain } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -89,6 +89,12 @@ registerRoutes(router, [
     method: 'post',
     path: '/auth/token',
     handler: verifyAuthToken,
+  },
+  {
+    method: 'get',
+    path: '/auth/verify-subdomain',
+    middlewares: [saas],
+    handler: verifySubdomain,
   },
 ]);
 

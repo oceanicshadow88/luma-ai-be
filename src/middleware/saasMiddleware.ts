@@ -14,37 +14,38 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
     }
     req.company = defaultCompany as Company;
     req.companyId = defaultCompany._id as string;
-    next();
-    return;
+    return next();
   }
 
   const origin = req.headers.origin ?? `${req.protocol}://${req.hostname}`;
 
   const hostname = new URL(origin).hostname.toLowerCase();
   if (!hostname) {
-    throw new AppException(HttpStatusCode.InternalServerError, `Invalid hostname: ${hostname}`);
+    throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
+      payload: `Invalid hostname: ${hostname}`,
+    });
   }
 
   const firstDotIndex = hostname.indexOf('.');
   if (firstDotIndex === -1) {
     // e.g., "localhost", no subdomain
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      `Missing subdomain: ${firstDotIndex}`,
-    );
+    throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
+      payload: `Missing subdomain: ${firstDotIndex}`,
+    });
   }
 
   const slug = hostname.substring(0, firstDotIndex);
   if (!slug) {
-    throw new AppException(HttpStatusCode.InternalServerError, `Invalid subdomain: ${slug}`);
+    throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
+      payload: `Invalid subdomain: ${slug}`,
+    });
   }
 
   const existCompany = await CompanyModel.findOne({ slug }).lean();
   if (!existCompany) {
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      `Company not found for slug: ${slug}`,
-    );
+    throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
+      payload: `Company not found for slug: ${slug}`,
+    });
   }
 
   req.company = existCompany as Company;
