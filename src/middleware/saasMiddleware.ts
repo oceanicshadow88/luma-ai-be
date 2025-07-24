@@ -31,8 +31,7 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
 
   if (
     partsCount !== 3 || // e.g., subdomain.lumaai.com
-    domainParts[1] !== 'lumaai' ||
-    domainParts[2] !== 'com'
+    domainParts[1] !== 'lumaai'
   ) {
     throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
       payload: `Invalid domain format: ${hostname}`,
