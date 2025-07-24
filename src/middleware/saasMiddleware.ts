@@ -22,22 +22,27 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
   const hostname = new URL(origin).hostname.toLowerCase();
   if (!hostname) {
     throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
-      payload: `Invalid hostname: ${hostname}`,
+      payload: `Invalid origin header or URL: ${hostname}`,
     });
   }
+  // Restrict form: subdomain.lumaai.com, no multi-level
+  const domainParts = hostname.split('.');
+  const partsCount = domainParts.length;
 
-  const firstDotIndex = hostname.indexOf('.');
-  if (firstDotIndex === -1) {
-    // e.g., "localhost", no subdomain
+  if (
+    partsCount !== 3 || // e.g., subdomain.lumaai.com
+    domainParts[1] !== 'lumaai' ||
+    domainParts[2] !== 'com'
+  ) {
     throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
-      payload: `Missing subdomain: ${firstDotIndex}`,
+      payload: `Invalid domain format: ${hostname}`,
     });
   }
 
-  const slug = hostname.substring(0, firstDotIndex);
+  const slug = domainParts[0];
   if (!slug) {
     throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
-      payload: `Invalid subdomain: ${slug}`,
+      payload: `Missing subdomain in hostname: ${hostname}`,
     });
   }
 
