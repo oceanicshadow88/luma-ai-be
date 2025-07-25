@@ -1,3 +1,5 @@
+import { authService } from '@src/services/auth/authService';
+import { companyService } from '@src/services/companyService';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
@@ -25,21 +27,9 @@ export const saas = async (req: Request, res: Response, next: NextFunction) => {
     throw new AppException(HttpStatusCode.InternalServerError, `Invalid hostname: ${hostname}`);
   }
 
-  const firstDotIndex = hostname.indexOf('.');
-  if (firstDotIndex === -1) {
-    // e.g., "localhost", no subdomain
-    throw new AppException(
-      HttpStatusCode.InternalServerError,
-      `Missing subdomain: ${firstDotIndex}`,
-    );
-  }
+  const slug = await authService.verifyDomainGetSlug(hostname);
 
-  const slug = hostname.substring(0, firstDotIndex);
-  if (!slug) {
-    throw new AppException(HttpStatusCode.InternalServerError, `Invalid subdomain: ${slug}`);
-  }
-
-  const existCompany = await CompanyModel.findOne({ slug }).lean();
+  const existCompany = await companyService.getCompanyBySlug(slug);
   if (!existCompany) {
     throw new AppException(
       HttpStatusCode.InternalServerError,

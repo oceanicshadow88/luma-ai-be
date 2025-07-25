@@ -1,6 +1,7 @@
+import { adminRegistrationPreCheck } from '@src/middleware/validation/adminRegistrationPreCheck';
 import { Router } from 'express';
 
-import { verifyAuthToken } from '../../controllers/auth/authController';
+import { verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -22,7 +23,6 @@ import {
 } from '../../middleware/fileUploader';
 import { saas } from '../../middleware/saasMiddleware';
 import { refreshToken } from '../../middleware/tokenHandler';
-import { adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
 import { validateBody } from '../../middleware/validation/validationMiddleware';
 import { registerRoutes } from '../../utils/registerRoutes';
 import { companyValidationSchema } from '../../validations/companyValidation';
@@ -89,6 +89,11 @@ registerRoutes(router, [
     method: 'post',
     path: '/auth/token',
     handler: verifyAuthToken,
+  },
+  {
+    method: 'get',
+    path: '/auth/verify-domain',
+    handler: verifyDomain,
   },
 ]);
 
