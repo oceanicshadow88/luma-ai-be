@@ -7,7 +7,7 @@ import { Application } from 'express';
 import request from 'supertest';
 
 describe('Sign Up Company and Owner', () => {
-  const apiPath = '/api/v1/auth/signup/institution-owner';
+  const apiPath = '/api/v1/auth/signup/institution';
   const testEmail = 'owner@nonexist-company.com';
   const verifyValue = '888888';
   const companyName = 'testCompany';
