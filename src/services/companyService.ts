@@ -45,4 +45,12 @@ export const companyService = {
     await company.deleteOne(); //Trigger pre deleteOne hook, also delete membership
     return true;
   },
+
+  getCompanyBySlug: async (slug: string) => {
+    const existCompany = await CompanyModel.findOne({ slug }).lean();
+    if (!existCompany) {
+      return false;
+    }
+    return existCompany;
+  },
 };
