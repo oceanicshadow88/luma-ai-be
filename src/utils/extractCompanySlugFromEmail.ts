@@ -4,7 +4,7 @@ import { HttpStatusCode } from 'axios';
 import freemail from 'freemail';
 import { parse } from 'psl';
 
-export const extractCompanySlug = async (email: string): Promise<string> => {
+export const extractCompanySlugFromEmail = async (email: string): Promise<string> => {
   const domain = email.split('@')[1]?.toLowerCase();
   // email required
   if (!domain) {

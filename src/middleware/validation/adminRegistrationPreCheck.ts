@@ -3,7 +3,7 @@ import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
 import { checkVerificationCode } from '@src/services/auth/registerService';
 import { userService } from '@src/services/userService';
-import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
+import { extractCompanySlugFromEmail } from '@src/utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
@@ -18,7 +18,7 @@ export const adminRegistrationPreCheck = async (
   await userService.checkUserConflict(email, username);
 
   // check company
-  const companySlug = await extractCompanySlug(email);
+  const companySlug = await extractCompanySlugFromEmail(email);
 
   // check verification value, error will be thrown if verification value is not valid
   await checkVerificationCode(verifyValue, email);

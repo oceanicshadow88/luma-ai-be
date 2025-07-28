@@ -3,7 +3,7 @@ import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
 import MembershipModel, { Membership } from '@src/models/membership';
 import { User } from '@src/models/user';
-import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
+import { extractCompanySlugFromEmail } from '@src/utils/extractCompanySlugFromEmail';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 
@@ -43,7 +43,7 @@ export const membershipService = {
   },
 
   createAdminMembershipByUser: async (user: User, role: RoleType): Promise<Membership> => {
-    const slug = await extractCompanySlug(user.email);
+    const slug = await extractCompanySlugFromEmail(user.email);
 
     const existCompany = await CompanyModel.findOne({ slug });
     if (!existCompany) {

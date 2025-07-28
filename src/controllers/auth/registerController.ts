@@ -1,16 +1,11 @@
 // Authentication and authorization
-import { LocaleType, ROLE } from '@src/config';
+import { LocaleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
-import UserModel, { User } from '@src/models/user';
 import { registerService } from '@src/services/auth/registerService';
-import { companyService } from '@src/services/companyService';
-import { membershipService } from '@src/services/membershipService';
-import { userService } from '@src/services/userService';
-import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
 import { clearPendingUserData, getPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-import { ObjectId, Types } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
 export interface RegisterUserInput {
   firstName: string;
@@ -38,10 +33,9 @@ export const learnerRegister = async (req: Request, res: Response) => {
   });
 };
 
-export const adminRegister = async (req: Request, res: Response) => {
+export const teacherRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
-
-  const { refreshToken, accessToken } = await registerService.adminRegister(userInput);
+  const { refreshToken, accessToken } = await registerService.teacherRegister(userInput);
 
   res.status(201).json({
     message: 'Successfully signed up!',
@@ -50,9 +44,10 @@ export const adminRegister = async (req: Request, res: Response) => {
   });
 };
 
-export const teacherRegister = async (req: Request, res: Response) => {
+export const adminRegister = async (req: Request, res: Response) => {
   const userInput = req.body as RegisterUserInput;
-  const { refreshToken, accessToken } = await registerService.teacherRegister(userInput);
+
+  const { refreshToken, accessToken } = await registerService.adminRegister(userInput);
 
   res.status(201).json({
     message: 'Successfully signed up!',
@@ -71,49 +66,24 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
   if (!pendingUser) {
     throw new AppException(
       HttpStatusCode.BadRequest,
-      'Missing user registration data, please return Admin Signup Page',
+      'Missing user registration data, please return Admin Signup Page.',
     );
   }
 
-  // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
+  // company create do not need to check verify code, because it is created by admin user registration and verify code is verified in user register
 
-  // check company slug
-  const slug = await extractCompanySlug(pendingUser.email);
-
-  // create user
-  let newUser: User | null = await UserModel.findOne({ email: pendingUser.email });
-  newUser ??= await userService.createUser(pendingUser);
-  if (!newUser?._id) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'User creation failed');
-  }
-
-  // create company
-  const newCompany = await companyService.createCompany({
+  const result = await registerService.companyOwnerRegister({
     companyName,
-    slug,
     plan,
-    owner: newUser._id as Types.ObjectId,
-    logoUrl,
     settings,
-  });
-  if (!newCompany._id) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
-  }
-
-  // create membership
-  const newMembership = await membershipService.createMembership({
-    user: newUser.id,
-    company: newCompany.id,
-    role: ROLE.ADMIN,
+    logoUrl,
+    pendingUser,
   });
 
   clearPendingUserData();
+
   return res.status(201).json({
     message: 'User, Company and Membership created successfully',
-    data: {
-      user: newUser._id,
-      company: newCompany._id,
-      membership: newMembership._id,
-    },
+    data: result,
   });
 };
