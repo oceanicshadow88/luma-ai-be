@@ -6,7 +6,6 @@ import { registerService } from '@src/services/auth/registerService';
 import { companyService } from '@src/services/companyService';
 import { membershipService } from '@src/services/membershipService';
 import { userService } from '@src/services/userService';
-import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
 import { clearPendingUserData, getPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
@@ -63,7 +62,7 @@ export const teacherRegister = async (req: Request, res: Response) => {
 
 export const handleOwnerRegistrationProcess = async (req: Request, res: Response) => {
   // Check fields
-  const { companyName, plan, settings } = req.body;
+  const { companyName, plan, settings,slug } = req.body;
 
   const logoUrl = req?.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
   // get user from user register
@@ -78,7 +77,6 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
   // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
 
   // check company slug
-  const slug = await extractCompanySlug(pendingUser.email);
 
   // create user
   let newUser: User | null = await UserModel.findOne({ email: pendingUser.email });

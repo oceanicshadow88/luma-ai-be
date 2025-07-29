@@ -2,7 +2,7 @@ import { jwtUtils } from '@src/lib/jwtUtils';
 import { HttpStatusCode } from 'axios';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
-import { config, EXPIRES_TIME_CONFIG, ROLE, RoleType } from '../config';
+import { config, EXPIRES_TIME_CONFIG, RoleType } from '../config';
 import AppException from '../exceptions/appException';
 import ResetCodeModel from '../models/resetCode';
 import { VerifyCodeType } from '../types/invitation';
@@ -95,10 +95,8 @@ export async function generateInvitationLinkAndStoreToken(
     signupBaseUrl = `${signupBaseUrl.replace(/\/$/, '')}/auth/signup`;
   }
 
-  if (role === ROLE.INSTRUCTOR) {
-    // If the role is INSTRUCTOR, append the teacher path to the signup URL
-    signupBaseUrl = `${signupBaseUrl}/teacher`;
-  }
+  signupBaseUrl = `${signupBaseUrl}/${role}`;
+  
   return `${signupBaseUrl}?token=${token}`;
 }
 
