@@ -1,4 +1,4 @@
-import { EXPIRES_TIME_CONFIG, LocaleType, MEMBERSHIP_STATUS, ROLE } from '@src/config';
+import { EXPIRES_TIME_CONFIG, LocaleType, MEMBERSHIP_STATUS } from '@src/config';
 import { generateRandomUsername } from '@src/lib/generateRandomUsername';
 import { membershipService } from '@src/services/membershipService';
 import { userService } from '@src/services/userService';
@@ -35,16 +35,16 @@ export class InvitationService {
     const newUsername = await generateRandomUsername();
     const { newUser } = await createUserAndTokens({
       email,
-      password: '123@Password',
+      password: '123@Password',//this is a huge security risk, should be change
       username: newUsername,
       firstName: 'Invited',
-      lastName: 'Teacher',
+      lastName: 'Invited',
       active: false,
     });
     await membershipService.createMembership({
       company: new mongoose.Types.ObjectId(companyId),
       user: newUser._id as Types.ObjectId,
-      role: ROLE.INSTRUCTOR,
+      role: role,
       status: MEMBERSHIP_STATUS.INVITED,
     });
     const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
