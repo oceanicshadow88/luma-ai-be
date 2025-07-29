@@ -35,7 +35,7 @@ export class InvitationService {
     const newUsername = await generateRandomUsername();
     const { newUser } = await createUserAndTokens({
       email,
-      password: '123@Password',//this is a huge security risk, should be change
+      password: '123@Password',//TODO: this is a huge security risk, should be change
       username: newUsername,
       firstName: 'Invited',
       lastName: 'Invited',

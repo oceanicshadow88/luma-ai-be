@@ -117,7 +117,7 @@ registerRoutes(router, [
 ]);
 
 // ----------------- INVITATION ROUTES -----------------
-registerRoutes(router, [
+registerRoutes(router, [ //TODO: Secure this route
   {
     method: 'post',
     path: '/invitation/generate',

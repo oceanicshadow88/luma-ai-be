@@ -2,7 +2,6 @@ import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
 import { checkVerificationCode } from '@src/services/auth/registerService';
-import { userService } from '@src/services/userService';
 import { extractCompanySlug } from '@src/utils/extractCompanySlugFromEmail';
 import { getSafePendingUserData, setPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
@@ -13,9 +12,14 @@ export const adminRegistrationPreCheck = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, username, verifyValue } = req.body;
-
-  await userService.checkUserConflict(email, username);
+  const { email, username, verifyValue, token } = req.body;
+  if(token){
+     next();
+     return;
+  }
+  // TODO: this user already exist in this company
+  // await userService.checkUserConflict(email, username);
+  //Need to spereate the username check and also email check
 
   // check company
   const companySlug = await extractCompanySlug(email);

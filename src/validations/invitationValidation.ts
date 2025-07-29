@@ -12,8 +12,8 @@ export const invitationSchema = Joi.object({
       'string.pattern.base': 'It is not a valid email address',
       'string.empty': 'Email is required',
     }),
-  role: Joi.string().required().valid(ROLE.INSTRUCTOR, ROLE.LEARNER).messages({
+  role: Joi.string().required().valid(ROLE.INSTRUCTOR, ROLE.LEARNER, ROLE.ADMIN).messages({
     'string.empty': 'Role is required',
-    'any.only': 'Role must be either instructor or learner',
+    'any.only': 'Role must be either instructor, learner, or admin',
   }),
 });

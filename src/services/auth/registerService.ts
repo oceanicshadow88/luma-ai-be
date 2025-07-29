@@ -52,12 +52,21 @@ export const registerService = {
 
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
-
-    // Create admin membership
-    await membershipService.createAdminMembershipByUser(newUser, ROLE.ADMIN);
-
-    return { refreshToken, accessToken };
+    const user = await UserModel.findOne({ email: userInput.email});    
+    if (user && user.active === false) {
+      Object.assign(user, userInput, { active: true });
+      await user.save();      
+      const tokens = await user.generateTokens();
+      await userService.updateUserById(user.id, { refreshToken: tokens.refreshToken });
+      return { refreshToken:tokens.refreshToken, accessToken: tokens.accessToken };
+    }
+    if(user && user.active === true) {
+      //TODO: What to do 
+    }
+      // Create a new user
+    const result = await createUserAndTokens(userInput);
+    await membershipService.createAdminMembershipByUser(result.newUser, ROLE.ADMIN);
+    return { refreshToken:result.refreshToken, accessToken: result.accessToken };
   },
 
   // Register learner user and create learner membership for specific organization

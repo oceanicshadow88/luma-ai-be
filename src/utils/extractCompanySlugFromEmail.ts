@@ -1,7 +1,6 @@
 // @ts-ignore
 import AppException from '@src/exceptions/appException';
 import { HttpStatusCode } from 'axios';
-import freemail from 'freemail';
 import { parse } from 'psl';
 
 export const extractCompanySlug = async (email: string): Promise<string> => {
@@ -14,15 +13,15 @@ export const extractCompanySlug = async (email: string): Promise<string> => {
     );
   }
   // block public email
-  if (freemail.isFree(email)) {
-    throw new AppException(
-      HttpStatusCode.UnprocessableEntity,
-      'Public email providers are not allowed',
-      {
-        field: 'email',
-      },
-    );
-  }
+  // if (freemail.isFree(email)) {
+  //   throw new AppException(
+  //     HttpStatusCode.UnprocessableEntity,
+  //     'Public email providers are not allowed',
+  //     {
+  //       field: 'email',
+  //     },
+  //   );
+  // }
   // Determine the structure of a domain name, identify top-level domains, subdomains, primary domains, etc
   const parsed = parse(domain);
   if (
