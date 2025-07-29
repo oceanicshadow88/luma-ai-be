@@ -29,14 +29,23 @@ const baseAuthSchema = Joi.object({
   password: passwordSchema,
 });
 
-const registerSchema = baseAuthSchema.keys({
-  firstName: Joi.string().required().messages({
-    'string.empty': 'First name is required',
-  }),
+const nameSchema = Joi.string()
+  .pattern(/^[a-zA-Z]+$/)
+  .min(2)
+  .max(20)
+  .required()
+  .messages({
+    'string.pattern.base': '{{#label}} must contain only letters',
+    'string.empty': '{{#label}} is required',
+    'string.min': '{{#label}} must be at least 2 characters',
+    'string.max': '{{#label}} must be less than 20 characters',
+  });
 
-  lastName: Joi.string().required().messages({
-    'string.empty': 'Last name is required',
-  }),
+const registerSchema = baseAuthSchema.keys({
+  firstName: nameSchema.label('First name'),
+
+  lastName: nameSchema.label('Last name'),
+
   username: Joi.string()
     .required()
     .pattern(/^[a-zA-Z0-9._-]+$/)
@@ -83,7 +92,7 @@ const registerSchema = baseAuthSchema.keys({
   active: Joi.boolean().default(true).messages({
     'boolean.base': 'Active must be a boolean value',
   }),
-  token: Joi.string().optional()
+  token: Joi.string().optional(),
 });
 
 const freshTokenSchema = Joi.object({
