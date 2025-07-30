@@ -4,7 +4,10 @@ import { Router } from 'express';
 import { verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
-import { resetPassword } from '../../controllers/auth/passwordResetController';
+import {
+  resetPasswordEnterprise,
+  resetPasswordLearner,
+} from '../../controllers/auth/passwordResetController';
 import {
   adminRegister,
   handleOwnerRegistrationProcess,
@@ -81,9 +84,15 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/reset-password',
-    middlewares: [validateBody(authValidationSchema.resetPassword)],
-    handler: resetPassword,
+    path: '/auth/reset-password/enterprise',
+    middlewares: [saas, validateBody(authValidationSchema.resetPassword)],
+    handler: resetPasswordEnterprise,
+  },
+  {
+    method: 'post',
+    path: '/auth/reset-password/learner',
+    middlewares: [saas, validateBody(authValidationSchema.resetPassword)],
+    handler: resetPasswordLearner,
   },
   {
     method: 'post',
@@ -117,7 +126,8 @@ registerRoutes(router, [
 ]);
 
 // ----------------- INVITATION ROUTES -----------------
-registerRoutes(router, [ //TODO: Secure this route
+registerRoutes(router, [
+  //TODO: Secure this route
   {
     method: 'post',
     path: '/invitation/generate',

@@ -1,6 +1,9 @@
 /// <reference types="jest" />
 
 import { afterAll, beforeAll, beforeEach } from '@jest/globals';
+import { ROLE } from '@src/config';
+import { Membership } from '@src/models/membership';
+import MembershipBuilder from '@test/__test__/builders/membershipBuilder';
 import { HttpStatusCode } from 'axios';
 
 import AppException from '../../src/exceptions/appException';
@@ -11,6 +14,7 @@ import * as db from './db';
 
 let defaultUser: UserDocument | null = null;
 let defaultCompany: CompanyDocument | null = null;
+let defaultMembership: Membership | null = null;
 
 const createDefaultData = async (): Promise<void> => {
   // Create a default company with owner for tests
@@ -27,6 +31,12 @@ const createDefaultData = async (): Promise<void> => {
     .withPlan('free')
     .withSlug('default-company')
     .withOwner(defaultUser._id)
+    .save();
+
+  defaultMembership = await new MembershipBuilder()
+    .withCompany(defaultCompany._id)
+    .withUser(defaultUser._id)
+    .withRole(ROLE.ADMIN)
     .save();
 };
 
@@ -56,9 +66,20 @@ export const getDefaultUser = (): UserDocument => {
   }
   return defaultUser;
 };
+
 export const getDefaultCompany = (): CompanyDocument => {
   if (!defaultCompany) {
     throw new AppException(HttpStatusCode.InternalServerError, 'Default company creation failed!');
   }
   return defaultCompany;
+};
+
+export const getDefaultMembership = (): Membership => {
+  if (!defaultMembership) {
+    throw new AppException(
+      HttpStatusCode.InternalServerError,
+      'Default membership creation failed!',
+    );
+  }
+  return defaultMembership;
 };
