@@ -184,6 +184,25 @@ describe('Reset password', () => {
     expect(response.body.message).toBe('Password has been reset successfully');
   });
 
+  it('should return success when role not match', async () => {
+    await new ResetCodeBuilder()
+      .withEmail(defaultUser.email)
+      .withCode(verifyValue)
+      .withVerifyType(VerifyCodeType.VERIFICATION)
+      .save();
+
+    const response = await request(app).post(apiPathLearner).set('origin', originURL).send({
+      email: defaultUser.email,
+      newPassword: newPassword,
+      verifyValue: verifyValue,
+      companyId: defaultCompany._id,
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe('Password has been reset successfully');
+  });
+
   it('should throw 401 unauthorized error when verification code not exists', async () => {
     await ResetCodeModel.deleteMany({ email: defaultUser.email });
 

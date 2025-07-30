@@ -45,9 +45,8 @@ export const passwordResetService = async ({
 
   const role = matchedMembershipWithSlug.role;
   if (!allowedRoles.includes(role)) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'Failed. Please check email.', {
-      payload: `User role: ${role} not match with ${allowedRoles}`,
-    });
+    logger.error(`User role: ${role} not match with ${allowedRoles}`);
+    return;
   }
 
   // Find the reset code for this email
