@@ -1,4 +1,3 @@
-import { adminRegistrationPreCheck } from '@src/middleware/validation/adminRegistrationPreCheck';
 import { Router } from 'express';
 
 import { verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
@@ -36,7 +35,7 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/admin',
-    middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
+    middlewares: [validateBody(authValidationSchema.register)],
     handler: adminRegister,
   },
   {
@@ -111,13 +110,15 @@ registerRoutes(router, [
     middlewares: [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
+      authGuard,
     ],
     handler: handleOwnerRegistrationProcess,
   },
 ]);
 
 // ----------------- INVITATION ROUTES -----------------
-registerRoutes(router, [ //TODO: Secure this route
+registerRoutes(router, [
+  //TODO: Secure this route
   {
     method: 'post',
     path: '/invitation/generate',

@@ -26,7 +26,6 @@ declare global {
 export const authGuard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   // Get auth header
   const authHeader = req.header('Authorization');
-
   if (!authHeader?.startsWith('Bearer ')) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
       payload: 'Access denied. No token provided with Bearer Auth.',
@@ -35,7 +34,6 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
 
   // Extract token
   const token = authHeader.substring(7);
-
   // Verify token signature and expiration
   const payload = jwtUtils.verifyAccessToken(token);
   if (!payload) {

@@ -12,10 +12,10 @@ export const adminRegistrationPreCheck = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { email, username, verifyValue, token } = req.body;
-  if(token){
-     next();
-     return;
+  const { email, verifyValue, token } = req.body;
+  if (token) {
+    next();
+    return;
   }
   // TODO: this user already exist in this company
   // await userService.checkUserConflict(email, username);
@@ -34,7 +34,7 @@ export const adminRegistrationPreCheck = async (
     setPendingUserData(user);
 
     throw new AppException(
-      HttpStatusCode.Unauthorized,
+      HttpStatusCode.Unauthorized, //TODO change to something else
       'No existing institution found. Please create your organization.',
       { payload: { user: getSafePendingUserData() } },
     );

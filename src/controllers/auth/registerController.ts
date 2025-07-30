@@ -5,8 +5,7 @@ import UserModel, { User } from '@src/models/user';
 import { registerService } from '@src/services/auth/registerService';
 import { companyService } from '@src/services/companyService';
 import { membershipService } from '@src/services/membershipService';
-import { userService } from '@src/services/userService';
-import { clearPendingUserData, getPendingUserData } from '@src/utils/storagePendingUser';
+import { clearPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 import { ObjectId, Types } from 'mongoose';
@@ -60,31 +59,21 @@ export const teacherRegister = async (req: Request, res: Response) => {
   });
 };
 
-export const handleOwnerRegistrationProcess = async (req: Request, res: Response) => {
+export const handleOwnerRegistrationProcess = async (req: any, res: Response) => {
   // Check fields
-  const { companyName, plan, settings,slug } = req.body;
+  const { companyName, plan, settings, slug } = req.body;
 
   const logoUrl = req?.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
-  // get user from user register
-  const pendingUser = getPendingUserData() as RegisterUserInput;
-  if (!pendingUser) {
-    throw new AppException(
-      HttpStatusCode.BadRequest,
-      'Missing user registration data, please return Admin Signup Page',
-    );
-  }
 
   // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
 
   // check company slug
 
   // create user
-  let newUser: User | null = await UserModel.findOne({ email: pendingUser.email });
-  newUser ??= await userService.createUser(pendingUser);
-  if (!newUser?._id) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'User creation failed');
+  let newUser: User | null = await UserModel.findOne({ email: req?.user.email });
+  if (!newUser) {
+    throw new AppException(HttpStatusCode.Unauthorized, 'User not found');
   }
-
   // create company
   const newCompany = await companyService.createCompany({
     companyName,
