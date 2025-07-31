@@ -48,7 +48,7 @@ const registerSchema = baseAuthSchema.keys({
 
   username: Joi.string()
     .required()
-    .pattern(/^[a-zA-Z0-9._-]+$/)
+    .pattern(/^[a-zA-Z0-9]+$/)
     .min(2)
     .max(20)
     .messages({
