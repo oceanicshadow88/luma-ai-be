@@ -1,6 +1,7 @@
 import { ROLE } from '@src/config';
 import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
+import MembershipModel from '@src/models/membership';
 import ResetCodeModel from '@src/models/resetCode';
 import UserModel from '@src/models/user';
 import { membershipService } from '@src/services/membershipService';
@@ -70,18 +71,55 @@ export const registerService = {
 
   // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
-    await userService.checkUserConflict(userInput.email, userInput.username);
     await checkVerificationCode(userInput.verifyValue, userInput.email);
 
-    const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+    // Check learner exist in this company
+    const existingUser = await UserModel.findOne({ email: userInput.email });
 
-    // Create learner membership with organization association
+    if (!existingUser) {
+      const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
+      if (userExistWithUsername) {
+        throw new AppException(
+          HttpStatusCode.Conflict,
+          'Username already in use. Try a different one.',
+          { field: 'username' },
+        );
+      }
+
+      const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
+
+      await membershipService.createMembership({
+        user: newUser._id as Types.ObjectId,
+        company: new Types.ObjectId(organizationId),
+        role: ROLE.LEARNER,
+      });
+
+      return { refreshToken, accessToken };
+    }
+
+    const existingLearnerMembership = await MembershipModel.findOne({
+      user: existingUser._id,
+      company: organizationId,
+      role: ROLE.LEARNER,
+    });
+
+    if (existingLearnerMembership) {
+      throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
+        field: 'email',
+      });
+    }
+
+    // User exist but not this company or in this company but not learner
     await membershipService.createMembership({
-      user: newUser._id as Types.ObjectId,
+      user: existingUser._id as Types.ObjectId,
       company: new Types.ObjectId(organizationId),
       role: ROLE.LEARNER,
     });
-    return { refreshToken, accessToken };
+
+    const { refreshToken, accessToken } = await existingUser.generateTokens();
+    await userService.updateUserById(existingUser.id, { refreshToken });
+
+    return { existingUser, refreshToken, accessToken };
   },
 };
 
