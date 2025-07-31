@@ -97,7 +97,6 @@ registerRoutes(router, [
   {
     method: 'get',
     path: '/auth/verify-user',
-    middlewares: [authGuard],
     handler: isActiveUser,
   },
 ]);

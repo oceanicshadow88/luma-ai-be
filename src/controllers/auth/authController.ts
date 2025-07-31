@@ -1,4 +1,6 @@
 import AppException from '@src/exceptions/appException';
+import { jwtUtils } from '@src/lib/jwtUtils';
+import UserModel from '@src/models/user';
 import { companyService } from '@src/services/companyService';
 import { VerifyInvitationLinkExist } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
@@ -31,7 +33,17 @@ export const verifyDomain = async (req: Request, res: Response) => {
 };
 
 export const isActiveUser = async (req: Request, res: Response) => {
+  const authHeader = req.header('Authorization') ?? '';
+  const token = authHeader.substring(7);
+  // Verify token signature and expiration
+  const payload = jwtUtils.verifyAccessToken(token);
+  if (!payload) {
+    throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
+      payload: 'Cannot find token payload',
+    });
+  }
+  const user = await UserModel.findOne({ email: payload.email }); //payload should contain the ID
   return res.send({
-    isActive: req.user?.active ?? false,
+    isActive: user?.active ?? false,
   });
 };

@@ -10,7 +10,7 @@ import CompanyModel, { Company } from '../models/company';
 export const saas = async (req: Request, res: Response, next: NextFunction) => {
   const isLocalEnv = config.env === 'local';
   if (isLocalEnv) {
-    const defaultCompany = await CompanyModel.findOne({ slug: 'default-company' });
+    const defaultCompany = await CompanyModel.findOne({ slug: 'kitman2' });
     if (!defaultCompany) {
       throw new AppException(HttpStatusCode.InternalServerError, 'Cannot not find default company');
     }
