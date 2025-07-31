@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
+import { isActiveUser, verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
@@ -93,6 +93,12 @@ registerRoutes(router, [
     method: 'get',
     path: '/auth/verify-domain',
     handler: verifyDomain,
+  },
+  {
+    method: 'get',
+    path: '/auth/verify-user',
+    middlewares: [authGuard],
+    handler: isActiveUser,
   },
 ]);
 

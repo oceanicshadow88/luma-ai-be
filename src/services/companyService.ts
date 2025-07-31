@@ -22,9 +22,14 @@ export interface CompanyCreateInput {
 export const companyService = {
   createCompany: async (companyInput: CompanyCreateInput): Promise<Company> => {
     // Check conflict
-    const existCompany = await CompanyModel.findOne({ slug: companyInput.slug });
-    if (existCompany) {
+    const existCompanyName = await CompanyModel.findOne({ companyName: companyInput.companyName });
+    if (existCompanyName) {
       throw new AppException(HttpStatusCode.Conflict, 'Company already exists');
+    }
+
+    const existCompanySlug = await CompanyModel.findOne({ slug: companyInput.slug });
+    if (existCompanySlug) {
+      throw new AppException(HttpStatusCode.Conflict, 'URL already exists');
     }
     const existOwner = await UserModel.exists({ _id: companyInput.owner });
     if (!existOwner) {

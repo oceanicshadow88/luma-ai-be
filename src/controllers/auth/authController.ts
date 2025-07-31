@@ -29,3 +29,9 @@ export const verifyDomain = async (req: Request, res: Response) => {
 
   return res.sendStatus(HttpStatusCode.Ok);
 };
+
+export const isActiveUser = async (req: Request, res: Response) => {
+  return res.send({
+    isActive: req.user?.active ?? false,
+  });
+};
