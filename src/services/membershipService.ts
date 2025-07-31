@@ -65,4 +65,11 @@ export const membershipService = {
       role,
     });
   },
+
+  getMembershipByUserIdAndCompanyId: async (
+    userId: Types.ObjectId,
+    companyId: Types.ObjectId,
+  ): Promise<Membership | null> => {
+    return MembershipModel.findOne({ user: userId, company: companyId });
+  },
 };

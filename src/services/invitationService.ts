@@ -1,5 +1,6 @@
 import { EXPIRES_TIME_CONFIG, LocaleType, MEMBERSHIP_STATUS } from '@src/config';
 import { generateRandomUsername } from '@src/lib/generateRandomUsername';
+import UserModel from '@src/models/user';
 import { membershipService } from '@src/services/membershipService';
 import { userService } from '@src/services/userService';
 import { GenerateInvitationRequest, GenerateInvitationResponse } from '@src/types/invitation';
@@ -33,9 +34,37 @@ export class InvitationService {
     frontendBaseUrl: string,
   ): Promise<GenerateInvitationResponse> {
     const newUsername = await generateRandomUsername();
+    // Check if the user already exists
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      //if membership exists, we can just generate an invitation link
+      const existingMembership = await membershipService.getMembershipByUserIdAndCompanyId(
+        existingUser._id as Types.ObjectId,
+        new mongoose.Types.ObjectId(companyId),
+      );
+      if (!existingMembership) {
+        await membershipService.createMembership({
+          user: existingUser._id as Types.ObjectId,
+          company: new mongoose.Types.ObjectId(companyId),
+          role,
+        });
+      }
+      // If the user already exists, we can just generate an invitation link
+      const invitationLink = await generateInvitationLinkAndStoreToken(
+        email,
+        role,
+        frontendBaseUrl,
+      );
+      return {
+        invitationLink,
+        email,
+        role,
+        expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
+      };
+    }
     const { newUser } = await createUserAndTokens({
       email,
-      password: '123@Password',//TODO: this is a huge security risk, should be change
+      password: '123@Password', //TODO: this is a huge security risk, should be change
       username: newUsername,
       firstName: 'Invited',
       lastName: 'Invited',
