@@ -49,6 +49,7 @@ export class InvitationService {
           user: existingUser._id as Types.ObjectId,
           company: new mongoose.Types.ObjectId(companyId),
           role,
+          status: MEMBERSHIP_STATUS.INVITED,
         });
       }
       // If the user already exists, we can just generate an invitation link
@@ -64,6 +65,37 @@ export class InvitationService {
         expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
       };
     }
+    const { newUser } = await createUserAndTokens({
+      email,
+      password: '123@Password', //TODO: this is a huge security risk, should be change
+      username: newUsername,
+      firstName: 'Invited',
+      lastName: 'Invited',
+      active: false,
+    });
+    await membershipService.createMembership({
+      company: new mongoose.Types.ObjectId(companyId),
+      user: newUser._id as Types.ObjectId,
+      role: role,
+      status: MEMBERSHIP_STATUS.INVITED,
+    });
+    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
+
+    return {
+      invitationLink,
+      email,
+      role,
+      expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
+    };
+  }
+
+  static async generateInvitationNew(
+    { email, role }: GenerateInvitationRequest,
+    companyId: string,
+    frontendBaseUrl: string,
+  ): Promise<GenerateInvitationResponse> {
+    const newUsername = await generateRandomUsername();
+
     const { newUser } = await createUserAndTokens({
       email,
       password: '123@Password', //TODO: this is a huge security risk, should be change

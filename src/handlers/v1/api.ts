@@ -12,7 +12,7 @@ import {
 } from '../../controllers/auth/registerController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { dashboardController } from '../../controllers/dashboardController';
-import { generateInvitation } from '../../controllers/invitationController';
+import { generateInvitation, generateInvitationNew } from '../../controllers/invitationController';
 import { authGuard } from '../../middleware/authGuard';
 import { extractFrontendUrl } from '../../middleware/extractFrontendUrl';
 import {
@@ -130,6 +130,12 @@ registerRoutes(router, [
     path: '/invitation/generate',
     middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
     handler: generateInvitation,
+  },
+  {
+    method: 'post',
+    path: '/invitation/generate/new',
+    middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
+    handler: generateInvitationNew,
   },
 ]);
 

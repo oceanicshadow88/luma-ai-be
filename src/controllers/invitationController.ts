@@ -27,3 +27,24 @@ export const generateInvitation = async (
     data: result,
   });
 };
+
+export const generateInvitationNew = async (
+  req: Request<{}, {}, GenerateInvitationRequest>,
+  res: Response,
+): Promise<void> => {
+  const { email, role } = req.body;
+
+  const result = await InvitationService.generateInvitationNew(
+    {
+      email,
+      role,
+    },
+    req.companyId,
+    req.frontendBaseUrl,
+  );
+  res.status(HttpStatusCode.Ok).json({
+    success: true,
+    message: 'Invitation link generated successfully',
+    data: result,
+  });
+};
