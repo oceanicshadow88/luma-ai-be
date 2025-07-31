@@ -1,14 +1,19 @@
 /// <reference types="jest" />
 
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { ROLE } from '@src/config';
+import { Company } from '@src/models/company';
 import MembershipModel from '@src/models/membership';
 import ResetCodeModel from '@src/models/resetCode';
-import UserModel from '@src/models/user';
+import UserModel, { User } from '@src/models/user';
 import { VerifyCodeType } from '@src/types/invitation';
+import CompanyBuilder from '@test/__test__/builders/companyBuilder';
 import ResetCodeBuilder from '@test/__test__/builders/resetCodeBuilder';
 import UserBuilder from '@test/__test__/builders/userBuilder';
 import { getApplication } from '@test/setup/app';
 import { getDefaultCompany, getDefaultUser } from '@test/setup/jest-setup';
+import { Application } from 'express';
+import mongoose from 'mongoose';
 import request from 'supertest';
 
 describe('Sign Up Learner', () => {
@@ -20,10 +25,17 @@ describe('Sign Up Learner', () => {
   const testLastname = 'user';
   const testPassword = '123@Password';
   const verifyValue = '888888';
+  let app: Application;
+  let defaultUser: User;
+  let defaultCompany: Company;
+
+  beforeEach(async () => {
+    app = getApplication();
+    defaultUser = getDefaultUser();
+    defaultCompany = getDefaultCompany();
+  });
 
   it('should register a learner successfully', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -38,7 +50,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -65,51 +77,90 @@ describe('Sign Up Learner', () => {
       company: defaultCompany?._id?.toString(),
     });
     expect(membership).not.toBeNull();
+
+    const code = await ResetCodeModel.findOne({ email: learnerUser.email });
+    expect(code).toBeNull();
   });
 
-  it('should return 409 conflict error if email already registered', async () => {
-    const defaultCompany = getDefaultCompany();
+  it('should register learner if user exists but not in this company', async () => {
+    const testCompany = await new CompanyBuilder().withSlug('newSlug').save();
 
     await new ResetCodeBuilder()
-      .withEmail(testEmail)
+      .withEmail(defaultUser.email)
       .withCode(verifyValue)
       .withVerifyType(VerifyCodeType.VERIFICATION)
       .save();
 
-    const defaultUser = getDefaultUser();
-
-    const learnerUser = new UserBuilder()
-      .withEmail(defaultUser.email)
-      .withUsername(testUsername)
-      .withFirstName(testFirstname)
-      .withLastName(testLastname)
-      .withPassword(testPassword)
-      .build();
-
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
-      .set('origin', originURL)
+      .set('origin', 'http://newSlug.lumaai.com')
       .send({
-        ...learnerUser,
+        email: defaultUser.email,
+        username: testUsername,
+        firstName: testFirstname,
+        lastName: testLastname,
+        password: testPassword,
         termsAccepted: true,
         verifyValue,
-        companyId: defaultCompany._id,
+        companyId: testCompany._id,
       });
 
-    expect(response.status).toBe(409);
-    expect(response.body.message).toBe('Email already registered. Please log in.');
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe('Successfully signed up!');
+    expect(response.body).toHaveProperty('refreshToken');
+    expect(response.body).toHaveProperty('accessToken');
+
+    const membership = await MembershipModel.findOne({
+      user: (defaultUser._id as mongoose.Types.ObjectId).toString(),
+      company: testCompany._id.toString(),
+      role: ROLE.LEARNER,
+    });
+    expect(membership).not.toBeNull();
+
+    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
+    expect(code).toBeNull();
+  });
+
+  it('should register learner if user exists with same company but in different role', async () => {
+    await new ResetCodeBuilder()
+      .withEmail(defaultUser.email)
+      .withCode(verifyValue)
+      .withVerifyType(VerifyCodeType.VERIFICATION)
+      .save();
+
+    const response = await request(app).post(apiPath).set('origin', originURL).send({
+      email: defaultUser.email,
+      username: testUsername,
+      firstName: testFirstname,
+      lastName: testLastname,
+      password: testPassword,
+      termsAccepted: true,
+      verifyValue,
+      companyId: defaultCompany._id,
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe('Successfully signed up!');
+    expect(response.body).toHaveProperty('refreshToken');
+    expect(response.body).toHaveProperty('accessToken');
+
+    const membership = await MembershipModel.findOne({
+      user: (defaultUser._id as mongoose.Types.ObjectId).toString(),
+      company: (defaultCompany._id as mongoose.Types.ObjectId)._id.toString(),
+      role: ROLE.LEARNER,
+    });
+    expect(membership).not.toBeNull();
+
+    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
+    expect(code).toBeNull();
   });
 
   it('should return 409 conflict error if username already registered', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
       .withVerifyType(VerifyCodeType.VERIFICATION)
       .save();
-
-    const defaultUser = getDefaultUser();
 
     const learnerUser = new UserBuilder()
       .withEmail(testEmail)
@@ -119,7 +170,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -134,7 +185,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should throw 401 unauthorized error when verification code not exists', async () => {
-    const defaultCompany = getDefaultCompany();
     await ResetCodeModel.deleteMany({ email: testEmail });
 
     const learnerUser = new UserBuilder()
@@ -145,7 +195,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -163,8 +213,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should return 401 if verification code is invalid', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -179,7 +227,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -197,8 +245,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should throw 429 too many requests error after 5 invalid attempts', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -214,7 +260,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -235,8 +281,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should throw 401 unauthorized error if reset code expired', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -252,7 +296,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
