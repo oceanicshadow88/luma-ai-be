@@ -52,6 +52,8 @@ export const registerService = {
 
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
+    await checkVerificationCode(userInput.verifyValue, userInput.email);
+
     const user = await UserModel.findOne({ email: userInput.email });
     if (user && user.active === false) {
       Object.assign(user, userInput, { active: true });
@@ -63,7 +65,16 @@ export const registerService = {
     if (user && user.active === true) {
       //TODO: What to do
     }
+
     // Create a new user
+    const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
+    if (userExistWithUsername) {
+      throw new AppException(
+        HttpStatusCode.Conflict,
+        'Username already in use. Try a different one.',
+        { field: 'username' },
+      );
+    }
     const result = await createUserAndTokens(userInput);
     return { refreshToken: result.refreshToken, accessToken: result.accessToken };
   },
