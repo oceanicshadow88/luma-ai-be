@@ -89,6 +89,7 @@ export const registerService = {
 
     if (!existingUser) {
       const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
+
       if (userExistWithUsername) {
         throw new AppException(
           HttpStatusCode.Conflict,
@@ -96,7 +97,6 @@ export const registerService = {
           { field: 'username' },
         );
       }
-
       const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
 
       await membershipService.createMembership({
@@ -107,11 +107,12 @@ export const registerService = {
 
       return { refreshToken, accessToken };
     }
-
+    existingUser.active = true;
+    await existingUser.save();
     const existingLearnerMembership = await MembershipModel.findOne({
       user: existingUser._id,
       company: organizationId,
-      role: ROLE.LEARNER,
+      status: 'active',
     });
 
     if (existingLearnerMembership) {
@@ -121,11 +122,11 @@ export const registerService = {
     }
 
     // User exist but not this company or in this company but not learner
-    await membershipService.createMembership({
-      user: existingUser._id as Types.ObjectId,
-      company: new Types.ObjectId(organizationId),
-      role: ROLE.LEARNER,
-    });
+    // await membershipService.createMembership({
+    //   user: existingUser._id as Types.ObjectId,
+    //   company: new Types.ObjectId(organizationId),
+    //   role: ROLE.LEARNER,
+    // });
 
     const { refreshToken, accessToken } = await existingUser.generateTokens();
     await userService.updateUserById(existingUser.id, { refreshToken });
