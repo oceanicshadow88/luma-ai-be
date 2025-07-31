@@ -1,11 +1,11 @@
 // Authentication and authorization
 import { LocaleType, ROLE } from '@src/config';
 import AppException from '@src/exceptions/appException';
+import CompanyModel from '@src/models/company';
 import UserModel, { User } from '@src/models/user';
 import { registerService } from '@src/services/auth/registerService';
 import { companyService } from '@src/services/companyService';
 import { membershipService } from '@src/services/membershipService';
-import { clearPendingUserData } from '@src/utils/storagePendingUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 import { ObjectId, Types } from 'mongoose';
@@ -59,18 +59,24 @@ export const teacherRegister = async (req: Request, res: Response) => {
   });
 };
 
-export const handleOwnerRegistrationProcess = async (req: any, res: Response) => {
+export const handleOwnerRegistrationProcess = async (req: Request, res: Response) => {
   // Check fields
   const { companyName, plan, settings, slug } = req.body;
 
   const logoUrl = req?.file ? `/uploads/company-logos/${req.file.filename}` : undefined;
 
-  // company create do not need to check verify code, // because it is created by user registration and verify code is verified in user register
+  // company create do not need to check verify code, because it is created by user registration and verify code is verified in user register
 
   // check company slug
+  const companyExistBySlug = await CompanyModel.findOne({ slug });
+  if (companyExistBySlug) {
+    throw new AppException(HttpStatusCode.Conflict, 'Slug already in use. Try a different one.', {
+      field: 'slug',
+    });
+  }
 
   // create user
-  let newUser: User | null = await UserModel.findOne({ email: req?.user.email });
+  let newUser: User | null = await UserModel.findOne({ email: req.user?.email });
   if (!newUser) {
     throw new AppException(HttpStatusCode.Unauthorized, 'User not found');
   }
@@ -94,7 +100,6 @@ export const handleOwnerRegistrationProcess = async (req: any, res: Response) =>
     role: ROLE.ADMIN,
   });
 
-  clearPendingUserData();
   return res.status(201).json({
     message: 'User, Company and Membership created successfully',
     data: {
