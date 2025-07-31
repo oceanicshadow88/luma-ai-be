@@ -37,6 +37,8 @@ export class InvitationService {
     // Check if the user already exists
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
+      const { refreshToken } = await existingUser.generateTokens();
+      await userService.updateUserById(existingUser.id, { refreshToken });
       //if membership exists, we can just generate an invitation link
       const existingMembership = await membershipService.getMembershipByUserIdAndCompanyId(
         existingUser._id as Types.ObjectId,
