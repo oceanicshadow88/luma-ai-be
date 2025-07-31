@@ -26,12 +26,12 @@ describe('Sign Up Learner', () => {
   const testPassword = '123@Password';
   const verifyValue = '888888';
   let app: Application;
-  let defalutUser: User;
+  let defaultUser: User;
   let defaultCompany: Company;
 
   beforeEach(async () => {
     app = getApplication();
-    defalutUser = getDefaultUser();
+    defaultUser = getDefaultUser();
     defaultCompany = getDefaultCompany();
   });
 
@@ -77,13 +77,16 @@ describe('Sign Up Learner', () => {
       company: defaultCompany?._id?.toString(),
     });
     expect(membership).not.toBeNull();
+
+    const code = await ResetCodeModel.findOne({ email: learnerUser.email });
+    expect(code).toBeNull();
   });
 
   it('should register learner if user exists but not in this company', async () => {
     const testCompany = await new CompanyBuilder().withSlug('newSlug').save();
 
     await new ResetCodeBuilder()
-      .withEmail(defalutUser.email)
+      .withEmail(defaultUser.email)
       .withCode(verifyValue)
       .withVerifyType(VerifyCodeType.VERIFICATION)
       .save();
@@ -92,7 +95,7 @@ describe('Sign Up Learner', () => {
       .post(apiPath)
       .set('origin', 'http://newSlug.lumaai.com')
       .send({
-        email: defalutUser.email,
+        email: defaultUser.email,
         username: testUsername,
         firstName: testFirstname,
         lastName: testLastname,
@@ -108,23 +111,56 @@ describe('Sign Up Learner', () => {
     expect(response.body).toHaveProperty('accessToken');
 
     const membership = await MembershipModel.findOne({
-      user: (defalutUser._id as mongoose.Types.ObjectId).toString(),
+      user: (defaultUser._id as mongoose.Types.ObjectId).toString(),
       company: testCompany._id.toString(),
       role: ROLE.LEARNER,
     });
     expect(membership).not.toBeNull();
+
+    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
+    expect(code).toBeNull();
+  });
+
+  it('should register learner if user exists with same company but in different role', async () => {
+    await new ResetCodeBuilder()
+      .withEmail(defaultUser.email)
+      .withCode(verifyValue)
+      .withVerifyType(VerifyCodeType.VERIFICATION)
+      .save();
+
+    const response = await request(app).post(apiPath).set('origin', originURL).send({
+      email: defaultUser.email,
+      username: testUsername,
+      firstName: testFirstname,
+      lastName: testLastname,
+      password: testPassword,
+      termsAccepted: true,
+      verifyValue,
+      companyId: defaultCompany._id,
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe('Successfully signed up!');
+    expect(response.body).toHaveProperty('refreshToken');
+    expect(response.body).toHaveProperty('accessToken');
+
+    const membership = await MembershipModel.findOne({
+      user: (defaultUser._id as mongoose.Types.ObjectId).toString(),
+      company: (defaultCompany._id as mongoose.Types.ObjectId)._id.toString(),
+      role: ROLE.LEARNER,
+    });
+    expect(membership).not.toBeNull();
+
+    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
+    expect(code).toBeNull();
   });
 
   it('should return 409 conflict error if username already registered', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
       .withVerifyType(VerifyCodeType.VERIFICATION)
       .save();
-
-    const defaultUser = getDefaultUser();
 
     const learnerUser = new UserBuilder()
       .withEmail(testEmail)
@@ -134,7 +170,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -149,7 +185,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should throw 401 unauthorized error when verification code not exists', async () => {
-    const defaultCompany = getDefaultCompany();
     await ResetCodeModel.deleteMany({ email: testEmail });
 
     const learnerUser = new UserBuilder()
@@ -160,7 +195,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -178,8 +213,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should return 401 if verification code is invalid', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -194,7 +227,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -212,8 +245,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should throw 429 too many requests error after 5 invalid attempts', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -229,7 +260,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
@@ -250,8 +281,6 @@ describe('Sign Up Learner', () => {
   });
 
   it('should throw 401 unauthorized error if reset code expired', async () => {
-    const defaultCompany = getDefaultCompany();
-
     await new ResetCodeBuilder()
       .withEmail(testEmail)
       .withCode(verifyValue)
@@ -267,7 +296,7 @@ describe('Sign Up Learner', () => {
       .withPassword(testPassword)
       .build();
 
-    const response = await request(getApplication())
+    const response = await request(app)
       .post(apiPath)
       .set('origin', originURL)
       .send({
