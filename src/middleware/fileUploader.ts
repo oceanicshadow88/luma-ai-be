@@ -1,9 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-
+import { NextFunction, Request, Response } from 'express';
+import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
-import logger from '../utils/logger';
 
 interface FileUploadOptions {
   folderName: string;
@@ -54,7 +52,6 @@ export function wrapMulterMiddleware(
   return (req: Request, res: Response, next: NextFunction) => {
     multerMiddleware(req, res, err => {
       if (err) {
-        logger.error('File upload error:', err);
         return next(err);
       }
       next();

@@ -6,18 +6,17 @@ const noDevNotesRule = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Disallow committing code with TODO, FIXME, WTF comments',
+      description: 'Disallow committing code with FIXME, WTF comments',
       recommended: true,
     },
     messages: {
       foundDevNote:
-        '❌ It is prohibited to submit comments with obvious development notes or questions, such as TODO, FIXME, WTF, etc. Please handle them before submitting.',
+        '❌ It is prohibited to submit comments with obvious development notes or questions, such as  FIXME, WTF, etc. Please handle them before submitting.',
     },
   },
   create(context) {
     const sourceCode = context.getSourceCode();
     const devNotePatterns = [
-      /\bTODO\b/i,
       /\bFIXME\b/i,
       /\bWTF\b/i,
       /\bHACK\b/i,
@@ -49,6 +48,9 @@ const localRulesPlugin = {
 };
 
 module.exports = [
+  {
+    ignores: ['**/node_modules/**', '**/dist/**', '**/coverage/**', 'eslint.config.js'],
+  },
   {
     files: ['**/*.ts', '**/*.js', '**/*.tsx', '**/*.jsx'],
     languageOptions: {

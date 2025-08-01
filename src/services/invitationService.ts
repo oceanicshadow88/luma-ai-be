@@ -1,11 +1,24 @@
-import { generateInvitationLink } from '../utils/invitationLink';
-import { GenerateInvitationRequest, GenerateInvitationResponse } from '../types/invitation';
-import { EXPIRES_TIME_CONFIG, MEMBERSHIP_STATUS, ROLE } from '../config';
-import { RegisterUserInput } from '../controllers/auth/registerController';
-import { userService } from './userService';
-import { membershipService } from './membershipService';
+import { EXPIRES_TIME_CONFIG, LocaleType, MEMBERSHIP_STATUS } from '@src/config';
+import { generateRandomUsername } from '@src/lib/generateRandomUsername';
+import UserModel from '@src/models/user';
+import { membershipService } from '@src/services/membershipService';
+import { userService } from '@src/services/userService';
+import { GenerateInvitationRequest, GenerateInvitationResponse } from '@src/types/invitation';
+import { generateInvitationLinkAndStoreToken } from '@src/utils/invitationLink';
+import mongoose, { Types } from 'mongoose';
 
-const createUserAndTokens = async (userInput: RegisterUserInput) => {
+export interface RegisterUserInputByInvitation {
+  firstName: string;
+  lastName: string;
+  username: string;
+  password: string;
+  email: string;
+  avatarUrl?: string;
+  locale?: LocaleType;
+  active: boolean;
+}
+
+const createUserAndTokens = async (userInput: RegisterUserInputByInvitation) => {
   const newUser = await userService.createUser(userInput);
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
@@ -17,23 +30,87 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
 export class InvitationService {
   static async generateInvitation(
     { email, role }: GenerateInvitationRequest,
-    companyId: any,
+    companyId: string,
+    frontendBaseUrl: string,
   ): Promise<GenerateInvitationResponse> {
+    const newUsername = await generateRandomUsername();
+    // Check if the user already exists
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      const { refreshToken } = await existingUser.generateTokens();
+      await userService.updateUserById(existingUser.id, { refreshToken });
+      //if membership exists, we can just generate an invitation link
+      const existingMembership = await membershipService.getMembershipByUserIdAndCompanyId(
+        existingUser._id as Types.ObjectId,
+        new mongoose.Types.ObjectId(companyId),
+      );
+      if (!existingMembership) {
+        await membershipService.createMembership({
+          user: existingUser._id as Types.ObjectId,
+          company: new mongoose.Types.ObjectId(companyId),
+          role,
+          status: MEMBERSHIP_STATUS.INVITED,
+        });
+      }
+      // If the user already exists, we can just generate an invitation link
+      const invitationLink = await generateInvitationLinkAndStoreToken(
+        email,
+        role,
+        frontendBaseUrl,
+      );
+      return {
+        invitationLink,
+        email,
+        role,
+        expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
+      };
+    }
     const { newUser } = await createUserAndTokens({
       email,
-      password: 'any',
-      username: 'teacher5',
-      firstName: 'teacher',
-      lastName: 'teacher',
-      verifyValue: '66666',
+      password: '123@Password', //TODO: this is a huge security risk, should be change
+      username: newUsername,
+      firstName: 'Invited',
+      lastName: 'Invited',
+      active: false,
     });
     await membershipService.createMembership({
-      company: companyId,
-      user: newUser._id as any,
-      role: ROLE.INSTRUCTOR,
+      company: new mongoose.Types.ObjectId(companyId),
+      user: newUser._id as Types.ObjectId,
+      role: role,
       status: MEMBERSHIP_STATUS.INVITED,
     });
-    const invitationLink = await generateInvitationLink(email, role);
+    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
+
+    return {
+      invitationLink,
+      email,
+      role,
+      expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
+    };
+  }
+
+  static async generateInvitationNew(
+    { email, role }: GenerateInvitationRequest,
+    companyId: string,
+    frontendBaseUrl: string,
+  ): Promise<GenerateInvitationResponse> {
+    const newUsername = await generateRandomUsername();
+
+    const { newUser } = await createUserAndTokens({
+      email,
+      password: '123@Password', //TODO: this is a huge security risk, should be change
+      username: newUsername,
+      firstName: 'Invited',
+      lastName: 'Invited',
+      active: false,
+    });
+    await membershipService.createMembership({
+      company: new mongoose.Types.ObjectId(companyId),
+      user: newUser._id as Types.ObjectId,
+      role: role,
+      status: MEMBERSHIP_STATUS.INVITED,
+    });
+    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
 
     return {
       invitationLink,

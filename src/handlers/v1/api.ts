@@ -1,32 +1,32 @@
 import { Router } from 'express';
-import { registerRoutes } from '../../utils/registerRoutes';
-// Controllers
-import { adminRegister, teacherRegister } from '../../controllers/auth/registerController';
-import { learnerRegister } from '../../controllers/auth/registerController';
+
+import { isActiveUser, verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
 import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
-import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
-import { companyController } from '../../controllers/companyController';
-import { generateInvitation } from '../../controllers/invitationController';
-
-// Middlewares
-import { refreshToken } from '../../middleware/tokenHandler';
-import { validateBody } from '../../middleware/validation/validationMiddleware';
-import { validateRegistration as adminRegistrationPreCheck } from '../../middleware/validation/adminRegistrationPreCheck';
-import { validateRegistration as teacherRegistrationPreCheck } from '../../middleware/validation/teacherRegistrationPreCheck';
-import { saas } from '../../middleware/saasMiddleware';
 import {
-  createFileUploader,
+  adminRegister,
+  handleOwnerRegistrationProcess,
+  learnerRegister,
+  teacherRegister,
+} from '../../controllers/auth/registerController';
+import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
+import { dashboardController } from '../../controllers/dashboardController';
+import { generateInvitation, generateInvitationNew } from '../../controllers/invitationController';
+import { authGuard } from '../../middleware/authGuard';
+import { extractFrontendUrl } from '../../middleware/extractFrontendUrl';
+import {
   ALLOWED_IMAGE_TYPES,
+  createFileUploader,
   wrapMulterMiddleware,
 } from '../../middleware/fileUploader';
-
-// Validation Schemas
-import authValidationSchema from '../../validations/userAuthValidation';
+import { saas } from '../../middleware/saasMiddleware';
+import { refreshToken } from '../../middleware/tokenHandler';
+import { validateBody } from '../../middleware/validation/validationMiddleware';
+import { registerRoutes } from '../../utils/registerRoutes';
 import { companyValidationSchema } from '../../validations/companyValidation';
-import { verifyAuthToken } from '../../controllers/auth/authController';
 import { invitationSchema } from '../../validations/invitationValidation';
+import authValidationSchema from '../../validations/userAuthValidation';
 
 const router = Router();
 
@@ -35,13 +35,13 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/admin',
-    middlewares: [validateBody(authValidationSchema.register), adminRegistrationPreCheck],
+    middlewares: [validateBody(authValidationSchema.register)],
     handler: adminRegister,
   },
   {
     method: 'post',
     path: '/auth/signup/instructor',
-    middlewares: [saas, validateBody(authValidationSchema.register), teacherRegistrationPreCheck],
+    middlewares: [saas, validateBody(authValidationSchema.register)],
     handler: teacherRegister,
   },
   {
@@ -53,13 +53,13 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/login/enterprise',
-    middlewares: [validateBody(authValidationSchema.login)],
+    middlewares: [saas, validateBody(authValidationSchema.login)],
     handler: loginEnterprise,
   },
   {
     method: 'post',
     path: '/auth/login/learner',
-    middlewares: [validateBody(authValidationSchema.login)],
+    middlewares: [saas, validateBody(authValidationSchema.login)],
     handler: loginLearner,
   },
   {
@@ -75,17 +75,29 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/request-verification-code',
+    middlewares: [validateBody(authValidationSchema.verificationCode)],
     handler: requestVerificationCode,
   },
   {
     method: 'post',
     path: '/auth/reset-password',
+    middlewares: [validateBody(authValidationSchema.resetPassword)],
     handler: resetPassword,
   },
   {
     method: 'post',
     path: '/auth/token',
     handler: verifyAuthToken,
+  },
+  {
+    method: 'get',
+    path: '/auth/verify-domain',
+    handler: verifyDomain,
+  },
+  {
+    method: 'get',
+    path: '/auth/verify-user',
+    handler: isActiveUser,
   },
 ]);
 
@@ -99,22 +111,40 @@ const logoUploader = createFileUploader({
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/auth/signup/institution',
+    path: '/auth/signup/institution', //TODO: Change to /owner/register
     middlewares: [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
+      authGuard,
     ],
-    handler: companyController.createCompany,
+    handler: handleOwnerRegistrationProcess,
   },
 ]);
 
 // ----------------- INVITATION ROUTES -----------------
 registerRoutes(router, [
+  //TODO: Secure this route
   {
     method: 'post',
     path: '/invitation/generate',
-    middlewares: [saas, validateBody(invitationSchema)],
+    middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
     handler: generateInvitation,
+  },
+  {
+    method: 'post',
+    path: '/invitation/generate/new',
+    middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
+    handler: generateInvitationNew,
+  },
+]);
+
+// ----------------- DASHBOARD ROUTES -----------------
+registerRoutes(router, [
+  {
+    method: 'get',
+    path: '/dashboard',
+    middlewares: [saas, authGuard],
+    handler: dashboardController.getAdminDashboard,
   },
 ]);
 

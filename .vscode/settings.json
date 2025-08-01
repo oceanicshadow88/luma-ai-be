@@ -1,6 +1,7 @@
 {
     // Format on save
     "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     // Files to validate with ESLint
     "eslint.validate": [
         "javascript",
@@ -10,11 +11,13 @@
     ],
     // Auto fix ESLint errors on save
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "always"
+        "source.fixAll": "always",
+        "source.fixAll.eslint": "always",
+        "source.organizeImports": "always",
     },
     "typescript.updateImportsOnFileMove.enabled": "always",
-    // Use relative imports in TS
-    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "javascript.preferences.importModuleSpecifier": "non-relative",
     "workbench.editor.enablePreview": false,
     "editor.foldingImportsByDefault": true,
     "less.format.enable": false,

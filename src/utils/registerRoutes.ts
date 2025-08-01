@@ -1,4 +1,5 @@
-import { Router, Request, Response, RequestHandler } from 'express';
+import { Request, RequestHandler, Response, Router } from 'express';
+
 import { asyncHandler } from '../middleware/asyncHandler';
 
 type AsyncHandlerFn = (req: Request, res: Response) => Promise<void | Response>;

@@ -1,10 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
+
 import {
   DEFAULT_MEMBERSHIP_STATUS,
   MEMBERSHIP_STATUS,
   MembershipStatusType,
-  RoleType,
   roleList,
+  RoleType,
 } from '../config';
 
 export interface Membership extends Document {
@@ -45,4 +46,6 @@ const membershipSchema = new Schema(
 
 membershipSchema.index({ user: 1, company: 1, role: 1 }, { unique: true });
 
-export default mongoose.model<Membership>('Membership', membershipSchema);
+const MembershipModel = mongoose.model<Membership>('Membership', membershipSchema);
+
+export default MembershipModel;

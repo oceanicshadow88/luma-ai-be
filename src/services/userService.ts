@@ -1,10 +1,10 @@
+import { LocaleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { Company } from '@src/models/company';
+import Membership from '@src/models/membership';
+import UserModel, { User } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
-import UserModel, { User } from '../models/user';
-import AppException from '../exceptions/appException';
 import { Types } from 'mongoose';
-import { LocaleType } from 'src/config';
-import { Company } from '../models/company';
-import Membership from '../models/membership';
 
 export interface UserCreateInput {
   firstName: string;
@@ -17,17 +17,30 @@ export interface UserCreateInput {
 }
 
 export const userService = {
-  // create users
-  createUser: async (userInput: UserCreateInput): Promise<User> => {
-    const existingUser = await UserModel.findOne({
-      $or: [{ email: userInput.email }, { username: userInput.username }],
-    });
-    if (existingUser) {
-      throw new AppException(HttpStatusCode.Conflict, 'User email or username already exist');
+  checkUserConflict: async (email: string, username: string): Promise<void> => {
+    const userExistWithEmail = await UserModel.findOne({ email });
+    if (userExistWithEmail) {
+      // user and company all exist
+      throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
+        field: 'email',
+      });
     }
 
+    const userExistWithUsername = await UserModel.findOne({ username });
+    if (userExistWithUsername) {
+      throw new AppException(
+        HttpStatusCode.Conflict,
+        'Username already in use. Try a different one.',
+        { field: 'username' },
+      );
+    }
+  },
+
+  // create users
+  createUser: async (userInput: UserCreateInput): Promise<User> => {
+    await userService.checkUserConflict(userInput.email, userInput.username);
+
     const user = new UserModel(userInput);
-    await user.hashPassword();
     await user.save();
 
     return user;
@@ -36,11 +49,11 @@ export const userService = {
   // Get user by ID
   getUserById: async (userId: string): Promise<User> => {
     if (!Types.ObjectId.isValid(userId)) {
-      throw new AppException(HttpStatusCode.BadRequest, 'Invalid user ID');
+      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid user ID');
     }
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'User not found');
+      throw new AppException(HttpStatusCode.InternalServerError, 'User not found');
     }
 
     return user;
@@ -60,27 +73,27 @@ export const userService = {
     return await user.deleteOne(); //Trigger pre deleteOne hook, also delete membership
   },
 
-  getCurrentUserInfo: async (userId: string) => {
-    const user = await userService.getUserById(userId);
-
+  getCurrentUserInfo: async (userId: string, companyId: string) => {
     const membership = await Membership.findOne({
-      user: user._id,
+      user: userId,
+      company: companyId,
     })
-      .populate<{ company: Company }>('company')
+      .populate<{ company: Company; user: User }>('company user')
       .lean();
-    if (!membership?.company) {
-      throw new AppException(HttpStatusCode.NotFound, 'Membership or organisation not found');
+
+    if (!membership?.company || !membership?.user) {
+      throw new AppException(HttpStatusCode.InternalServerError, 'Invalid Membership');
     }
 
     return {
-      userId: (user._id as Types.ObjectId).toString(),
-      username: user.username,
-      name: `${user.firstName} ${user.lastName}`,
-      email: user.email,
+      userId: (membership.user._id as Types.ObjectId).toString(),
+      username: membership.user.username,
+      name: `${membership.user.firstName} ${membership.user.lastName}`,
+      email: membership.user.email,
       role: membership.role,
-      enterprise: membership.company,
-      avatarUrl: user.avatarUrl,
-      locale: user.locale,
+      company: membership.company,
+      avatarUrl: membership.user.avatarUrl,
+      locale: membership.user.locale,
     };
   },
 };

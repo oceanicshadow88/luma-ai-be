@@ -1,15 +1,16 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
-import config from '../config';
+import config from '@src/config';
+import AppException from '@src/exceptions/appException';
+import { VerifyCodeType } from '@src/types/invitation';
+import { HttpStatusCode } from 'axios';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface ResetCode extends Document {
   email: string;
   code: string;
+  verifyType: VerifyCodeType; // Use enum instead of union type
   expiresAt: Date;
   attempts: number;
-  validateResetCode(code: string): Promise<{
-    isValid: boolean;
-    message: string;
-  }>;
+  validateResetCode(code: string): Promise<void>;
 }
 
 const resetCodeSchema: Schema<ResetCode> = new Schema(
@@ -24,6 +25,12 @@ const resetCodeSchema: Schema<ResetCode> = new Schema(
     code: {
       type: String,
       required: true,
+    },
+    verifyType: {
+      type: String,
+      required: true,
+      enum: Object.values(VerifyCodeType),
+      default: VerifyCodeType.VERIFICATION,
     },
     expiresAt: {
       type: Date,
@@ -41,14 +48,19 @@ const resetCodeSchema: Schema<ResetCode> = new Schema(
 resetCodeSchema.methods.validateResetCode = async function (
   this: ResetCode,
   code: string,
-): Promise<{ isValid: boolean; message: string }> {
+): Promise<void> {
   // Check if code is expired
   if (this.expiresAt < new Date()) {
     // No need to delete, MongoDB TTL will handle this
-    return {
-      isValid: false,
-      message: 'Invalid or expired code. Please request a new one.',
-    };
+    throw new AppException(
+      HttpStatusCode.Unauthorized,
+      'Invalid or expired verification value. Please request a new one.',
+      {
+        field: 'verificationCode',
+        payload:
+          'Used, expired or invalid verification value. Please check your email or contact admin.',
+      },
+    );
   }
 
   // Increment attempt counter to prevent brute force
@@ -59,27 +71,31 @@ resetCodeSchema.methods.validateResetCode = async function (
     // Delete the code after too many attempts
     await this.deleteOne();
 
-    return {
-      isValid: false,
-      message: 'Too many incorrect attempts. Please request a new verification code.',
-    };
+    throw new AppException(
+      HttpStatusCode.TooManyRequests,
+      'Too many incorrect attempts. Please request a new verification value.',
+      {
+        field: 'verificationCode',
+        payload: `Used, expired or invalid verification value. Please check your email or contact admin.`,
+      },
+    );
   }
 
   // Verify the code
   if (this.code !== code) {
     await this.save(); // Save the incremented attempt counter
 
-    return {
-      isValid: false,
-      message: 'Invalid code. Please try again.',
-    };
+    throw new AppException(
+      HttpStatusCode.Unauthorized,
+      'Invalid or expired verification value. Please request a new one.',
+      {
+        field: 'verificationCode',
+        payload: `Used, expired or invalid verification value. Please check your email or contact admin.`,
+      },
+    );
   }
 
-  // If we get here, the code is valid
-  return {
-    isValid: true,
-    message: 'Code verified successfully',
-  };
+  // If we get here, the code is valid - no return needed
 };
 
 // Prevent duplicate model registration in development (hot reload)

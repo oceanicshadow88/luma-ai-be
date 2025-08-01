@@ -2,19 +2,32 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "./dist/tests",
+    "outDir": "./dist/test",
     "baseUrl": ".",
-    "paths": {},
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ],
+      "@loaders/*": [
+        "loaders/*"
+      ],
+      "@test/*": [
+        "test/*"
+      ],
+    },
     "rootDirs": [
       "src",
-      "tests"
-    ]
+      "loaders",
+      "test"
+    ],
+    "types": ["node", "jest"]
   },
   "include": [
     "src",
-    "tests",
+    "test",
     "loaders",
-    "eslint.config.js"
+    "eslint.config.js",
+    "jest.config.ts"
   ],
   "exclude": [
     "node_modules"

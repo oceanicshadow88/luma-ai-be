@@ -1,5 +1,11 @@
 import { RoleType } from '../config';
 
+// Verification/Reset value types enum for reuse across the application
+export enum VerifyCodeType {
+  VERIFICATION = 'verification',
+  INVITATION = 'invitation',
+}
+
 export interface GenerateInvitationRequest {
   email: string;
   role: RoleType;
