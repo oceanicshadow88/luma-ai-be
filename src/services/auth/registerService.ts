@@ -65,7 +65,7 @@ export const registerService = {
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
     //await checkVerificationCode(userInput.verifyValue, userInput.email);
-    console.log(userInput);
+
     const user = await UserModel.findOne({
       email: userInput.email,
       role: ROLE.ADMIN,

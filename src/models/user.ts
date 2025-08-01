@@ -224,16 +224,20 @@ userSchema.pre('save', async function (next) {
   }
 
   if (hasCompanyAndRecordUpdate) {
-    const userExistWithUsername = await UserModel.exists({
-      username: this.username,
-      company: this.company,
-    });
-    if (userExistWithUsername) {
-      throw new AppException(
-        HttpStatusCode.Conflict,
-        'Username already in use. Try a different one.',
-        { field: 'username' },
-      );
+    // Only check username uniqueness if username is being modified
+    if (this.isModified('username')) {
+      const userExistWithUsername = await UserModel.exists({
+        username: this.username,
+        company: this.company,
+        _id: { $ne: this._id }, // Exclude current user from the check
+      });
+      if (userExistWithUsername) {
+        throw new AppException(
+          HttpStatusCode.Conflict,
+          'Username already in use. Try a different one.',
+          { field: 'username' },
+        );
+      }
     }
   }
   if (!this.isModified('password')) {
