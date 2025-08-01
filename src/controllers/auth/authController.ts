@@ -1,6 +1,6 @@
 import AppException from '@src/exceptions/appException';
 import { jwtUtils } from '@src/lib/jwtUtils';
-import UserModel from '@src/models/user';
+import UserModel, { USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
 import { VerifyInvitationLinkExist } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
@@ -42,8 +42,8 @@ export const isActiveUser = async (req: Request, res: Response) => {
       payload: 'Cannot find token payload',
     });
   }
-  const user = await UserModel.findOne({ email: payload.email }); //payload should contain the ID
+  const user = await UserModel.findOne({ email: payload.email, company: req.companyId }); //payload should contain the ID
   return res.send({
-    isActive: user?.active ?? false,
+    isActive: user?.status === USER_STATUS.ACTIVE ? true : false,
   });
 };

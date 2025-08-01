@@ -12,6 +12,7 @@ async function handleLogin(req: Request, res: Response, allowedRoles: RoleType[]
     password,
     slug,
     allowedRoles,
+    companyId: req.company._id.toString(),
   });
 
   res.json({ success: true, data: loginResult });

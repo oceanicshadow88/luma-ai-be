@@ -1,5 +1,5 @@
 import AppException from '@src/exceptions/appException';
-import { adminDashboardDataMock, DEFAULT_MOCK_COUNT } from '@src/mockData/adminDashboardDataMock';
+import { adminDashboardDataMock } from '@src/mockData/adminDashboardDataMock';
 import { companyUsageService } from '@src/services/companyUsageService';
 import { userService } from '@src/services/userService';
 import { HttpStatusCode } from 'axios';
@@ -21,8 +21,8 @@ export const dashboardController = {
     //TODO: mock data for dashboard display(replace later)
     const dashboardData = {
       currentUserInfo,
-      totalLearners: companyUsage?.currentLearners ?? DEFAULT_MOCK_COUNT,
-      totalInstructors: companyUsage?.currentInstructors ?? DEFAULT_MOCK_COUNT,
+      totalLearners: 0,
+      totalInstructors: 0,
       adminDashboardDataMock,
     };
 

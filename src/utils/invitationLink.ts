@@ -1,4 +1,5 @@
 import { jwtUtils } from '@src/lib/jwtUtils';
+import { USER_STATUS } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
@@ -56,11 +57,15 @@ export async function generateInvitationLinkAndStoreToken(
   email: string,
   role: RoleType,
   frontendBaseUrl: string,
+  id: string,
+  status: USER_STATUS = USER_STATUS.INVITED,
 ): Promise<string> {
   const secret: Secret = config.jwt?.secret;
   const payload: InvitationTokenPayload = {
     email,
     role,
+    id,
+    status,
     purpose: 'invitation',
   };
 
@@ -96,7 +101,7 @@ export async function generateInvitationLinkAndStoreToken(
   }
 
   signupBaseUrl = `${signupBaseUrl}/${role}`;
-  
+
   return `${signupBaseUrl}?token=${token}`;
 }
 

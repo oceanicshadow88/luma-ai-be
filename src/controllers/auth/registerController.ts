@@ -1,11 +1,10 @@
 // Authentication and authorization
-import { LocaleType, ROLE } from '@src/config';
+import { LocaleType, RoleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
 import UserModel, { User } from '@src/models/user';
 import { registerService } from '@src/services/auth/registerService';
 import { companyService } from '@src/services/companyService';
-import { membershipService } from '@src/services/membershipService';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 import { ObjectId, Types } from 'mongoose';
@@ -19,6 +18,7 @@ export interface RegisterUserInput {
   avatarUrl?: string;
   locale?: LocaleType;
   verifyValue: string;
+  role?: RoleType;
   _id?: ObjectId;
 }
 
@@ -49,8 +49,10 @@ export const adminRegister = async (req: Request, res: Response) => {
 };
 
 export const teacherRegister = async (req: Request, res: Response) => {
-  const userInput = req.body as RegisterUserInput;
-  const { refreshToken, accessToken } = await registerService.teacherRegister(userInput);
+  const { refreshToken, accessToken } = await registerService.instructorRegister(
+    req.body as RegisterUserInput,
+    req.companyId,
+  );
 
   res.status(201).json({
     message: 'Successfully signed up!',
@@ -76,8 +78,8 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
   }
 
   // create user
-  let newUser: User | null = await UserModel.findOne({ email: req.user?.email });
-  if (!newUser) {
+  let user: User | null = await UserModel.findOne({ email: req.user?.email });
+  if (!user) {
     throw new AppException(HttpStatusCode.Unauthorized, 'User not found');
   }
   // create company
@@ -85,27 +87,21 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
     companyName,
     slug,
     plan,
-    owner: newUser._id as Types.ObjectId,
+    owner: user._id as Types.ObjectId,
     logoUrl,
     settings,
   });
   if (!newCompany._id) {
     throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
   }
-
-  // create membership
-  const newMembership = await membershipService.createMembership({
-    user: newUser.id,
-    company: newCompany.id,
-    role: ROLE.ADMIN,
-  });
+  user.company = newCompany._id as Types.ObjectId;
+  await user.save();
 
   return res.status(201).json({
     message: 'User, Company and Membership created successfully',
     data: {
-      user: newUser._id,
+      user: user._id,
       company: newCompany._id,
-      membership: newMembership._id,
     },
   });
 };

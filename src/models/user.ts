@@ -2,29 +2,38 @@ import { HttpStatusCode } from 'axios';
 import bcrypt from 'bcryptjs';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
-import { DEFAULT_LOCALE, LOCALES, LocaleType } from '../config';
+import { DEFAULT_LOCALE, LOCALES, LocaleType, roleList, RoleType } from '../config';
 import AppException from '../exceptions/appException';
 import { jwtUtils } from '../lib/jwtUtils';
-import MembershipModel from './membership';
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export enum USER_STATUS {
+  ACTIVE = 'active',
+  INVITED = 'invited',
+  DISABLED = 'disabled',
+}
 
 export interface User extends Document {
-  firstName: string;
-  lastName: string;
-  username: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
   password: string;
   email: string;
   avatarUrl: string;
   locale: LocaleType;
   createdAt: Date;
-  active: boolean;
   refreshToken?: string;
   loginAttempts: number;
   lockUntil?: Date;
+  role: RoleType;
+  status?: USER_STATUS;
+  company: mongoose.Types.ObjectId;
   isLocked(): boolean;
   incrementLoginAttempts(): Promise<void>;
   hashPassword(): Promise<void>;
   validatePassword(inputPassword: string): Promise<boolean>;
   generateTokens(): Promise<{ accessToken: string; refreshToken: string }>;
+  hasUser(email: string, companyId: string): Promise<boolean>;
 }
 
 export interface UserModel extends Model<User> {
@@ -35,16 +44,12 @@ const userSchema: Schema<User> = new Schema(
   {
     firstName: {
       type: String,
-      required: true,
     },
     lastName: {
       type: String,
-      required: true,
     },
     username: {
       type: String,
-      required: true,
-      unique: true,
       index: true,
       minlength: 2,
       maxlength: 20,
@@ -65,7 +70,6 @@ const userSchema: Schema<User> = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       index: true,
       lowercase: true,
       trim: true,
@@ -93,10 +97,6 @@ const userSchema: Schema<User> = new Schema(
       enum: LOCALES,
       default: DEFAULT_LOCALE,
     },
-    active: {
-      type: Boolean,
-      default: true,
-    },
     refreshToken: {
       type: String,
       required: false,
@@ -108,6 +108,22 @@ const userSchema: Schema<User> = new Schema(
     lockUntil: {
       type: Date,
       default: null,
+    },
+    role: {
+      type: String,
+      enum: roleList,
+      required: true,
+    },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      index: true,
+    },
+    status: {
+      type: String,
+      enum: USER_STATUS,
+      required: true,
+      default: USER_STATUS.DISABLED,
     },
   },
   { timestamps: true },
@@ -183,14 +199,48 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
+  const hasCompanyAndNewRecord = this.isNew && this.company;
+  const hasCompanyAndRecordUpdate = !this.isNew && this.company;
+
+  if (hasCompanyAndNewRecord) {
+    const userExistWithEmail = await UserModel.exists({
+      email: this.email,
+      company: this.company,
+    });
+    if (userExistWithEmail) {
+      throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
+        field: 'email',
+      });
+    }
+
+    const userExistWithUsername = await UserModel.exists({
+      username: this.username,
+      company: this.company,
+    });
+    if (userExistWithUsername) {
+      throw new AppException(
+        HttpStatusCode.Conflict,
+        'Username already in use. Try a different one.',
+        { field: 'username' },
+      );
+    }
+  }
+
+  if (hasCompanyAndRecordUpdate) {
+    const userExistWithUsername = await UserModel.exists({
+      username: this.username,
+      company: this.company,
+    });
+    if (userExistWithUsername) {
+      throw new AppException(
+        HttpStatusCode.Conflict,
+        'Username already in use. Try a different one.',
+        { field: 'username' },
+      );
+    }
+  }
 
   this.password = await bcrypt.hash(this.password, 12);
-  next();
-});
-
-// When deleting a user, delete the relevant membership
-userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-  await MembershipModel.deleteMany({ user: this._id });
   next();
 });
 

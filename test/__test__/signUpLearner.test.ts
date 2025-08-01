@@ -1,9 +1,7 @@
 /// <reference types="jest" />
 
 import { beforeEach, describe, expect, it } from '@jest/globals';
-import { ROLE } from '@src/config';
 import { Company } from '@src/models/company';
-import MembershipModel from '@src/models/membership';
 import ResetCodeModel from '@src/models/resetCode';
 import UserModel, { User } from '@src/models/user';
 import { VerifyCodeType } from '@src/types/invitation';
@@ -13,7 +11,6 @@ import UserBuilder from '@test/__test__/builders/userBuilder';
 import { getApplication } from '@test/setup/app';
 import { getDefaultCompany, getDefaultUser } from '@test/setup/jest-setup';
 import { Application } from 'express';
-import mongoose from 'mongoose';
 import request from 'supertest';
 
 describe('Sign Up Learner', () => {
@@ -72,12 +69,6 @@ describe('Sign Up Learner', () => {
     expect(user).not.toBeNull();
     expect(user?.username).toBe(testUsername);
 
-    const membership = await MembershipModel.findOne({
-      user: user?._id,
-      company: defaultCompany?._id?.toString(),
-    });
-    expect(membership).not.toBeNull();
-
     const code = await ResetCodeModel.findOne({ email: learnerUser.email });
     expect(code).toBeNull();
   });
@@ -110,13 +101,6 @@ describe('Sign Up Learner', () => {
     expect(response.body).toHaveProperty('refreshToken');
     expect(response.body).toHaveProperty('accessToken');
 
-    const membership = await MembershipModel.findOne({
-      user: (defaultUser._id as mongoose.Types.ObjectId).toString(),
-      company: testCompany._id.toString(),
-      role: ROLE.LEARNER,
-    });
-    expect(membership).not.toBeNull();
-
     const code = await ResetCodeModel.findOne({ email: defaultUser.email });
     expect(code).toBeNull();
   });
@@ -144,13 +128,6 @@ describe('Sign Up Learner', () => {
     expect(response.body).toHaveProperty('refreshToken');
     expect(response.body).toHaveProperty('accessToken');
 
-    const membership = await MembershipModel.findOne({
-      user: (defaultUser._id as mongoose.Types.ObjectId).toString(),
-      company: (defaultCompany._id as mongoose.Types.ObjectId)._id.toString(),
-      role: ROLE.LEARNER,
-    });
-    expect(membership).not.toBeNull();
-
     const code = await ResetCodeModel.findOne({ email: defaultUser.email });
     expect(code).toBeNull();
   });
@@ -164,7 +141,7 @@ describe('Sign Up Learner', () => {
 
     const learnerUser = new UserBuilder()
       .withEmail(testEmail)
-      .withUsername(defaultUser.username)
+      .withUsername(defaultUser.username ?? '')
       .withFirstName(testFirstname)
       .withLastName(testLastname)
       .withPassword(testPassword)
