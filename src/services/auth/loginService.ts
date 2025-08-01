@@ -1,12 +1,13 @@
 import { RoleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
-import UserModel from '@src/models/user';
+import UserModel, { USER_STATUS } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
 export interface LoginResult {
   refreshToken?: string;
   accessToken?: string;
   companySlug: string;
   role: RoleType;
+  companyId?: string;
 }
 
 export const loginService = {
@@ -16,13 +17,19 @@ export const loginService = {
     slug,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     allowedRoles,
+    companyId,
   }: {
     email: string;
     password: string;
     slug: string;
     allowedRoles: RoleType[];
+    companyId: string;
   }): Promise<LoginResult> => {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({
+      email,
+      company: companyId,
+      status: USER_STATUS.ACTIVE,
+    });
     if (!user) {
       throw new AppException(
         HttpStatusCode.Unauthorized,
@@ -47,8 +54,6 @@ export const loginService = {
       );
     }
 
-    //find by Company
-
     const { refreshToken, accessToken } = await user.generateTokens();
     user.refreshToken = refreshToken;
     user.loginAttempts = 0;
@@ -60,6 +65,7 @@ export const loginService = {
       refreshToken,
       companySlug: slug,
       role: user.role,
+      companyId: user.company?.toString(),
     };
   },
 };
