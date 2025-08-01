@@ -9,7 +9,12 @@ import { HttpStatusCode } from 'axios';
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput, companyId?: string) => {
-  const newUser = await userService.createUser({ ...userInput, company: companyId });
+  let newUser = null;
+  if (companyId) {
+    newUser = await userService.createUser({ ...userInput, company: companyId });
+  } else {
+    newUser = await userService.createUser({ ...userInput });
+  }
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
   await userService.updateUserById(newUser.id, { refreshToken });
@@ -60,7 +65,7 @@ export const registerService = {
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
     //await checkVerificationCode(userInput.verifyValue, userInput.email);
-
+    console.log(userInput);
     const user = await UserModel.findOne({
       email: userInput.email,
       role: ROLE.ADMIN,
