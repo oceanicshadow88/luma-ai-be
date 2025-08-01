@@ -194,57 +194,57 @@ userSchema.statics.refreshAuthToken = async function (
   };
 };
 
+// Helper function to check email uniqueness for new users
+async function checkEmailUniqueness(email: string, company: mongoose.Types.ObjectId) {
+  const userExists = await UserModel.exists({ email, company });
+  if (userExists) {
+    throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
+      field: 'email',
+    });
+  }
+}
+
+// Helper function to check username uniqueness
+async function checkUsernameUniqueness(
+  username: string,
+  company: mongoose.Types.ObjectId,
+  excludeId?: mongoose.Types.ObjectId,
+) {
+  const query: Record<string, unknown> = { username, company };
+  if (excludeId) {
+    query._id = { $ne: excludeId };
+  }
+
+  const userExists = await UserModel.exists(query);
+  if (userExists) {
+    throw new AppException(
+      HttpStatusCode.Conflict,
+      'Username already in use. Try a different one.',
+      { field: 'username' },
+    );
+  }
+}
+
 // Hash password before saving if it's modified
 userSchema.pre('save', async function (next) {
-  const hasCompanyAndNewRecord = this.isNew && this.company;
-  const hasCompanyAndRecordUpdate = !this.isNew && this.company;
-
-  if (hasCompanyAndNewRecord) {
-    const userExistWithEmail = await UserModel.exists({
-      email: this.email,
-      company: this.company,
-    });
-    if (userExistWithEmail) {
-      throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
-        field: 'email',
-      });
-    }
-
-    const userExistWithUsername = await UserModel.exists({
-      username: this.username,
-      company: this.company,
-    });
-    if (userExistWithUsername) {
-      throw new AppException(
-        HttpStatusCode.Conflict,
-        'Username already in use. Try a different one.',
-        { field: 'username' },
-      );
+  // Handle uniqueness checks for new users
+  if (this.isNew && this.company) {
+    await checkEmailUniqueness(this.email, this.company);
+    if (this.username) {
+      await checkUsernameUniqueness(this.username, this.company);
     }
   }
 
-  if (hasCompanyAndRecordUpdate) {
-    // Only check username uniqueness if username is being modified
-    if (this.isModified('username')) {
-      const userExistWithUsername = await UserModel.exists({
-        username: this.username,
-        company: this.company,
-        _id: { $ne: this._id }, // Exclude current user from the check
-      });
-      if (userExistWithUsername) {
-        throw new AppException(
-          HttpStatusCode.Conflict,
-          'Username already in use. Try a different one.',
-          { field: 'username' },
-        );
-      }
-    }
-  }
-  if (!this.isModified('password')) {
-    return next();
+  // Handle username uniqueness for existing users when username is modified
+  if (!this.isNew && this.company && this.isModified('username') && this.username) {
+    await checkUsernameUniqueness(this.username, this.company, this._id as mongoose.Types.ObjectId);
   }
 
-  this.password = await bcrypt.hash(this.password, 12);
+  // Hash password if it's been modified
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
+
   next();
 });
 
