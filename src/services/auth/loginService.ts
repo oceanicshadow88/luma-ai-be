@@ -15,14 +15,11 @@ export const loginService = {
     email,
     password,
     slug,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    allowedRoles,
     companyId,
   }: {
     email: string;
     password: string;
     slug: string;
-    allowedRoles: RoleType[];
     companyId: string;
   }): Promise<LoginResult> => {
     const user = await UserModel.findOne({
