@@ -1,7 +1,7 @@
 import type { Document } from 'mongoose';
 
 import { DEFAULT_LOCALE, type LocaleType } from '../../../src/config';
-import UserModel, { type User } from '../../../src/models/user';
+import UserModel, { type User, USER_STATUS } from '../../../src/models/user';
 
 export interface UserDocument extends Document, User {
   _id: string;
@@ -19,7 +19,7 @@ class UserBuilder {
       email: 'john@example.com',
       avatarUrl: '',
       locale: DEFAULT_LOCALE,
-      active: true,
+      status: USER_STATUS.ACTIVE,
       refreshToken: undefined,
       loginAttempts: 0,
       lockUntil: undefined,
@@ -61,8 +61,8 @@ class UserBuilder {
     return this;
   }
 
-  withActive(active: boolean): UserBuilder {
-    this.user.active = active;
+  withStatus(status: USER_STATUS): UserBuilder {
+    this.user.status = status;
     return this;
   }
 

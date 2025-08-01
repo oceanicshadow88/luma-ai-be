@@ -15,6 +15,7 @@ export const userSeeder = {
         lastName: 'admin',
         email: 'test@test.com',
         password: '123@Password',
+        role: 'admin',
       });
       return newUser;
     } catch (err) {

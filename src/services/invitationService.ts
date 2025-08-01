@@ -1,25 +1,24 @@
-import { EXPIRES_TIME_CONFIG, LocaleType, MEMBERSHIP_STATUS } from '@src/config';
-import { generateRandomUsername } from '@src/lib/generateRandomUsername';
-import UserModel from '@src/models/user';
-import { membershipService } from '@src/services/membershipService';
+import { EXPIRES_TIME_CONFIG, LocaleType, RoleType } from '@src/config';
+import AppException from '@src/exceptions/appException';
+import UserModel, { USER_STATUS } from '@src/models/user';
 import { userService } from '@src/services/userService';
 import { GenerateInvitationRequest, GenerateInvitationResponse } from '@src/types/invitation';
 import { generateInvitationLinkAndStoreToken } from '@src/utils/invitationLink';
+import { HttpStatusCode } from 'axios';
 import mongoose, { Types } from 'mongoose';
 
 export interface RegisterUserInputByInvitation {
-  firstName: string;
-  lastName: string;
-  username: string;
   password: string;
   email: string;
   avatarUrl?: string;
   locale?: LocaleType;
-  active: boolean;
+  company: Types.ObjectId;
+  role: RoleType;
+  status?: USER_STATUS;
 }
 
-const createUserAndTokens = async (userInput: RegisterUserInputByInvitation) => {
-  const newUser = await userService.createUser(userInput);
+const createUserAndTokens = async (userInput: RegisterUserInputByInvitation, companyId: string) => {
+  const newUser = await userService.createUser({ ...userInput, company: companyId });
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
   await userService.updateUserById(newUser.id, { refreshToken });
@@ -28,36 +27,31 @@ const createUserAndTokens = async (userInput: RegisterUserInputByInvitation) => 
 };
 
 export class InvitationService {
-  static async generateInvitation(
+  static async generateInvitationNew(
     { email, role }: GenerateInvitationRequest,
     companyId: string,
     frontendBaseUrl: string,
   ): Promise<GenerateInvitationResponse> {
-    const newUsername = await generateRandomUsername();
-    // Check if the user already exists
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser) {
-      const { refreshToken } = await existingUser.generateTokens();
-      await userService.updateUserById(existingUser.id, { refreshToken });
-      //if membership exists, we can just generate an invitation link
-      const existingMembership = await membershipService.getMembershipByUserIdAndCompanyId(
-        existingUser._id as Types.ObjectId,
-        new mongoose.Types.ObjectId(companyId),
-      );
-      if (!existingMembership) {
-        await membershipService.createMembership({
-          user: existingUser._id as Types.ObjectId,
+    const userExists = await UserModel.findOne({ email, company: companyId });
+    if (!userExists) {
+      const { newUser } = await createUserAndTokens(
+        {
+          email,
+          password: '123@Password', //TODO: this is a huge security risk, should be change
           company: new mongoose.Types.ObjectId(companyId),
-          role,
-          status: MEMBERSHIP_STATUS.INVITED,
-        });
-      }
-      // If the user already exists, we can just generate an invitation link
+          role: role,
+          status: USER_STATUS.INVITED,
+        },
+        companyId,
+      );
+
       const invitationLink = await generateInvitationLinkAndStoreToken(
         email,
         role,
         frontendBaseUrl,
+        newUser?.id ?? '',
       );
+
       return {
         invitationLink,
         email,
@@ -65,53 +59,21 @@ export class InvitationService {
         expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
       };
     }
-    const { newUser } = await createUserAndTokens({
-      email,
-      password: '123@Password', //TODO: this is a huge security risk, should be change
-      username: newUsername,
-      firstName: 'Invited',
-      lastName: 'Invited',
-      active: false,
-    });
-    await membershipService.createMembership({
-      company: new mongoose.Types.ObjectId(companyId),
-      user: newUser._id as Types.ObjectId,
-      role: role,
-      status: MEMBERSHIP_STATUS.INVITED,
-    });
-    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
 
-    return {
-      invitationLink,
+    if (userExists.status === USER_STATUS.ACTIVE) {
+      throw new AppException(HttpStatusCode.Conflict, 'User exists');
+    }
+    if (userExists.status === USER_STATUS.DISABLED) {
+      throw new AppException(HttpStatusCode.Conflict, 'User disabled');
+    }
+
+    const invitationLink = await generateInvitationLinkAndStoreToken(
       email,
       role,
-      expiresIn: EXPIRES_TIME_CONFIG.EXPIRES_IN_DISPLAY,
-    };
-  }
-
-  static async generateInvitationNew(
-    { email, role }: GenerateInvitationRequest,
-    companyId: string,
-    frontendBaseUrl: string,
-  ): Promise<GenerateInvitationResponse> {
-    const newUsername = await generateRandomUsername();
-
-    const { newUser } = await createUserAndTokens({
-      email,
-      password: '123@Password', //TODO: this is a huge security risk, should be change
-      username: newUsername,
-      firstName: 'Invited',
-      lastName: 'Invited',
-      active: false,
-    });
-    await membershipService.createMembership({
-      company: new mongoose.Types.ObjectId(companyId),
-      user: newUser._id as Types.ObjectId,
-      role: role,
-      status: MEMBERSHIP_STATUS.INVITED,
-    });
-    const invitationLink = await generateInvitationLinkAndStoreToken(email, role, frontendBaseUrl);
-
+      frontendBaseUrl,
+      userExists.id ?? '',
+      userExists.status ?? USER_STATUS.INVITED,
+    );
     return {
       invitationLink,
       email,

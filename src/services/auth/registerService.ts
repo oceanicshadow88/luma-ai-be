@@ -1,19 +1,15 @@
 import { ROLE } from '@src/config';
 import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
-import MembershipModel from '@src/models/membership';
 import ResetCodeModel from '@src/models/resetCode';
-import UserModel from '@src/models/user';
-import { membershipService } from '@src/services/membershipService';
+import UserModel, { USER_STATUS } from '@src/models/user';
 import { userService } from '@src/services/userService';
 import { VerifyCodeType } from '@src/types/invitation';
-import { verifyInvitationToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
-import { Types } from 'mongoose';
 
 // Create user and generate authentication tokens
-const createUserAndTokens = async (userInput: RegisterUserInput) => {
-  const newUser = await userService.createUser(userInput);
+const createUserAndTokens = async (userInput: RegisterUserInput, companyId?: string) => {
+  const newUser = await userService.createUser({ ...userInput, company: companyId });
   // Generate authentication tokens
   const { refreshToken, accessToken } = await newUser.generateTokens();
   await userService.updateUserById(newUser.id, { refreshToken });
@@ -21,67 +17,85 @@ const createUserAndTokens = async (userInput: RegisterUserInput) => {
   return { newUser, refreshToken, accessToken };
 };
 
+const getInviteUser = async (userInput: RegisterUserInput, companyId: string) => {
+  const user = await UserModel.findOne({ email: userInput.email, company: companyId });
+  if (!user) {
+    throw new AppException(HttpStatusCode.NotFound, 'Non invited users');
+  }
+  if (user.status === 'active') {
+    throw new AppException(HttpStatusCode.Conflict, 'User already exists.');
+  }
+
+  const userExistWithUsername = await UserModel.exists({
+    username: userInput.username,
+    companyId: companyId,
+  });
+  if (userExistWithUsername) {
+    throw new AppException(
+      HttpStatusCode.Conflict,
+      'Username already in use. Try a different one.',
+      { field: 'username' },
+    );
+  }
+  return user;
+};
+
 export const registerService = {
-  teacherRegister: async (userInput: RegisterUserInput) => {
-    const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
-    if (userExistWithUsername) {
-      throw new AppException(
-        HttpStatusCode.Conflict,
-        'Username already in use. Try a different one.',
-        { field: 'username' },
-      );
-    }
+  instructorRegister: async (userInput: RegisterUserInput, companyId: string) => {
+    //await verifyInvitationToken(userInput.verifyValue);
 
-    const user = await UserModel.findOne({ email: userInput.email });
-    //this need to be change to email
-    if (!user) {
-      throw new AppException(HttpStatusCode.NotFound, 'Non invited users');
-    }
+    const invitedUser = await getInviteUser(userInput, companyId);
 
-    // check the token
-    await verifyInvitationToken(userInput.verifyValue);
-
-    // Update user data and save - this will trigger pre-save hook for password hashing
-    Object.assign(user, userInput, { active: true });
-    await user.save();
-
-    const { refreshToken, accessToken } = await user.generateTokens();
-    await userService.updateUserById(user.id, { refreshToken });
+    const { refreshToken, accessToken } = await invitedUser.generateTokens();
+    const updatedUser = {
+      ...invitedUser,
+      ...userInput,
+      ...{ status: USER_STATUS.ACTIVE, refreshToken },
+    };
+    await userService.updateUserById(invitedUser.id, updatedUser);
 
     return { refreshToken, accessToken };
   },
 
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    await checkVerificationCode(userInput.verifyValue, userInput.email);
+    //await checkVerificationCode(userInput.verifyValue, userInput.email);
 
-    const user = await UserModel.findOne({ email: userInput.email });
-    if (user && user.active === false) {
-      Object.assign(user, userInput, { active: true });
-      await user.save();
-      const tokens = await user.generateTokens();
-      await userService.updateUserById(user.id, { refreshToken: tokens.refreshToken });
-      return { refreshToken: tokens.refreshToken, accessToken: tokens.accessToken };
-    }
-    if (user && user.active === true) {
-      //TODO: What to do
-    }
+    const user = await UserModel.findOne({
+      email: userInput.email,
+      role: 'admin',
+    });
 
-    // Create a new user
-    const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
-    if (userExistWithUsername) {
-      throw new AppException(
-        HttpStatusCode.Conflict,
-        'Username already in use. Try a different one.',
-        { field: 'username' },
+    if (!user) {
+      const result = await createUserAndTokens(
+        {
+          ...userInput,
+          ...{ role: ROLE.ADMIN, status: USER_STATUS.ACTIVE },
+        },
+        '',
       );
+      return { refreshToken: result.refreshToken, accessToken: result.accessToken };
     }
-    const result = await createUserAndTokens(userInput);
-    return { refreshToken: result.refreshToken, accessToken: result.accessToken };
+
+    if (user.status === USER_STATUS.ACTIVE) {
+      throw new AppException(HttpStatusCode.Conflict, 'Email already exists.', {
+        field: 'email',
+      });
+    }
+
+    const { refreshToken, accessToken } = await user.generateTokens();
+    const updatedUser = {
+      ...user,
+      ...userInput,
+      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLE.ADMIN },
+    };
+    await userService.updateUserById(user.id, updatedUser);
+    return { refreshToken, accessToken };
   },
 
   // Register learner user and create learner membership for specific organization
-  learnerRegister: async (userInput: RegisterUserInput, organizationId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  learnerRegister: async (userInput: RegisterUserInput, companyId: string) => {
     await checkVerificationCode(userInput.verifyValue, userInput.email);
 
     // Check learner exist in this company
@@ -97,29 +111,18 @@ export const registerService = {
           { field: 'username' },
         );
       }
-      const { newUser, refreshToken, accessToken } = await createUserAndTokens(userInput);
-
-      await membershipService.createMembership({
-        user: newUser._id as Types.ObjectId,
-        company: new Types.ObjectId(organizationId),
-        role: ROLE.LEARNER,
-      });
+      const { refreshToken, accessToken } = await createUserAndTokens(userInput);
 
       return { refreshToken, accessToken };
     }
-    existingUser.active = true;
-    await existingUser.save();
-    const existingLearnerMembership = await MembershipModel.findOne({
-      user: existingUser._id,
-      company: organizationId,
-      status: 'active',
-    });
-
-    if (existingLearnerMembership) {
+    if (existingUser.status === USER_STATUS.ACTIVE) {
       throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
         field: 'email',
       });
     }
+
+    existingUser.status = USER_STATUS.ACTIVE;
+    await existingUser.save();
 
     // User exist but not this company or in this company but not learner
     // await membershipService.createMembership({

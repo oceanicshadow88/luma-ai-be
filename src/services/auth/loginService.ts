@@ -1,15 +1,13 @@
 import { RoleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
-import { Company } from '@src/models/company';
-import MembershipModel from '@src/models/membership';
-import UserModel from '@src/models/user';
+import UserModel, { USER_STATUS } from '@src/models/user';
 import { HttpStatusCode } from 'axios';
-import { Types } from 'mongoose';
 export interface LoginResult {
   refreshToken?: string;
   accessToken?: string;
   companySlug: string;
   role: RoleType;
+  companyId?: string;
 }
 
 export const loginService = {
@@ -17,14 +15,21 @@ export const loginService = {
     email,
     password,
     slug,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     allowedRoles,
+    companyId,
   }: {
     email: string;
     password: string;
     slug: string;
     allowedRoles: RoleType[];
+    companyId: string;
   }): Promise<LoginResult> => {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({
+      email,
+      company: companyId,
+      status: USER_STATUS.ACTIVE,
+    });
     if (!user) {
       throw new AppException(
         HttpStatusCode.Unauthorized,
@@ -49,32 +54,6 @@ export const loginService = {
       );
     }
 
-    const memberships = await MembershipModel.find({ user: user._id }).populate<{
-      company: Pick<Company, 'slug'> & { _id: Types.ObjectId };
-    }>('company', 'slug');
-    if (!memberships.length) {
-      throw new AppException(
-        HttpStatusCode.InternalServerError,
-        'Membership or company not exist.',
-      );
-    }
-    const matchedMembershipWithSlug = memberships.find(m => m.company.slug === slug);
-    if (!matchedMembershipWithSlug) {
-      throw new AppException(
-        HttpStatusCode.Unauthorized,
-        'Login failed. Please check your email and password',
-        { payload: ` Company slug not match with subdomain: ${slug}.` },
-      );
-    }
-    const role = matchedMembershipWithSlug.role;
-    if (!allowedRoles.includes(role)) {
-      throw new AppException(
-        HttpStatusCode.Unauthorized,
-        'Login failed. Please verify your login details or switch to the correct portal.',
-        { payload: `User role: ${role} not match with ${allowedRoles}` },
-      );
-    }
-
     const { refreshToken, accessToken } = await user.generateTokens();
     user.refreshToken = refreshToken;
     user.loginAttempts = 0;
@@ -84,8 +63,9 @@ export const loginService = {
     return {
       accessToken,
       refreshToken,
-      companySlug: matchedMembershipWithSlug.company.slug,
-      role: matchedMembershipWithSlug.role,
+      companySlug: slug,
+      role: user.role,
+      companyId: user.company?.toString(),
     };
   },
 };

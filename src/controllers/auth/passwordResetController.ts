@@ -24,7 +24,7 @@ export const verifyResetCode = async (req: Request, res: Response) => {
   const { email, verifyValue, newPassword } = req.body;
 
   // Find user by email
-  const user = await UserModel.findOne({ email }).exec();
+  const user = await UserModel.findOne({ email, company: req.companyId }).exec();
 
   // User not exist still return true
   if (!user) {

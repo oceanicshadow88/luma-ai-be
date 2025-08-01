@@ -10,7 +10,6 @@ import {
   LocaleType,
   TIMEZONES,
 } from '../config';
-import MembershipModel from './membership';
 
 export interface Company extends Document {
   companyName: string;
@@ -84,12 +83,6 @@ const companySchema = new Schema(
   // timestamp auto createAt and updateAt
   { timestamps: true },
 );
-
-// When deleting a company, delete the relevant membership
-companySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-  await MembershipModel.deleteMany({ company: this._id });
-  next();
-});
 
 const CompanyModel = mongoose.model<Company>('Company', companySchema);
 export default CompanyModel;
