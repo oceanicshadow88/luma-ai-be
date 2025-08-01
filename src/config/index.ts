@@ -46,6 +46,7 @@ interface Config {
   emailFrom: string;
   smtpConfig: SmtpConfig;
 }
+//configuration definition: things that manages all environment-based application settings
 
 export const config: Config = {
   env: process.env.NODE_ENV ?? 'production',
@@ -100,7 +101,7 @@ export const EXPIRES_TIME_CONFIG = {
 } as const;
 
 // Mongoose DB type and default value
-// companyPlan
+// companyPlan //these are not configuration
 export const COMPANY_PLANS = {
   FREE: 'free',
   PRO: 'pro',
@@ -128,13 +129,5 @@ export const ROLE = {
 } as const;
 export type RoleType = (typeof ROLE)[keyof typeof ROLE];
 export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'learner']
-// membership status
-export const MEMBERSHIP_STATUS = {
-  ACTIVE: 'active',
-  INVITED: 'invited',
-  DISABLED: 'disabled',
-} as const;
-export type MembershipStatusType = (typeof MEMBERSHIP_STATUS)[keyof typeof MEMBERSHIP_STATUS];
-export const DEFAULT_MEMBERSHIP_STATUS = MEMBERSHIP_STATUS.ACTIVE;
 
 export default config;

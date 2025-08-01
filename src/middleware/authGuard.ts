@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 
 import AppException from '../exceptions/appException';
 import { jwtUtils } from '../lib/jwtUtils';
-import UserModel from '../models/user';
+import UserModel, { USER_STATUS } from '../models/user';
 
 declare global {
   namespace Express {
@@ -13,7 +13,7 @@ declare global {
         id: string;
         email: string;
         username: string;
-        active: boolean;
+        status: USER_STATUS;
       };
     }
   }
@@ -50,7 +50,7 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
     });
   }
 
-  if (!user.active) {
+  if (user.status !== 'active') {
     throw new AppException(HttpStatusCode.Forbidden, 'Unauthorized Access', {
       payload: 'User account is inactive.',
     });
@@ -58,8 +58,8 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
   req.user = {
     id: (user._id as Types.ObjectId).toString(),
     email: user.email,
-    username: user.username,
-    active: user.active,
+    username: user?.username || '',
+    status: user.status,
   };
 
   next();
@@ -90,7 +90,7 @@ export const authGuardLite = (req: Request, res: Response, next: NextFunction): 
     id: payload.userId,
     email: payload.email || '',
     username: payload.name || '',
-    active: true,
+    status: payload.status,
   };
 
   next();

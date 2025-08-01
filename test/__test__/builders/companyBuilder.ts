@@ -87,7 +87,7 @@ class CompanyBuilder {
     return this;
   }
 
-  withActive(active: boolean): CompanyBuilder {
+  withStaus(active: boolean): CompanyBuilder {
     this.company.active = active;
     return this;
   }

@@ -89,9 +89,6 @@ const registerSchema = baseAuthSchema.keys({
     'any.only': 'You must agree to the terms to continue',
   }),
 
-  active: Joi.boolean().default(true).messages({
-    'boolean.base': 'Active must be a boolean value',
-  }),
   token: Joi.string().optional(),
 });
 

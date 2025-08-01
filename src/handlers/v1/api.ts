@@ -12,7 +12,7 @@ import {
 } from '../../controllers/auth/registerController';
 import { requestVerificationCode } from '../../controllers/auth/verifyCodeController';
 import { dashboardController } from '../../controllers/dashboardController';
-import { generateInvitation, generateInvitationNew } from '../../controllers/invitationController';
+import { generateInvitation } from '../../controllers/invitationController';
 import { authGuard } from '../../middleware/authGuard';
 import { extractFrontendUrl } from '../../middleware/extractFrontendUrl';
 import {
@@ -97,6 +97,7 @@ registerRoutes(router, [
   {
     method: 'get',
     path: '/auth/verify-user',
+    middlewares: [saas],
     handler: isActiveUser,
   },
 ]);
@@ -130,15 +131,9 @@ registerRoutes(router, [
     middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
     handler: generateInvitation,
   },
-  {
-    method: 'post',
-    path: '/invitation/generate/new',
-    middlewares: [extractFrontendUrl, saas, validateBody(invitationSchema)],
-    handler: generateInvitationNew,
-  },
 ]);
 
-// ----------------- DASHBOARD ROUTES -----------------
+// -------------- DASHBOARD ROUTES -----------------
 registerRoutes(router, [
   {
     method: 'get',
