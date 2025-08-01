@@ -63,7 +63,7 @@ export const registerService = {
 
     const user = await UserModel.findOne({
       email: userInput.email,
-      role: 'admin',
+      role: ROLE.ADMIN,
     });
 
     if (!user) {
