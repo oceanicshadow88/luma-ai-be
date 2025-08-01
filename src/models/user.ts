@@ -196,9 +196,6 @@ userSchema.statics.refreshAuthToken = async function (
 
 // Hash password before saving if it's modified
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
   const hasCompanyAndNewRecord = this.isNew && this.company;
   const hasCompanyAndRecordUpdate = !this.isNew && this.company;
 
@@ -238,6 +235,9 @@ userSchema.pre('save', async function (next) {
         { field: 'username' },
       );
     }
+  }
+  if (!this.isModified('password')) {
+    return next();
   }
 
   this.password = await bcrypt.hash(this.password, 12);
