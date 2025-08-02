@@ -99,47 +99,42 @@ export const registerService = {
   },
 
   // Register learner user and create learner membership for specific organization
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   learnerRegister: async (userInput: RegisterUserInput, companyId: string) => {
     await checkVerificationCode(userInput.verifyValue, userInput.email);
 
-    // Check learner exist in this company
-    const existingUser = await UserModel.findOne({ email: userInput.email });
+    const user = await UserModel.findOne({
+      email: userInput.email,
+      company: companyId,
+    });
 
-    if (!existingUser) {
-      const userExistWithUsername = await UserModel.findOne({ username: userInput.username });
+    if (!user) {
+      const newUser = await userService.createUser({
+        ...userInput,
+        ...{ role: ROLE.LEARNER, status: USER_STATUS.ACTIVE },
+        company: companyId,
+      });
 
-      if (userExistWithUsername) {
-        throw new AppException(
-          HttpStatusCode.Conflict,
-          'Username already in use. Try a different one.',
-          { field: 'username' },
-        );
-      }
-      const { refreshToken, accessToken } = await createUserAndTokens(userInput);
+      const { refreshToken, accessToken } = await newUser.generateTokens();
+      await userService.updateUserById(newUser.id, { refreshToken });
 
-      return { refreshToken, accessToken };
+      return { refreshToken: refreshToken, accessToken: accessToken };
     }
-    if (existingUser.status === USER_STATUS.ACTIVE) {
-      throw new AppException(HttpStatusCode.Conflict, 'Email already registered. Please log in.', {
+
+    if (user.status === USER_STATUS.ACTIVE) {
+      throw new AppException(HttpStatusCode.Conflict, 'Email already exists.', {
         field: 'email',
       });
     }
 
-    existingUser.status = USER_STATUS.ACTIVE;
-    await existingUser.save();
-
-    // User exist but not this company or in this company but not learner
-    // await membershipService.createMembership({
-    //   user: existingUser._id as Types.ObjectId,
-    //   company: new Types.ObjectId(organizationId),
-    //   role: ROLE.LEARNER,
-    // });
-
-    const { refreshToken, accessToken } = await existingUser.generateTokens();
-    await userService.updateUserById(existingUser.id, { refreshToken });
-
-    return { existingUser, refreshToken, accessToken };
+    const { refreshToken, accessToken } = await user.generateTokens();
+    const updatedUser = {
+      ...user,
+      ...userInput,
+      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLE.LEARNER },
+    };
+    await userService.updateUserById(user.id, updatedUser);
+    return { refreshToken, accessToken };
   },
 };
 
