@@ -1,7 +1,7 @@
+import { handleLogin } from '@src/controllers/auth/loginController';
 import { Router } from 'express';
 
 import { isActiveUser, verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
-import { loginEnterprise, loginLearner } from '../../controllers/auth/loginController';
 import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import {
@@ -52,15 +52,9 @@ registerRoutes(router, [
   },
   {
     method: 'post',
-    path: '/auth/login/enterprise',
+    path: '/auth/login',
     middlewares: [saas, validateBody(authValidationSchema.login)],
-    handler: loginEnterprise,
-  },
-  {
-    method: 'post',
-    path: '/auth/login/learner',
-    middlewares: [saas, validateBody(authValidationSchema.login)],
-    handler: loginLearner,
+    handler: handleLogin,
   },
   {
     method: 'post',
