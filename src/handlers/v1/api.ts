@@ -6,6 +6,7 @@ import { userLogout } from '../../controllers/auth/logoutController';
 import { resetPassword } from '../../controllers/auth/passwordResetController';
 import {
   adminRegister,
+  checkCompanyAvailability,
   handleOwnerRegistrationProcess,
   learnerRegister,
   teacherRegister,
@@ -113,6 +114,11 @@ registerRoutes(router, [
       authGuard,
     ],
     handler: handleOwnerRegistrationProcess,
+  },
+  {
+    method: 'get',
+    path: '/auth/institution/:companySlug',
+    handler: checkCompanyAvailability,
   },
 ]);
 

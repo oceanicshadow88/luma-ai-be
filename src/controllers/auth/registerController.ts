@@ -105,3 +105,11 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
     },
   });
 };
+
+export const checkCompanyAvailability = async (req: Request, res: Response) => {
+  const { companySlug } = req.params;
+  const companyExists = await CompanyModel.exists({ slug: companySlug, active: true });
+  res.status(200).json({
+    available: !!companyExists as boolean,
+  });
+};
