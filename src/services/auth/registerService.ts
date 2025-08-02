@@ -5,6 +5,7 @@ import ResetCodeModel from '@src/models/resetCode';
 import UserModel, { USER_STATUS } from '@src/models/user';
 import { userService } from '@src/services/userService';
 import { VerifyCodeType } from '@src/types/invitation';
+import { verifyInvitationToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
 
 // Create user and generate authentication tokens
@@ -47,7 +48,7 @@ const getInviteUser = async (userInput: RegisterUserInput, companyId: string) =>
 
 export const registerService = {
   instructorRegister: async (userInput: RegisterUserInput, companyId: string) => {
-    //await verifyInvitationToken(userInput.verifyValue);
+    await verifyInvitationToken(userInput.verifyValue);
 
     const invitedUser = await getInviteUser(userInput, companyId);
 
@@ -64,7 +65,7 @@ export const registerService = {
 
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    //await checkVerificationCode(userInput.verifyValue, userInput.email);
+    await checkVerificationCode(userInput.verifyValue, userInput.email);
 
     const user = await UserModel.findOne({
       email: userInput.email,
