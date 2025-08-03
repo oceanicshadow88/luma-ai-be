@@ -5,9 +5,10 @@ import CompanyModel from '@src/models/company';
 import UserModel, { User } from '@src/models/user';
 import { registerService } from '@src/services/auth/registerService';
 import { companyService } from '@src/services/companyService';
+import { userService } from '@src/services/userService';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-import { ObjectId, Types } from 'mongoose';
+import mongoose, { ObjectId, Types } from 'mongoose';
 
 export interface RegisterUserInput {
   firstName: string;
@@ -95,20 +96,28 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
     throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
   }
   user.company = newCompany._id as Types.ObjectId;
-  await user.save();
+
+  const { refreshToken, accessToken } = await user.generateTokens();
+
+  const updatedUser = {
+    refreshToken,
+    company: newCompany._id as mongoose.Types.ObjectId,
+  };
+
+  await userService.updateUserById(user.id, updatedUser);
 
   return res.status(201).json({
-    message: 'User, Company and Membership created successfully',
-    data: {
-      user: user._id,
-      company: newCompany._id,
-    },
+    message: 'User and Company created successfully',
+    refreshToken,
+    accessToken,
   });
 };
 
 export const checkCompanyAvailability = async (req: Request, res: Response) => {
   const { companySlug } = req.params;
+
   const companyExists = await CompanyModel.exists({ slug: companySlug, active: true });
+
   res.status(200).json({
     available: !!companyExists as boolean,
   });
