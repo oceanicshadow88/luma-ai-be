@@ -1,3 +1,4 @@
+import { RoleType } from '@src/config';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';
@@ -14,6 +15,7 @@ declare global {
         email: string;
         username: string;
         status: USER_STATUS;
+        role: RoleType;
       };
     }
   }
@@ -42,7 +44,11 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
     });
   }
   // Check if user still exists and is active
-  const user = await UserModel.findById(payload.userId).select('-password -refreshToken');
+  const user = await UserModel.findOne({
+    _id: payload.userId,
+    company: req.companyId,
+    status: USER_STATUS.ACTIVE,
+  }).select('-password -refreshToken');
 
   if (!user) {
     throw new AppException(HttpStatusCode.Forbidden, 'Unauthorized Access', {
@@ -50,16 +56,12 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
     });
   }
 
-  if (user.status !== 'active') {
-    throw new AppException(HttpStatusCode.Forbidden, 'Unauthorized Access', {
-      payload: 'User account is inactive.',
-    });
-  } // Add user info to request object
   req.user = {
     id: (user._id as Types.ObjectId).toString(),
     email: user.email,
     username: user?.username || '',
-    status: user.status,
+    status: user.status as USER_STATUS,
+    role: user.role as RoleType,
   };
 
   next();
@@ -67,6 +69,7 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
 
 /**
  * Lite version of authGuard that does not check user existence or status
+ * WHY DO I NEED TWO ??????
  */
 export const authGuardLite = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.header('Authorization');
@@ -90,7 +93,9 @@ export const authGuardLite = (req: Request, res: Response, next: NextFunction): 
     id: payload.userId,
     email: payload.email || '',
     username: payload.name || '',
-    status: payload.status,
+    // eslint-disable-next-line local/no-dev-notes
+    status: payload.status as USER_STATUS, // maybe there will be a bug
+    role: payload.role as RoleType,
   };
 
   next();
