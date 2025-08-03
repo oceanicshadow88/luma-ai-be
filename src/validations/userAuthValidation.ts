@@ -24,6 +24,11 @@ const passwordSchema = Joi.string()
       'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
   });
 
+const loginSchema = Joi.object({
+  email: emailSchema,
+  password: Joi.string().required(),
+});
+
 const baseAuthSchema = Joi.object({
   email: emailSchema,
   password: passwordSchema,
@@ -113,7 +118,7 @@ const verificationCodeSchema = Joi.object({
 const authValidationSchema = {
   register: registerSchema,
   learnerRegister: registerSchema,
-  login: baseAuthSchema,
+  login: loginSchema,
   freshToken: freshTokenSchema,
   resetPassword: resetPasswordSchema,
   verificationCode: verificationCodeSchema,
