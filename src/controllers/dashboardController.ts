@@ -21,8 +21,8 @@ export const dashboardController = {
     //TODO: mock data for dashboard display(replace later)
     const dashboardData = {
       currentUserInfo,
-      totalLearners: 0,
-      totalInstructors: 0,
+      totalLearners: companyUsage.currentLearners,
+      totalInstructors: companyUsage.currentInstructors,
       adminDashboardDataMock,
     };
 
