@@ -1,4 +1,5 @@
 import { handleLogin } from '@src/controllers/auth/loginController';
+import { someAuth } from '@src/middleware/someAuth';
 import { Router } from 'express';
 
 import { isActiveUser, verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
@@ -36,19 +37,19 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/admin',
-    middlewares: [validateBody(authValidationSchema.register)],
+    middlewares: [saas, someAuth, validateBody(authValidationSchema.register)],
     handler: adminRegister,
   },
   {
     method: 'post',
     path: '/auth/signup/instructor',
-    middlewares: [saas, validateBody(authValidationSchema.register)],
+    middlewares: [saas, someAuth, validateBody(authValidationSchema.register)],
     handler: teacherRegister,
   },
   {
     method: 'post',
     path: '/auth/signup/learner',
-    middlewares: [saas, validateBody(authValidationSchema.learnerRegister)],
+    middlewares: [saas, someAuth, validateBody(authValidationSchema.learnerRegister)],
     handler: learnerRegister,
   },
   {
