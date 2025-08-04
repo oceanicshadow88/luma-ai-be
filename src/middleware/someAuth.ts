@@ -15,7 +15,7 @@ export const someAuth = (req: Request, res: Response, next: NextFunction): void 
     });
   }
 
-  if (req.companyId !== payload.companyId) {
+  if (req.companyId.toString() !== payload.companyId.toString()) {
     throw new AppException(
       HttpStatusCode.InternalServerError,
       `Company ID mismatch: ${req.companyId} !== ${payload.companyId}`,
