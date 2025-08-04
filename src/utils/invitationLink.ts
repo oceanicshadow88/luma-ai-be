@@ -58,6 +58,7 @@ export async function generateInvitationLinkAndStoreToken(
   role: RoleType,
   frontendBaseUrl: string,
   id: string,
+  companyId: string = '',
   status: USER_STATUS = USER_STATUS.INVITED,
 ): Promise<string> {
   const secret: Secret = config.jwt?.secret;
@@ -67,6 +68,7 @@ export async function generateInvitationLinkAndStoreToken(
     id,
     status,
     purpose: 'invitation',
+    companyId,
   };
 
   const options: SignOptions = {

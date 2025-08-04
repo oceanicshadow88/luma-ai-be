@@ -50,6 +50,7 @@ export class InvitationService {
         role,
         frontendBaseUrl,
         newUser?.id ?? '',
+        companyId,
       );
 
       return {
@@ -72,6 +73,7 @@ export class InvitationService {
       role,
       frontendBaseUrl,
       userExists.id ?? '',
+      companyId,
       userExists.status ?? USER_STATUS.INVITED,
     );
     return {
