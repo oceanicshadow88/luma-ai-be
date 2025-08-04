@@ -56,7 +56,7 @@ export const registerService = {
     const updatedUser = {
       ...invitedUser,
       ...userInput,
-      ...{ status: USER_STATUS.ACTIVE, refreshToken },
+      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLE.INSTRUCTOR },
     };
     await userService.updateUserById(invitedUser.id, updatedUser);
 
