@@ -162,10 +162,13 @@ userSchema.methods.generateTokens = async function (
   this: User,
 ): Promise<{ accessToken: string; refreshToken: string }> {
   const userId = (this._id as Types.ObjectId).toString();
-  const accessToken = jwtUtils.generateAccessToken({ userId, companyId: this.company.toString() });
+  const accessToken = jwtUtils.generateAccessToken({
+    userId,
+    companyId: this.company?.toString() ?? '',
+  });
   const refreshToken = jwtUtils.generateRefreshToken({
     userId,
-    companyId: this.company.toString(),
+    companyId: this.company?.toString() ?? '',
   });
 
   return { accessToken, refreshToken };
@@ -183,11 +186,11 @@ userSchema.statics.refreshAuthToken = async function (
 
   const newAccessToken = jwtUtils.generateAccessToken({
     userId: (user._id as Types.ObjectId).toString(),
-    companyId: user.company.toString(),
+    companyId: user.company?.toString() ?? '',
   });
   const newRefreshToken = jwtUtils.generateRefreshToken({
     userId: (user._id as Types.ObjectId).toString(),
-    companyId: user.company.toString(),
+    companyId: user.company?.toString() ?? '',
   });
 
   user.refreshToken = newRefreshToken;
