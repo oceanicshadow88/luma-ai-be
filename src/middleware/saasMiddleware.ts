@@ -9,13 +9,15 @@ import { Company } from '../models/company';
 export const saas = async (req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin ?? `${req.protocol}://${req.hostname}`;
   const allowedMainDomains = ['lumaai.com', 'lumaai.localhost'];
-  if (allowedMainDomains.includes(req.hostname)) {
-    next();
-    return;
-  }
+
   const hostname = new URL(origin).hostname.toLowerCase();
   if (!hostname) {
     throw new AppException(HttpStatusCode.InternalServerError, `Invalid hostname: ${hostname}`);
+  }
+
+  if (allowedMainDomains.includes(hostname)) {
+    next();
+    return;
   }
 
   const slug = await authService.verifyDomainGetSlug(hostname);
