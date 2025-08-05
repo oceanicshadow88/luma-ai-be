@@ -11,9 +11,10 @@ export const someAuth = async (req: Request, res: Response, next: NextFunction):
 
   if (!token) {
     next();
+    return;
   }
   const payload = jwtUtils.verifyAccessToken(token);
-  if (!payload?.id || !payload?.companyId || !payload?.role) {
+  if (!payload) {
     throw new AppException(HttpStatusCode.Unauthorized, 'Unauthorized Access', {
       payload: 'Cannot find token payload',
     });
