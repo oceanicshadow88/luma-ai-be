@@ -102,8 +102,9 @@ export const registerService = {
   // Register learner user and create learner membership for specific organization
 
   learnerRegister: async (userInput: RegisterUserInput, companyId: string) => {
+    console.log('1');
     await checkVerificationCode(userInput.verifyValue, userInput.email);
-
+    console.log('2');
     const user = await UserModel.findOne({
       email: userInput.email,
       company: companyId,
@@ -115,18 +116,20 @@ export const registerService = {
         ...{ role: ROLE.LEARNER, status: USER_STATUS.ACTIVE },
         company: companyId,
       });
-
+      console.log('3');
       const { refreshToken, accessToken } = await newUser.generateTokens();
       await userService.updateUserById(newUser.id, { refreshToken });
-
+      console.log('4');
       return { refreshToken: refreshToken, accessToken: accessToken };
     }
 
+    console.log('5');
     if (user.status === USER_STATUS.ACTIVE) {
       throw new AppException(HttpStatusCode.Conflict, 'Email already exists.', {
         field: 'email',
       });
     }
+    console.log('6');
 
     const { refreshToken, accessToken } = await user.generateTokens();
     const updatedUser = {
