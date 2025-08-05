@@ -115,7 +115,6 @@ export const registerService = {
         ...{ role: ROLE.LEARNER, status: USER_STATUS.ACTIVE },
         company: companyId,
       });
-
       const { refreshToken, accessToken } = await newUser.generateTokens();
       await userService.updateUserById(newUser.id, { refreshToken });
 

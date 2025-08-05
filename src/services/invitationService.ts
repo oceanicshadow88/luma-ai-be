@@ -50,6 +50,7 @@ export class InvitationService {
         role,
         frontendBaseUrl,
         newUser?.id ?? '',
+        companyId,
       );
 
       return {
@@ -60,7 +61,7 @@ export class InvitationService {
       };
     }
 
-    if (userExists.status === USER_STATUS.ACTIVE) {
+    if (userExists.status === USER_STATUS.ACTIVE || userExists.status === USER_STATUS.INVITED) {
       throw new AppException(HttpStatusCode.Conflict, 'User exists');
     }
     if (userExists.status === USER_STATUS.DISABLED) {
@@ -72,6 +73,7 @@ export class InvitationService {
       role,
       frontendBaseUrl,
       userExists.id ?? '',
+      companyId,
       userExists.status ?? USER_STATUS.INVITED,
     );
     return {
