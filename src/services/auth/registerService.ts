@@ -109,7 +109,6 @@ export const registerService = {
 
     if (!user) {
       await checkVerificationCode(userInput.verifyValue, userInput.email);
-      console.log(1);
 
       const newUser = await userService.createUser({
         ...userInput,
@@ -122,7 +121,6 @@ export const registerService = {
       return { refreshToken: refreshToken, accessToken: accessToken };
     }
 
-    console.log(2);
     if (user.status === USER_STATUS.ACTIVE) {
       throw new AppException(HttpStatusCode.Conflict, 'Email already exists.', {
         field: 'email',
