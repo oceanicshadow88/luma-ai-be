@@ -65,14 +65,14 @@ export const registerService = {
 
   // Register admin user and create admin membership
   adminRegister: async (userInput: RegisterUserInput) => {
-    await checkVerificationCode(userInput.verifyValue, userInput.email);
-
     const user = await UserModel.findOne({
       email: userInput.email,
       role: ROLE.ADMIN,
     });
 
     if (!user) {
+      await checkVerificationCode(userInput.verifyValue, userInput.email);
+
       const result = await createUserAndTokens(
         {
           ...userInput,
@@ -102,14 +102,15 @@ export const registerService = {
   // Register learner user and create learner membership for specific organization
 
   learnerRegister: async (userInput: RegisterUserInput, companyId: string) => {
-    await checkVerificationCode(userInput.verifyValue, userInput.email);
-
     const user = await UserModel.findOne({
       email: userInput.email,
       company: companyId,
     });
 
     if (!user) {
+      await checkVerificationCode(userInput.verifyValue, userInput.email);
+      console.log(1);
+
       const newUser = await userService.createUser({
         ...userInput,
         ...{ role: ROLE.LEARNER, status: USER_STATUS.ACTIVE },
@@ -121,6 +122,7 @@ export const registerService = {
       return { refreshToken: refreshToken, accessToken: accessToken };
     }
 
+    console.log(2);
     if (user.status === USER_STATUS.ACTIVE) {
       throw new AppException(HttpStatusCode.Conflict, 'Email already exists.', {
         field: 'email',
