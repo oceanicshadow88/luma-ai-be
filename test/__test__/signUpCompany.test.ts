@@ -6,7 +6,7 @@ import { companyService } from '@src/services/companyService';
 import UserBuilder from '@test/__test__/builders/userBuilder';
 import { getApplication } from '@test/setup/app';
 import { getDefaultCompany, getDefaultUser } from '@test/setup/jest-setup';
-import { Application } from 'express';
+import { Application, NextFunction, Request, Response } from 'express';
 import request from 'supertest';
 
 describe('Sign Up Company and Owner', () => {
@@ -149,5 +149,34 @@ describe('Sign Up Company and Owner', () => {
 
     expect(response.status).toBe(500);
     expect(response.body.message).toBe('Internal Server Error');
+  });
+
+  it('should return 500 if req.user.email missing', async () => {
+    await jest.isolateModulesAsync(async () => {
+      jest.doMock('@src/middleware/authGuard', () => ({
+        authGuard: (req: Request, res: Response, next: NextFunction) => {
+          req.user = {
+            id: '',
+            email: undefined as unknown as string,
+            username: 'test-user',
+            status: USER_STATUS.ACTIVE,
+            role: ROLE.ADMIN,
+          };
+          next();
+        },
+      }));
+
+      const { loadApp, getApplication } = await import('@test/setup/app');
+      await loadApp();
+      const app = getApplication();
+
+      const response = await request(app).post(apiPath).send({
+        companyName,
+        slug,
+      });
+
+      expect(response.status).toBe(500);
+      expect(response.body.message).toBe('Internal Server Error');
+    });
   });
 });
