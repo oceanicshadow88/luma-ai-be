@@ -5,7 +5,11 @@ import logger from '@src/utils/logger';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
-export const someAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const validateTokenAndUrlWithInvitedUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   const { token } = req.body;
   if (!token) {
     next();

@@ -52,25 +52,25 @@ export const userService = {
     return await user.deleteOne(); //Trigger pre deleteOne hook, also delete membership
   },
 
-  getCurrentUserInfo: async (userId: string, companyId: string) => {
-    // const membership = await Membership.findOne({
-    //   user: userId,
-    //   company: companyId,
-    // })
-    //   .populate<{ company: Company; user: User }>('company user')
-    //   .lean();
-    // if (!membership?.company || !membership?.user) {
-    //   throw new AppException(HttpStatusCode.InternalServerError, 'Invalid Membership');
-    // }
-    // return {
-    //   userId: (membership.user._id as Types.ObjectId).toString(),
-    //   username: membership.user.username,
-    //   name: `${membership.user.firstName} ${membership.user.lastName}`,
-    //   email: membership.user.email,
-    //   role: membership.role,
-    //   company: membership.company,
-    //   avatarUrl: membership.user.avatarUrl,
-    //   locale: membership.user.locale,
-    // };
-  },
+  // getCurrentUserInfo: async (userId: string, companyId: string) => {
+  // const membership = await Membership.findOne({
+  //   user: userId,
+  //   company: companyId,
+  // })
+  //   .populate<{ company: Company; user: User }>('company user')
+  //   .lean();
+  // if (!membership?.company || !membership?.user) {
+  //   throw new AppException(HttpStatusCode.InternalServerError, 'Invalid Membership');
+  // }
+  // return {
+  //   userId: (membership.user._id as Types.ObjectId).toString(),
+  //   username: membership.user.username,
+  //   name: `${membership.user.firstName} ${membership.user.lastName}`,
+  //   email: membership.user.email,
+  //   role: membership.role,
+  //   company: membership.company,
+  //   avatarUrl: membership.user.avatarUrl,
+  //   locale: membership.user.locale,
+  // };
+  // },
 };
