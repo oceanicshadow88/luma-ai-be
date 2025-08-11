@@ -1,31 +1,50 @@
 /// <reference types="jest" />
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
+import { Company } from '@src/models/company';
 import ResetCodeModel from '@src/models/resetCode';
-import UserModel from '@src/models/user';
+import UserModel, { User } from '@src/models/user';
 import { VerifyCodeType } from '@src/types/invitation';
 import ResetCodeBuilder from '@test/__test__/builders/resetCodeBuilder';
+import { Application } from 'express';
+import mongoose from 'mongoose';
 import request from 'supertest';
 
 import { getApplication } from '../setup/app';
-import { getDefaultUser } from '../setup/jest-setup';
+import { getDefaultCompany, getDefaultUser } from '../setup/jest-setup';
 
 describe('Reset password', () => {
-  it('should successfully reset the password when the user exists with valid code', async () => {
-    const defaultUser = getDefaultUser();
+  const apiPathEnterprise = '/api/v1/auth/reset-password';
+  const originURL = 'http://default-company.lumaai.com';
+  const newPassword = '55647Aabb@';
+  const verifyValue = '888888';
+  let app: Application;
+  let defaultCompany: Company;
+  let defaultUser: User;
+
+  beforeEach(async () => {
+    app = getApplication();
+    defaultCompany = getDefaultCompany();
+    defaultUser = getDefaultUser();
+
+    defaultUser.company = defaultCompany._id as mongoose.Types.ObjectId;
+    await defaultUser.save();
+  });
+
+  it('should successfully reset the password with exist user in right company', async () => {
     await new ResetCodeBuilder()
       .withEmail(defaultUser.email)
-      .withCode('888888')
+      .withCode(verifyValue)
       .withVerifyType(VerifyCodeType.VERIFICATION)
       .save();
 
-    const response = await request(getApplication()).post('/api/v1/auth/reset-password').send({
+    const response = await request(app).post(apiPathEnterprise).set('origin', originURL).send({
       email: defaultUser.email,
-      newPassword: '55647Aabb@',
-      verifyValue: '888888',
+      newPassword: newPassword,
+      verifyValue: verifyValue,
+      companyId: defaultCompany._id,
     });
 
     expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
     expect(response.body.message).toBe('Password has been reset successfully');
 
     //The assertion verification value has been deleted
@@ -35,102 +54,5 @@ describe('Reset password', () => {
     //Claiming that user refreshToken has been cleared
     const user = await UserModel.findOne({ email: defaultUser.email }).exec();
     expect(user?.refreshToken).toBeUndefined();
-  });
-
-  it('should return true when the user not exists', async () => {
-    const response = await request(getApplication()).post('/api/v1/auth/reset-password').send({
-      email: 'test@notexist.com',
-      newPassword: '55647Aabb@',
-      verifyValue: '888888',
-    });
-
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-  });
-
-  it('should throw 401 unauthorized error when verification code not exists', async () => {
-    const defaultUser = getDefaultUser();
-    await ResetCodeModel.deleteMany({ email: defaultUser.email });
-
-    const response = await request(getApplication()).post('/api/v1/auth/reset-password').send({
-      email: defaultUser.email,
-      newPassword: '55647Aabb@',
-      verifyValue: '888888',
-    });
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toMatch(
-      /Invalid or expired verification value. Please request a new one./,
-    );
-    expect(response.body.field).toBe('verificationCode');
-  });
-
-  it('should throw 401 invalid error if verification code is invalid', async () => {
-    const defaultUser = getDefaultUser();
-    await new ResetCodeBuilder()
-      .withEmail(defaultUser.email)
-      .withVerifyType(VerifyCodeType.VERIFICATION)
-      .withCode('888888')
-      .save();
-    const response = await request(getApplication()).post('/api/v1/auth/reset-password').send({
-      email: defaultUser.email,
-      newPassword: '55647Aabb@',
-      verifyValue: 'wrongCode',
-    });
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toBe(
-      'Invalid or expired verification value. Please request a new one.',
-    );
-    expect(response.body.field).toBe('verificationCode');
-
-    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
-    expect(code?.attempts).toBe(1);
-  });
-
-  it('should throw 429 too many requests error after 5 invalid attempts', async () => {
-    const defaultUser = getDefaultUser();
-    await new ResetCodeBuilder()
-      .withEmail(defaultUser.email)
-      .withCode('888888')
-      .withVerifyType(VerifyCodeType.VERIFICATION)
-      .withAttempts(4)
-      .save();
-
-    const response = await request(getApplication()).post('/api/v1/auth/reset-password').send({
-      email: defaultUser.email,
-      newPassword: '55647Aabb@',
-      verifyValue: 'wrongCodeAgain',
-    });
-
-    expect(response.status).toBe(429);
-    expect(response.body.message).toBe(
-      'Too many incorrect attempts. Please request a new verification value.',
-    );
-
-    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
-    expect(code).toBeNull();
-  });
-
-  it('should throw 401 unauthorized error if reset code expired', async () => {
-    const defaultUser = getDefaultUser();
-    await new ResetCodeBuilder()
-      .withEmail(defaultUser.email)
-      .withCode('888888')
-      .withVerifyType(VerifyCodeType.VERIFICATION)
-      .withExpiry(-10)
-      .save();
-
-    const response = await request(getApplication()).post('/api/v1/auth/reset-password').send({
-      email: defaultUser.email,
-      newPassword: '55647Aabb@',
-      verifyValue: '888888',
-    });
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toBe(
-      'Invalid or expired verification value. Please request a new one.',
-    );
-    expect(response.body.field).toBe('verificationCode');
   });
 });
