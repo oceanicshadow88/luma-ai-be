@@ -1,12 +1,28 @@
-import { ROLE } from '@src/config';
+import { CompanyPlanType, LocaleType, ROLE } from '@src/config';
 import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
+import CompanyModel from '@src/models/company';
 import ResetCodeModel from '@src/models/resetCode';
-import UserModel, { USER_STATUS } from '@src/models/user';
+import UserModel, { User, USER_STATUS } from '@src/models/user';
+import { companyService } from '@src/services/companyService';
 import { userService } from '@src/services/userService';
 import { VerifyCodeType } from '@src/types/invitation';
 import { verifyInvitationToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
+import { Types } from 'mongoose';
+
+interface RegisterCompanyOwnerInput {
+  companyName: string;
+  plan?: CompanyPlanType;
+  slug: string;
+  logoUrl?: string;
+  settings?: {
+    timezone?: string;
+    locale?: LocaleType;
+    primaryColor?: string;
+  };
+  email: string;
+}
 
 // Create user and generate authentication tokens
 const createUserAndTokens = async (userInput: RegisterUserInput, companyId?: string) => {
@@ -99,8 +115,44 @@ export const registerService = {
     return { refreshToken, accessToken };
   },
 
-  // Register learner user and create learner membership for specific organization
+  // Register admin user and new company, set admin user as company owner, then create membership
+  registerCompanyWithOwner: async (ownerInput: RegisterCompanyOwnerInput) => {
+    // check company slug
+    const companyExistBySlug = await CompanyModel.findOne({ slug: ownerInput.slug });
+    if (companyExistBySlug) {
+      throw new AppException(HttpStatusCode.Conflict, 'Slug already in use. Try a different one.', {
+        field: 'slug',
+      });
+    }
 
+    let user: User | null = await UserModel.findOne({ email: ownerInput.email });
+    if (!user) {
+      throw new AppException(HttpStatusCode.Unauthorized, 'User not found');
+    }
+
+    // create company
+    const newCompany = await companyService.createCompany({
+      companyName: ownerInput.companyName,
+      slug: ownerInput.slug,
+      plan: ownerInput.plan,
+      owner: user._id as Types.ObjectId,
+      logoUrl: ownerInput.logoUrl,
+      settings: ownerInput.settings,
+    });
+
+    if (!newCompany._id) {
+      throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
+    }
+
+    user.company = newCompany._id as Types.ObjectId;
+    const { refreshToken, accessToken } = await user.generateTokens();
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return { accessToken, refreshToken };
+  },
+
+  // Register learner user and create learner membership for specific organization
   learnerRegister: async (userInput: RegisterUserInput, companyId: string) => {
     const user = await UserModel.findOne({
       email: userInput.email,
