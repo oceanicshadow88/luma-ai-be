@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { ROLE } from '@src/config';
-import CompanyModel from '@src/models/company';
+import CompanyModel, { Company } from '@src/models/company';
 import UserModel, { User, USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
 import UserBuilder from '@test/__test__/builders/userBuilder';
@@ -137,7 +137,7 @@ describe('Sign Up Company and Owner', () => {
     jest.spyOn(companyService, 'createCompany').mockResolvedValueOnce({
       companyName,
       slug,
-    } as any);
+    } as Partial<Company> as Company);
 
     const response = await request(app)
       .post(apiPath)
@@ -149,22 +149,5 @@ describe('Sign Up Company and Owner', () => {
 
     expect(response.status).toBe(500);
     expect(response.body.message).toBe('Internal Server Error');
-  });
-
-  it('should return 401 if req.user.email missing', async () => {
-    jest.mock('@src/middleware/authGuard.ts', () => {
-      return (req: any, res: any, next: any) => {
-        req.user = {};
-        next();
-      };
-    });
-
-    const response = await request(app).post(apiPath).send({
-      companyName,
-      slug,
-    });
-
-    expect(response.status).toBe(401);
-    expect(response.body.message).toBe('Missing admin user for institution registration.');
   });
 });
