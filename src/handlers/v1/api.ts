@@ -1,5 +1,5 @@
 import { handleLogin } from '@src/controllers/auth/loginController';
-import { someAuth } from '@src/middleware/someAuth';
+import { validateTokenAndUrlWithInvitedUser } from '@src/middleware/someAuth';
 import { Router } from 'express';
 
 import { isActiveUser, verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
@@ -37,19 +37,31 @@ registerRoutes(router, [
   {
     method: 'post',
     path: '/auth/signup/admin',
-    middlewares: [saas, someAuth, validateBody(authValidationSchema.register)],
+    middlewares: [
+      saas,
+      validateTokenAndUrlWithInvitedUser,
+      validateBody(authValidationSchema.register),
+    ],
     handler: adminRegister,
   },
   {
     method: 'post',
     path: '/auth/signup/instructor',
-    middlewares: [saas, someAuth, validateBody(authValidationSchema.register)],
+    middlewares: [
+      saas,
+      validateTokenAndUrlWithInvitedUser,
+      validateBody(authValidationSchema.register),
+    ],
     handler: teacherRegister,
   },
   {
     method: 'post',
     path: '/auth/signup/learner',
-    middlewares: [saas, someAuth, validateBody(authValidationSchema.learnerRegister)],
+    middlewares: [
+      saas,
+      validateTokenAndUrlWithInvitedUser,
+      validateBody(authValidationSchema.learnerRegister),
+    ],
     handler: learnerRegister,
   },
   {
