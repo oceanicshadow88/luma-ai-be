@@ -108,7 +108,7 @@ const logoUploader = createFileUploader({
 registerRoutes(router, [
   {
     method: 'post',
-    path: '/auth/signup/institution', //TODO: Change to /owner/register
+    path: '/auth/signup/institution',
     middlewares: [
       wrapMulterMiddleware(logoUploader.single('logo')),
       validateBody(companyValidationSchema),
