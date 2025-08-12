@@ -1,13 +1,21 @@
 import AppException from '@src/exceptions/appException';
 import { jwtUtils } from '@src/lib/jwtUtils';
 import UserModel from '@src/models/user';
+<<<<<<< HEAD:src/middleware/validateTokenAndUrlWithInvitedUser.ts
 import { ROLE_LIST, RoleType } from '@src/types/constants';
+=======
+import { roleList, RoleType } from '@src/types/constants';
+>>>>>>> 3bcc41a82db8da55c73ceee8a4259e605505f489:src/middleware/someAuth.ts
 import logger from '@src/utils/logger';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
 function isValidRole(value: string): value is RoleType {
+<<<<<<< HEAD:src/middleware/validateTokenAndUrlWithInvitedUser.ts
   return ROLE_LIST.includes(value as RoleType);
+=======
+  return roleList.includes(value as RoleType);
+>>>>>>> 3bcc41a82db8da55c73ceee8a4259e605505f489:src/middleware/someAuth.ts
 }
 
 export const validateTokenAndUrlWithInvitedUser = async (
