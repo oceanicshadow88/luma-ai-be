@@ -9,7 +9,7 @@ export default class ResetCodeBuilder {
       email: 'test@example.com',
       code: '888888',
       verifyType: VerifyCodeType.VERIFICATION,
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000), // default expird in 15 mins
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000), // default expired in 15 mins
       attempts: 0,
     };
   }

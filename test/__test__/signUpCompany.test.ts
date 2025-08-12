@@ -12,7 +12,7 @@ import request from 'supertest';
 describe('Sign Up Company and Owner', () => {
   const apiPath = '/api/v1/auth/signup/institution';
   const companyName = 'newCompany';
-  const slug = 'newslug';
+  const slug = 'new-slug';
 
   let app: Application;
   let owner: User;

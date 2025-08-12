@@ -19,10 +19,10 @@ export const companyValidationSchema = Joi.object({
     .trim()
     .required()
     .messages({
-      'string.pattern.base': 'Organisation name can only contain letters, numbers, and spaces',
-      'string.empty': 'Organisation name is required',
-      'string.min': 'Organisation name must be at least 2 characters',
-      'string.max': 'Organisation name must be less than 20 characters',
+      'string.pattern.base': 'Organization name can only contain letters, numbers, and spaces',
+      'string.empty': 'Organization name is required',
+      'string.min': 'Organization name must be at least 2 characters',
+      'string.max': 'Organization name must be less than 20 characters',
     }),
 
   slug: Joi.string()
