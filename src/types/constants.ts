@@ -38,4 +38,4 @@ export const ROLE = {
   LEARNER: 'learner',
 } as const;
 export type RoleType = (typeof ROLE)[keyof typeof ROLE];
-export const roleList = Object.values(ROLE); // value:['admin', 'instructor', 'learner']
+export const ROLE_LIST = Object.values(ROLE); // value:['admin', 'instructor', 'learner']

@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, LOCALES, LocaleType, roleList, RoleType } from '@src/types/constants';
+import { DEFAULT_LOCALE, LOCALES, LocaleType, ROLE_LIST, RoleType } from '@src/types/constants';
 import { HttpStatusCode } from 'axios';
 import bcrypt from 'bcryptjs';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
@@ -111,7 +111,7 @@ const userSchema: Schema<User> = new Schema(
     },
     role: {
       type: String,
-      enum: roleList,
+      enum: ROLE_LIST,
       required: true,
     },
     company: {

@@ -1,13 +1,13 @@
 import AppException from '@src/exceptions/appException';
 import { jwtUtils } from '@src/lib/jwtUtils';
 import UserModel from '@src/models/user';
-import { roleList, RoleType } from '@src/types/constants';
+import { ROLE_LIST, RoleType } from '@src/types/constants';
 import logger from '@src/utils/logger';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
 function isValidRole(value: string): value is RoleType {
-  return roleList.includes(value as RoleType);
+  return ROLE_LIST.includes(value as RoleType);
 }
 
 export const validateTokenAndUrlWithInvitedUser = async (
