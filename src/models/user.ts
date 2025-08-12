@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { DEFAULT_LOCALE, LOCALES, LocaleType, ROLE_LIST, RoleType } from '@src/types/constants';
-=======
-import { DEFAULT_LOCALE, LOCALES, LocaleType, roleList, RoleType } from '@src/types/constants';
->>>>>>> 3bcc41a82db8da55c73ceee8a4259e605505f489
 import { HttpStatusCode } from 'axios';
 import bcrypt from 'bcryptjs';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
