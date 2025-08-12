@@ -1,7 +1,7 @@
-import { EXPIRES_TIME_CONFIG, LocaleType, RoleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
 import UserModel, { USER_STATUS } from '@src/models/user';
 import { userService } from '@src/services/userService';
+import { EXPIRES_TIME_CONFIG, LocaleType, RoleType } from '@src/types/constants';
 import { GenerateInvitationRequest, GenerateInvitationResponse } from '@src/types/invitation';
 import { generateInvitationLinkAndStoreToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';

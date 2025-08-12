@@ -1,4 +1,3 @@
-import { CompanyPlanType, LocaleType, ROLE } from '@src/config';
 import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
@@ -6,6 +5,7 @@ import ResetCodeModel from '@src/models/resetCode';
 import UserModel, { User, USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
 import { userService } from '@src/services/userService';
+import { CompanyPlanType, LocaleType, ROLE } from '@src/types/constants';
 import { VerifyCodeType } from '@src/types/invitation';
 import { verifyInvitationToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';

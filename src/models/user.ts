@@ -1,8 +1,8 @@
+import { DEFAULT_LOCALE, LOCALES, LocaleType, roleList, RoleType } from '@src/types/constants';
 import { HttpStatusCode } from 'axios';
 import bcrypt from 'bcryptjs';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
-import { DEFAULT_LOCALE, LOCALES, LocaleType, roleList, RoleType } from '../config';
 import AppException from '../exceptions/appException';
 import { jwtUtils } from '../lib/jwtUtils';
 

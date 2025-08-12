@@ -1,6 +1,6 @@
-import { RoleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
 import UserModel, { USER_STATUS } from '@src/models/user';
+import { RoleType } from '@src/types/constants';
 import { HttpStatusCode } from 'axios';
 export interface LoginResult {
   refreshToken?: string;

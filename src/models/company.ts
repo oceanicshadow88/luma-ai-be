@@ -1,5 +1,3 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
 import {
   COMPANY_PLANS,
   CompanyPlanType,
@@ -9,7 +7,8 @@ import {
   LOCALES,
   LocaleType,
   TIMEZONES,
-} from '../config';
+} from '@src/types/constants';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface Company extends Document {
   companyName: string;
