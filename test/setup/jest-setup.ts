@@ -18,7 +18,7 @@ const createDefaultData = async (): Promise<void> => {
   // Create a default company with owner for tests
   defaultUser = await new UserBuilder()
     .withEmail('owner@lumaai.com')
-    .withUsername('defaultowner')
+    .withUsername('defaultOwner')
     .withFirstName('Default')
     .withLastName('Owner')
     .withPassword('123@Password')

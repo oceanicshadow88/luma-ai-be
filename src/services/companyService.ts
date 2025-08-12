@@ -29,7 +29,7 @@ export const companyService = {
 
     const existCompanySlug = await CompanyModel.findOne({ slug: companyInput.slug });
     if (existCompanySlug) {
-      throw new AppException(HttpStatusCode.Conflict, 'Organisation Slug already exists');
+      throw new AppException(HttpStatusCode.Conflict, 'Organization Slug already exists');
     }
     const existOwner = await UserModel.exists({ _id: companyInput.owner });
     if (!existOwner) {

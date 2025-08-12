@@ -15,7 +15,7 @@ class UserBuilder {
     this.user = {
       firstName: 'John',
       lastName: 'Doe',
-      username: 'johndoe',
+      username: 'John',
       password: '!passwordD123',
       email: 'john@example.com',
       avatarUrl: '',
