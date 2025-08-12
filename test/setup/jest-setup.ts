@@ -3,6 +3,7 @@
 import { afterAll, beforeAll, beforeEach } from '@jest/globals';
 import { ROLE } from '@src/config';
 import { HttpStatusCode } from 'axios';
+import { Types } from 'mongoose';
 
 import AppException from '../../src/exceptions/appException';
 import CompanyBuilder, { type CompanyDocument } from '../__test__/builders/companyBuilder';
@@ -30,6 +31,9 @@ const createDefaultData = async (): Promise<void> => {
     .withSlug('default-company')
     .withOwner(defaultUser._id)
     .save();
+
+  defaultUser.company = new Types.ObjectId(defaultCompany._id);
+  await defaultUser.save();
 };
 
 beforeAll(async () => {
