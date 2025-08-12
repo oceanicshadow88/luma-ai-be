@@ -1,4 +1,4 @@
-import { RoleType } from '../config';
+import { RoleType } from '@src/types/constants';
 
 // Verification/Reset value types enum for reuse across the application
 export enum VerifyCodeType {

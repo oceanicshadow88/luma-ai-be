@@ -1,9 +1,14 @@
 import AppException from '@src/exceptions/appException';
 import { jwtUtils } from '@src/lib/jwtUtils';
 import UserModel from '@src/models/user';
+import { roleList, RoleType } from '@src/types/constants';
 import logger from '@src/utils/logger';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
+
+function isValidRole(value: string): value is RoleType {
+  return roleList.includes(value as RoleType);
+}
 
 export const validateTokenAndUrlWithInvitedUser = async (
   req: Request,
@@ -44,9 +49,8 @@ export const validateTokenAndUrlWithInvitedUser = async (
 
   const url = req.originalUrl;
   const roleFromUrl = url.split('/').filter(Boolean).pop() ?? '';
-  const roleList = ['admin', 'instructor', 'learner'];
 
-  if (!roleFromUrl || !roleList.includes(roleFromUrl)) {
+  if (!roleFromUrl || !isValidRole(roleFromUrl)) {
     logger.info(`Invalid role in URL: ${roleFromUrl}`);
     next();
     return;

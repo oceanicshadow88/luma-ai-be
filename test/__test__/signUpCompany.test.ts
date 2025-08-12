@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { ROLE } from '@src/config';
 import CompanyModel, { Company } from '@src/models/company';
 import UserModel, { User, USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
+import { ROLE } from '@src/types/constants';
 import UserBuilder from '@test/__test__/builders/userBuilder';
 import { getApplication } from '@test/setup/app';
 import { getDefaultCompany, getDefaultUser } from '@test/setup/jest-setup';

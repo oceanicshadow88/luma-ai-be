@@ -1,4 +1,5 @@
-import { ROLE } from '../config';
+import { ROLE } from '@src/types/constants';
+
 import CompanyUsageModel from '../models/companyUsage';
 import UserModel from '../models/user';
 

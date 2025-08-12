@@ -1,8 +1,8 @@
 // Authentication and authorization
-import { LocaleType, RoleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
 import { registerService } from '@src/services/auth/registerService';
+import { LocaleType, RoleType } from '@src/types/constants';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 import { ObjectId } from 'mongoose';

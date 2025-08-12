@@ -1,6 +1,6 @@
-import { LocaleType } from '@src/config';
 import AppException from '@src/exceptions/appException';
 import UserModel, { User } from '@src/models/user';
+import { LocaleType } from '@src/types/constants';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 
