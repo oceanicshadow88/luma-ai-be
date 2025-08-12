@@ -1,5 +1,5 @@
 import { handleLogin } from '@src/controllers/auth/loginController';
-import { validateTokenAndUrlWithInvitedUser } from '@src/middleware/someAuth';
+import { validateTokenAndUrlWithInvitedUser } from '@src/middleware/validateTokenAndUrlWithInvitedUser';
 import { Router } from 'express';
 
 import { isActiveUser, verifyAuthToken, verifyDomain } from '../../controllers/auth/authController';
