@@ -64,25 +64,19 @@ class CompanyBuilder {
   }
 
   withTimezone(timezone: string): CompanyBuilder {
-    if (!this.company.settings) {
-      this.company.settings = {};
-    }
+    this.company.settings ??= {};
     this.company.settings.timezone = timezone;
     return this;
   }
 
   withLocale(locale: LocaleType): CompanyBuilder {
-    if (!this.company.settings) {
-      this.company.settings = {};
-    }
+    this.company.settings ??= {};
     this.company.settings.locale = locale;
     return this;
   }
 
   withPrimaryColor(primaryColor: string): CompanyBuilder {
-    if (!this.company.settings) {
-      this.company.settings = {};
-    }
+    this.company.settings ??= {};
     this.company.settings.primaryColor = primaryColor;
     return this;
   }
