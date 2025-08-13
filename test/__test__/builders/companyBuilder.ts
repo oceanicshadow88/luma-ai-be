@@ -1,13 +1,6 @@
 import type { Document } from 'mongoose';
 import { Types } from 'mongoose';
 
-import {
-  type CompanyPlanType,
-  DEFAULT_COMPANY_PLAN,
-  DEFAULT_LOCALE,
-  DEFAULT_TIMEZONE,
-  type LocaleType,
-} from '../../../src/config';
 import CompanyModel, { type Company } from '../../../src/models/company';
 
 export interface CompanyDocument extends Document, Company {

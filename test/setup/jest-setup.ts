@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { afterAll, beforeAll, beforeEach } from '@jest/globals';
-import { ROLE } from '@src/config';
+import { ROLE } from '@src/config/constants';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 

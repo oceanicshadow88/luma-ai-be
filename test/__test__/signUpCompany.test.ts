@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { ROLE } from '@src/config';
+import { ROLE } from '@src/config/constants';
 import CompanyModel, { Company } from '@src/models/company';
 import UserModel, { User, USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
