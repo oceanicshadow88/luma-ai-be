@@ -29,9 +29,9 @@ export const TIMEZONES: string[] = moment.tz.names();
 export const DEFAULT_TIMEZONE = TIMEZONES[0];
 
 // Membership Role
-export const ROLE = {
+export const ROLES = {
   ADMIN: 'admin',
   INSTRUCTOR: 'instructor',
   LEARNER: 'learner',
 } as const;
-export const ROLE_LIST = Object.values(ROLE);
+export const ROLE_LIST = Object.values(ROLES);

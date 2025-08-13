@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { ROLE } from '@src/config/constants';
+import { ROLES } from '@src/config/constants';
 import CompanyModel, { Company } from '@src/models/company';
 import UserModel, { User, USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
@@ -25,7 +25,7 @@ describe('Sign Up Company and Owner', () => {
       .withFirstName('new')
       .withLastName('Owner')
       .withPassword('123@Password')
-      .withRole(ROLE.ADMIN)
+      .withRole(ROLES.ADMIN)
       .withStatus(USER_STATUS.ACTIVE)
       .save();
   });
@@ -160,7 +160,7 @@ describe('Sign Up Company and Owner', () => {
             email: undefined as unknown as string,
             username: 'test-user',
             status: USER_STATUS.ACTIVE,
-            role: ROLE.ADMIN,
+            role: ROLES.ADMIN,
           };
           next();
         },
