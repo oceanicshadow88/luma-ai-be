@@ -7,27 +7,24 @@ export const EXPIRES_TIME_CONFIG = {
   EXPIRES_IN_DISPLAY: '24 hours', // Display text for API responses
 } as const;
 
-// Mongoose DB type and default value
-// companyPlan
+// Company Plan
 export const COMPANY_PLANS = {
   FREE: 'free',
   PRO: 'pro',
   ENTERPRISE: 'enterprise',
 } as const;
-export type CompanyPlanType = (typeof COMPANY_PLANS)[keyof typeof COMPANY_PLANS];
 export const COMPANY_PLAN_LIST = Object.values(COMPANY_PLANS);
 export const DEFAULT_COMPANY_PLAN = COMPANY_PLANS.FREE;
 
-// locales
+// Locales
 export const LOCALES = {
   EN_US: 'en-US',
   ZH_CN: 'zh-CN',
 } as const;
-export type LocaleType = (typeof LOCALES)[keyof typeof LOCALES];
 export const LOCALE_LIST = Object.values(LOCALES);
 export const DEFAULT_LOCALE = LOCALES.EN_US;
 
-// all timezone
+// Timezones
 export const TIMEZONES: string[] = moment.tz.names();
 export const DEFAULT_TIMEZONE = TIMEZONES[0];
 
@@ -37,5 +34,4 @@ export const ROLES = {
   INSTRUCTOR: 'instructor',
   LEARNER: 'learner',
 } as const;
-export type RoleType = (typeof ROLES)[keyof typeof ROLES];
-export const ROLE_LIST = Object.values(ROLES); // value:['admin', 'instructor', 'learner']
+export const ROLE_LIST = Object.values(ROLES);

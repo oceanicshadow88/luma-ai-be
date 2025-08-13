@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, LocaleType, ROLE, RoleType } from '@src/types/constants';
+import { DEFAULT_LOCALE, LocaleType, ROLES, RoleType } from '@src/types/constants';
 import type { Document } from 'mongoose';
 import mongoose from 'mongoose';
 
@@ -24,7 +24,7 @@ class UserBuilder {
       refreshToken: undefined,
       loginAttempts: 0,
       lockUntil: undefined,
-      role: ROLE.ADMIN,
+      role: ROLES.ADMIN,
     };
   }
 

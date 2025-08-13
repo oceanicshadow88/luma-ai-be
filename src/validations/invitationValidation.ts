@@ -1,4 +1,4 @@
-import { ROLE } from '@src/types/constants';
+import { ROLES } from '@src/types/constants';
 import Joi from 'joi';
 
 export const invitationSchema = Joi.object({
@@ -11,7 +11,7 @@ export const invitationSchema = Joi.object({
       'string.pattern.base': 'It is not a valid email address',
       'string.empty': 'Email is required',
     }),
-  role: Joi.string().required().valid(ROLE.INSTRUCTOR, ROLE.LEARNER, ROLE.ADMIN).messages({
+  role: Joi.string().required().valid(ROLES.INSTRUCTOR, ROLES.LEARNER, ROLES.ADMIN).messages({
     'string.empty': 'Role is required',
     'any.only': 'Role must be either instructor, learner, or admin',
   }),
