@@ -1,3 +1,5 @@
+import { DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE } from '@src/config/constants';
+import { CompanyPlanType, LocaleType } from '@src/types/constantsTypes';
 import type { Document } from 'mongoose';
 import { Types } from 'mongoose';
 

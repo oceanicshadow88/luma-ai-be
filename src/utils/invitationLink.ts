@@ -1,9 +1,11 @@
+import { EXPIRES_TIME_CONFIG } from '@src/config/constants';
 import { jwtUtils } from '@src/lib/jwtUtils';
 import { USER_STATUS } from '@src/models/user';
+import { RoleType } from '@src/types/constantsTypes';
 import { HttpStatusCode } from 'axios';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
-import { config, EXPIRES_TIME_CONFIG, RoleType } from '../config';
+import { config } from '../config';
 import AppException from '../exceptions/appException';
 import ResetCodeModel from '../models/resetCode';
 import { VerifyCodeType } from '../types/invitation';

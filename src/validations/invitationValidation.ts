@@ -1,6 +1,5 @@
+import { ROLE } from '@src/config/constants';
 import Joi from 'joi';
-
-import { ROLE } from '../config';
 
 export const invitationSchema = Joi.object({
   email: Joi.string()
