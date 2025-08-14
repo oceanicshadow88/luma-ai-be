@@ -1,7 +1,9 @@
 /// <reference types="jest" />
 
 import { afterAll, beforeAll, beforeEach } from '@jest/globals';
+import { ROLES } from '@src/config/constants';
 import { HttpStatusCode } from 'axios';
+import { Types } from 'mongoose';
 
 import AppException from '../../src/exceptions/appException';
 import CompanyBuilder, { type CompanyDocument } from '../__test__/builders/companyBuilder';
@@ -16,10 +18,11 @@ const createDefaultData = async (): Promise<void> => {
   // Create a default company with owner for tests
   defaultUser = await new UserBuilder()
     .withEmail('owner@lumaai.com')
-    .withUsername('defaultowner')
+    .withUsername('defaultOwner')
     .withFirstName('Default')
     .withLastName('Owner')
     .withPassword('123@Password')
+    .withRole(ROLES.ADMIN)
     .save();
 
   defaultCompany = await new CompanyBuilder()
@@ -28,6 +31,9 @@ const createDefaultData = async (): Promise<void> => {
     .withSlug('default-company')
     .withOwner(defaultUser._id)
     .save();
+
+  defaultUser.company = new Types.ObjectId(defaultCompany._id);
+  await defaultUser.save();
 };
 
 beforeAll(async () => {

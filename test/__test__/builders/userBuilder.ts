@@ -1,6 +1,8 @@
+import { DEFAULT_LOCALE, ROLES } from '@src/config/constants';
+import { LocaleType, RoleType } from '@src/types/constantsTypes';
 import type { Document } from 'mongoose';
+import mongoose from 'mongoose';
 
-import { DEFAULT_LOCALE, type LocaleType } from '../../../src/config';
 import UserModel, { type User, USER_STATUS } from '../../../src/models/user';
 
 export interface UserDocument extends Document, User {
@@ -14,7 +16,7 @@ class UserBuilder {
     this.user = {
       firstName: 'John',
       lastName: 'Doe',
-      username: 'johndoe',
+      username: 'John',
       password: '!passwordD123',
       email: 'john@example.com',
       avatarUrl: '',
@@ -23,6 +25,7 @@ class UserBuilder {
       refreshToken: undefined,
       loginAttempts: 0,
       lockUntil: undefined,
+      role: ROLES.ADMIN,
     };
   }
 
@@ -78,6 +81,16 @@ class UserBuilder {
 
   withLockUntil(lockUntil?: Date): UserBuilder {
     this.user.lockUntil = lockUntil;
+    return this;
+  }
+
+  withRole(role: RoleType): UserBuilder {
+    this.user.role = role;
+    return this;
+  }
+
+  withCompany(companyId: string): UserBuilder {
+    this.user.company = new mongoose.Types.ObjectId(companyId);
     return this;
   }
 

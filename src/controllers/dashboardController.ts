@@ -1,7 +1,6 @@
 import AppException from '@src/exceptions/appException';
 import { adminDashboardDataMock } from '@src/mockData/adminDashboardDataMock';
 import { companyUsageService } from '@src/services/companyUsageService';
-import { userService } from '@src/services/userService';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 
@@ -16,11 +15,11 @@ export const dashboardController = {
 
     const companyUsage = await companyUsageService.upsertCompanyUsage(req.companyId);
 
-    const currentUserInfo = await userService.getCurrentUserInfo(req.user.id, req.companyId);
+    // const currentUserInfo = await userService.getCurrentUserInfo(req.user.id, req.companyId);
 
     //TODO: mock data for dashboard display(replace later)
     const dashboardData = {
-      currentUserInfo,
+      // currentUserInfo,
       totalLearners: companyUsage.currentLearners,
       totalInstructors: companyUsage.currentInstructors,
       adminDashboardDataMock,

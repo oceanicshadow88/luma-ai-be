@@ -1,13 +1,8 @@
+import { DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE } from '@src/config/constants';
+import { CompanyPlanType, LocaleType } from '@src/types/constantsTypes';
 import type { Document } from 'mongoose';
 import { Types } from 'mongoose';
 
-import {
-  type CompanyPlanType,
-  DEFAULT_COMPANY_PLAN,
-  DEFAULT_LOCALE,
-  DEFAULT_TIMEZONE,
-  type LocaleType,
-} from '../../../src/config';
 import CompanyModel, { type Company } from '../../../src/models/company';
 
 export interface CompanyDocument extends Document, Company {
@@ -64,25 +59,19 @@ class CompanyBuilder {
   }
 
   withTimezone(timezone: string): CompanyBuilder {
-    if (!this.company.settings) {
-      this.company.settings = {};
-    }
+    this.company.settings ??= {};
     this.company.settings.timezone = timezone;
     return this;
   }
 
   withLocale(locale: LocaleType): CompanyBuilder {
-    if (!this.company.settings) {
-      this.company.settings = {};
-    }
+    this.company.settings ??= {};
     this.company.settings.locale = locale;
     return this;
   }
 
   withPrimaryColor(primaryColor: string): CompanyBuilder {
-    if (!this.company.settings) {
-      this.company.settings = {};
-    }
+    this.company.settings ??= {};
     this.company.settings.primaryColor = primaryColor;
     return this;
   }

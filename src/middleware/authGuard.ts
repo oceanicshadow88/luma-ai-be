@@ -1,4 +1,4 @@
-import { RoleType } from '@src/config';
+import { RoleType } from '@src/types/constantsTypes';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 import { Types } from 'mongoose';

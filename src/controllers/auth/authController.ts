@@ -21,11 +21,11 @@ export const verifyDomain = async (req: Request, res: Response) => {
   const origin = req.headers.origin ?? `${req.protocol}://${req.hostname}`;
   const hostname = new URL(origin).hostname.toLowerCase();
 
-  const comapnySlug = await authService.verifyDomainGetSlug(hostname);
-  const existCompany = await companyService.getCompanyBySlug(comapnySlug);
+  const companySlug = await authService.verifyDomainGetSlug(hostname);
+  const existCompany = await companyService.getCompanyBySlug(companySlug);
   if (!existCompany) {
     throw new AppException(HttpStatusCode.NotFound, 'Page not found', {
-      payload: `Company not found for slug: ${comapnySlug} of domain`,
+      payload: `Company not found for slug: ${companySlug} of domain`,
     });
   }
 

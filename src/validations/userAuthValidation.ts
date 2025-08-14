@@ -1,6 +1,5 @@
+import { DEFAULT_LOCALE, LOCALE_LIST } from '@src/config/constants';
 import Joi from 'joi';
-
-import { DEFAULT_LOCALE, LOCALE_LIST } from '../config';
 
 const emailSchema = Joi.string()
   .required()

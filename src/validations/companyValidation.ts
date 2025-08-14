@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import {
   COMPANY_PLAN_LIST,
   DEFAULT_COMPANY_PLAN,
@@ -7,7 +5,8 @@ import {
   DEFAULT_TIMEZONE,
   LOCALE_LIST,
   TIMEZONES,
-} from '../config';
+} from '@src/config/constants';
+import Joi from 'joi';
 
 // hex color
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
@@ -20,10 +19,10 @@ export const companyValidationSchema = Joi.object({
     .trim()
     .required()
     .messages({
-      'string.pattern.base': 'Organisation name can only contain letters, numbers, and spaces',
-      'string.empty': 'Organisation name is required',
-      'string.min': 'Organisation name must be at least 2 characters',
-      'string.max': 'Organisation name must be less than 20 characters',
+      'string.pattern.base': 'Organization name can only contain letters, numbers, and spaces',
+      'string.empty': 'Organization name is required',
+      'string.min': 'Organization name must be at least 2 characters',
+      'string.max': 'Organization name must be less than 20 characters',
     }),
 
   slug: Joi.string()

@@ -1,13 +1,12 @@
 // Authentication and authorization
-import { LocaleType, RoleType } from '@src/config';
+
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
-import UserModel, { User } from '@src/models/user';
 import { registerService } from '@src/services/auth/registerService';
-import { companyService } from '@src/services/companyService';
+import { LocaleType, RoleType } from '@src/types/constantsTypes';
 import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
-import { ObjectId, Types } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
 export interface RegisterUserInput {
   firstName: string;
@@ -69,40 +68,26 @@ export const handleOwnerRegistrationProcess = async (req: Request, res: Response
 
   // company create do not need to check verify code, because it is created by user registration and verify code is verified in user register
 
-  // check company slug
-  const companyExistBySlug = await CompanyModel.findOne({ slug });
-  if (companyExistBySlug) {
-    throw new AppException(HttpStatusCode.Conflict, 'Slug already in use. Try a different one.', {
-      field: 'slug',
-    });
+  if (!req.user?.email) {
+    throw new AppException(
+      HttpStatusCode.InternalServerError,
+      'Missing admin user for institution registration.',
+    );
   }
 
-  // create user
-  let user: User | null = await UserModel.findOne({ email: req.user?.email });
-  if (!user) {
-    throw new AppException(HttpStatusCode.Unauthorized, 'User not found');
-  }
-  // create company
-  const newCompany = await companyService.createCompany({
+  const { refreshToken, accessToken } = await registerService.registerCompanyWithOwner({
     companyName,
-    slug,
     plan,
-    owner: user._id as Types.ObjectId,
-    logoUrl,
+    slug,
     settings,
+    logoUrl,
+    email: req.user?.email,
   });
-  if (!newCompany._id) {
-    throw new AppException(HttpStatusCode.InternalServerError, 'Company creation failed');
-  }
-  user.company = newCompany._id as Types.ObjectId;
-  await user.save();
 
-  return res.status(201).json({
-    message: 'User, Company and Membership created successfully',
-    data: {
-      user: user._id,
-      company: newCompany._id,
-    },
+  res.status(201).json({
+    message: 'Successfully signed up!',
+    refreshToken,
+    accessToken,
   });
 };
 

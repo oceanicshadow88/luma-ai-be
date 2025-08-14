@@ -1,4 +1,5 @@
-import { DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE } from '../../config';
+import { DEFAULT_COMPANY_PLAN, DEFAULT_LOCALE, DEFAULT_TIMEZONE } from '@src/config/constants';
+
 import Company from '../../models/company';
 import { User } from '../../models/user';
 
