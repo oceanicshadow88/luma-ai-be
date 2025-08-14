@@ -1,7 +1,8 @@
+import { DEFAULT_LOCALE, ROLES } from '@src/config/constants';
+import { LocaleType, RoleType } from '@src/types/constantsTypes';
 import type { Document } from 'mongoose';
 import mongoose from 'mongoose';
 
-import { DEFAULT_LOCALE, type LocaleType, ROLE, RoleType } from '../../../src/config';
 import UserModel, { type User, USER_STATUS } from '../../../src/models/user';
 
 export interface UserDocument extends Document, User {
@@ -24,7 +25,7 @@ class UserBuilder {
       refreshToken: undefined,
       loginAttempts: 0,
       lockUntil: undefined,
-      role: ROLE.ADMIN,
+      role: ROLES.ADMIN,
     };
   }
 

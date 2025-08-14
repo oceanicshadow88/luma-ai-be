@@ -1,15 +1,13 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
 import {
   COMPANY_PLANS,
-  CompanyPlanType,
   DEFAULT_COMPANY_PLAN,
   DEFAULT_LOCALE,
   DEFAULT_TIMEZONE,
   LOCALES,
-  LocaleType,
   TIMEZONES,
-} from '../config';
+} from '@src/config/constants';
+import { CompanyPlanType, LocaleType } from '@src/types/constantsTypes';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface Company extends Document {
   companyName: string;

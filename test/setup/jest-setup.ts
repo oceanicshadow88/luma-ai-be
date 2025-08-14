@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { afterAll, beforeAll, beforeEach } from '@jest/globals';
-import { ROLE } from '@src/config';
+import { ROLES } from '@src/config/constants';
 import { HttpStatusCode } from 'axios';
 import { Types } from 'mongoose';
 
@@ -22,7 +22,7 @@ const createDefaultData = async (): Promise<void> => {
     .withFirstName('Default')
     .withLastName('Owner')
     .withPassword('123@Password')
-    .withRole(ROLE.ADMIN)
+    .withRole(ROLES.ADMIN)
     .save();
 
   defaultCompany = await new CompanyBuilder()

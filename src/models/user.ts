@@ -1,8 +1,9 @@
+import { DEFAULT_LOCALE, LOCALES, ROLE_LIST } from '@src/config/constants';
+import { LocaleType, RoleType } from '@src/types/constantsTypes';
 import { HttpStatusCode } from 'axios';
 import bcrypt from 'bcryptjs';
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
-import { DEFAULT_LOCALE, LOCALES, LocaleType, roleList, RoleType } from '../config';
 import AppException from '../exceptions/appException';
 import { jwtUtils } from '../lib/jwtUtils';
 
@@ -111,7 +112,7 @@ const userSchema: Schema<User> = new Schema(
     },
     role: {
       type: String,
-      enum: roleList,
+      enum: ROLE_LIST,
       required: true,
     },
     company: {

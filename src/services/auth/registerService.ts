@@ -1,4 +1,4 @@
-import { CompanyPlanType, LocaleType, ROLE } from '@src/config';
+import { ROLES } from '@src/config/constants';
 import { RegisterUserInput } from '@src/controllers/auth/registerController';
 import AppException from '@src/exceptions/appException';
 import CompanyModel from '@src/models/company';
@@ -6,6 +6,7 @@ import ResetCodeModel from '@src/models/resetCode';
 import UserModel, { User, USER_STATUS } from '@src/models/user';
 import { companyService } from '@src/services/companyService';
 import { userService } from '@src/services/userService';
+import { CompanyPlanType, LocaleType } from '@src/types/constantsTypes';
 import { VerifyCodeType } from '@src/types/invitation';
 import { verifyInvitationToken } from '@src/utils/invitationLink';
 import { HttpStatusCode } from 'axios';
@@ -83,7 +84,7 @@ export const registerService = {
   adminRegister: async (userInput: RegisterUserInput) => {
     const user = await UserModel.findOne({
       email: userInput.email,
-      role: ROLE.ADMIN,
+      role: ROLES.ADMIN,
     });
 
     if (!user) {
@@ -92,7 +93,7 @@ export const registerService = {
       const result = await createUserAndTokens(
         {
           ...userInput,
-          ...{ role: ROLE.ADMIN, status: USER_STATUS.ACTIVE },
+          ...{ role: ROLES.ADMIN, status: USER_STATUS.ACTIVE },
         },
         '',
       );
@@ -109,7 +110,7 @@ export const registerService = {
     const updatedUser = {
       ...user,
       ...userInput,
-      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLE.ADMIN },
+      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLES.ADMIN },
     };
     await userService.updateUserById(user.id, updatedUser);
     return { refreshToken, accessToken };
@@ -164,7 +165,7 @@ export const registerService = {
 
       const newUser = await userService.createUser({
         ...userInput,
-        ...{ role: ROLE.LEARNER, status: USER_STATUS.ACTIVE },
+        ...{ role: ROLES.LEARNER, status: USER_STATUS.ACTIVE },
         company: companyId,
       });
       const { refreshToken, accessToken } = await newUser.generateTokens();
@@ -183,7 +184,7 @@ export const registerService = {
     const updatedUser = {
       ...user,
       ...userInput,
-      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLE.LEARNER },
+      ...{ status: USER_STATUS.ACTIVE, refreshToken, role: ROLES.LEARNER },
     };
     await userService.updateUserById(user.id, updatedUser);
     return { refreshToken, accessToken };

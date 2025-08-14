@@ -1,7 +1,7 @@
+import { CompanyPlanType, LocaleType } from '@src/types/constantsTypes';
 import { HttpStatusCode } from 'axios';
 import mongoose from 'mongoose';
 
-import { CompanyPlanType, LocaleType } from '../config';
 import AppException from '../exceptions/appException';
 import CompanyModel, { Company } from '../models/company';
 import UserModel from '../models/user';
