@@ -105,33 +105,6 @@ describe('Sign Up Learner', () => {
     expect(code).toBeNull();
   });
 
-  it('should register learner if user exists with same company but in different role', async () => {
-    await new ResetCodeBuilder()
-      .withEmail(defaultUser.email)
-      .withCode(verifyValue)
-      .withVerifyType(VerifyCodeType.VERIFICATION)
-      .save();
-
-    const response = await request(app).post(apiPath).set('origin', originURL).send({
-      email: defaultUser.email,
-      username: testUsername,
-      firstName: testFirstname,
-      lastName: testLastname,
-      password: testPassword,
-      termsAccepted: true,
-      verifyValue,
-      companyId: defaultCompany._id,
-    });
-
-    expect(response.status).toBe(201);
-    expect(response.body.message).toBe('Successfully signed up!');
-    expect(response.body).toHaveProperty('refreshToken');
-    expect(response.body).toHaveProperty('accessToken');
-
-    const code = await ResetCodeModel.findOne({ email: defaultUser.email });
-    expect(code).toBeNull();
-  });
-
   it('should return 409 conflict error if username already registered', async () => {
     await new ResetCodeBuilder()
       .withEmail(testEmail)

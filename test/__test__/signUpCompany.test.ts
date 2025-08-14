@@ -114,7 +114,7 @@ describe('Sign Up Company and Owner', () => {
     expect(response.body.message).toBe('Company already exists');
   });
 
-  it('should return 500 if owner already has company', async () => {
+  it('should return 403 if owner already has company', async () => {
     const defaultUser = getDefaultUser();
     const { accessToken } = await defaultUser.generateTokens();
 
@@ -126,8 +126,8 @@ describe('Sign Up Company and Owner', () => {
         slug,
       });
 
-    expect(response.status).toBe(500);
-    expect(response.body.message).toBe('Internal Server Error');
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Unauthorized Access');
   });
 
   it('should return 500 if company creation failed (no _id returned)', async () => {
